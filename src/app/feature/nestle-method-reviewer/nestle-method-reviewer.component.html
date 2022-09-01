@@ -1,0 +1,9 @@
+<app-ui-method-doc-view [methodDoc]="methodDoc" *ngIf="ready"></app-ui-method-doc-view>
+
+<div class="actions" *ngIf="ready">
+  <button mat-raised-button color="primary" (click)="onApprove()"><mat-icon>check</mat-icon>Onayla</button>
+  <button mat-raised-button color="accent" (click)="onReject()">
+    <mat-icon>change_circle</mat-icon>
+    Revize İste
+  </button>
+</div>

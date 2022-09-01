@@ -1,0 +1,65 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 24px);
+  padding: 12px;
+  padding-bottom: 90px;
+  position: relative;
+}
+
+::ng-deep {
+  mat-expansion-panel-header {
+    min-height: 36px;
+    height: auto;
+    padding: 12px 24px;
+    &.mat-expanded {
+      height: auto;
+    }
+    &.valid {
+      background-color: rgba(0, 128, 0, 0.15) !important;
+      mat-panel-description {
+        > mat-icon {
+          color: rgb(0, 128, 0);
+        }
+      }
+    }
+
+    mat-panel-description {
+      justify-content: flex-end;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-width: 180px;
+    }
+  }
+  div.mat-expansion-panel-body {
+    padding-top: 16px;
+  }
+}
+
+div.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 24px;
+
+  > .mat-expansion-panel {
+    width: 100%;
+  }
+}
+
+div.actions {
+  position: fixed;
+  bottom: 4px;
+  right: 32px;
+  text-align: right;
+  > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin: 8px 0;
+    gap: 12px;
+  }
+}

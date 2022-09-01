@@ -1,0 +1,51 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>İş Adımı</mat-label>
+      <textarea matInput required formControlName="Name" class="h-72"></textarea>
+      <mat-hint>İş adımı ile ilgili bilgi veriniz. (Max: 500 karakter)</mat-hint>
+      <mat-error *ngIf="form.controls.Name.hasError('required') || form.controls.Name.hasError('maxlength')"
+        >İş adımı ile ilgili bilgi veriniz. (Max: 500 karakter)</mat-error
+      >
+    </mat-form-field>
+    <h4 class="px-4 my-8">Gerekli İş İzinleri</h4>
+    <mat-divider class="pb-8"></mat-divider>
+    <mat-slide-toggle formControlName="NoWorkPermits"
+      >Bu iş adımı için herhangi bir iş izni gerekmemektedir.</mat-slide-toggle
+    >
+    <div class="select-list" *ngIf="!form.controls.NoWorkPermits.value">
+      <div class="select-list-item" *ngFor="let listItem of workPermitSelectList">
+        <mat-checkbox
+          class="checkbox-margin"
+          [checked]="listItem.selected"
+          [value]="listItem.item.Code"
+          (change)="onWorkPermitChange($event)"
+          >{{ listItem.item.Value }}</mat-checkbox
+        >
+      </div>
+    </div>
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+    <h4 class="px-4 mb-8">Özel Yetkinlik Gerekliliği</h4>
+    <mat-divider class="pb-8"></mat-divider>
+    <mat-slide-toggle formControlName="NoRequiredSkills"
+      >Bu iş adımı için herhangi bir özel yetkinlik gerekliliği yoktur.</mat-slide-toggle
+    >
+    <div class="select-list" *ngIf="!form.controls.NoRequiredSkills.value">
+      <div class="select-list-item" *ngFor="let listItem of skillsSelectList">
+        <mat-checkbox
+          class="checkbox-margin"
+          [checked]="listItem.selected"
+          [value]="listItem.item.Code"
+          (change)="onRequiredSkillChange($event)"
+          >{{ listItem.item.Value }}</mat-checkbox
+        >
+      </div>
+    </div>
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="!isValid" tabindex="-1">Kaydet</button>
+</div>

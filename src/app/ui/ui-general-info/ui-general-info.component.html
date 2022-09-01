@@ -1,0 +1,20 @@
+<div class="container" *ngIf="data">
+  <div class="row">
+    <div class="cell">
+      <span class="header">İşi Veren Firma</span>
+      <span class="value">{{ data.RefData.Project.CompanyName }}<br />{{ data.RefData.Project.FacilityName }}</span>
+    </div>
+    <div class="cell">
+      <span class="header">İşi Veren Firma Yetkilisi</span>
+      <span class="value">{{ data.RefData.Project.ProjectOwner }}</span>
+    </div>
+    <div class="cell">
+      <span class="header">İş Tanımı</span>
+      <span class="value">{{ data.RefData.Project.ProjectName }}<br />{{ data.RefData.Project.ProjectDesc }}</span>
+    </div>
+    <div class="cell">
+      <span class="header">İşe Başlama Tarihi</span>
+      <span class="value">{{ dtStart | date: 'dd.MM.yyyy' }}</span>
+    </div>
+  </div>
+</div>

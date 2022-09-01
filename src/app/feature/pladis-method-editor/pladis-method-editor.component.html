@@ -1,0 +1,129 @@
+<div class="container" *ngIf="ready">
+  <mat-card class="my-16" *ngIf="versionNotes">
+    <mat-card-title class="primary-color">İstenilen Düzenleme</mat-card-title>
+    <mat-card-content class="mt-16">
+      <p>{{ versionNotes }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header class="valid">
+      <mat-panel-title> 1. Genel Bilgiler </mat-panel-title>
+      <mat-panel-description> {{ methodDoc?.VersionCode }} </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-general-info [data]="methodDoc"></app-ui-general-info>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.workInfo) }">
+      <mat-panel-title> 2. Taşeron ve Çalışmanın Bilgileri </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.workInfo)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.workInfo)">warning</mat-icon>
+        <span>Tüm alanları doldurunuz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-work-info [(data)]="methodDoc"></app-ui-work-info>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.workTypes) }">
+      <mat-panel-title> 3. Yapılacak İş Türü </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.workTypes)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.workTypes)">warning</mat-icon>
+        <span>En az 1 adet seçiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-checkbox-list [(list)]="workTypes"></app-ui-checkbox-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.risks) }">
+      <mat-panel-title>
+        4. Tehlike; Kazaya veya Gıda güvenliğine sebep olabilecek potansiyel ortam ve şartlar
+      </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.risks)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.risks)">warning</mat-icon>
+        <span>En az 1 adet seçiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-checkbox-list [(list)]="risks"></app-ui-checkbox-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.equipments) }">
+      <mat-panel-title> 5. Kullanılacak Ekipmanlar </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.equipments)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.equipments)">warning</mat-icon>
+        <span>En az 1 adet seçiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-checkbox-list [(list)]="equipments"></app-ui-checkbox-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.ppe) }">
+      <mat-panel-title> 6. Yapılacak İşe Göre Kullanılması Gereken Kişisel Koruyucu Donanımlar </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.ppe)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.ppe)">warning</mat-icon>
+        <span>En az 1 adet seçiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-checkbox-list [(list)]="ppe"></app-ui-checkbox-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.tasks) }">
+      <mat-panel-title> 7. Yapım Metodu ve Risk Analizi </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.tasks)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.tasks)">warning</mat-icon>
+        <span>En az 1 adet iş adımı ekleyiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-tasks-list
+      [companyCode]="companyCode"
+      [(tasks)]="tasks"
+      (addTask)="onAddTaskClick()"
+      (editTask)="onEditTaskClick($event)"
+      (deleteTask)="onDeleteTaskClick($event)"
+      (addTaskRisk)="onAddTaskRisk($event)"
+      (editTaskRisk)="onEditTaskRisk($event)"
+      (deleteTaskRisk)="onDeleteTaskRisk($event)"
+      (addTaskPrecaution)="onAddTaskPrecaution($event)"
+      (editTaskPrecaution)="onEditTaskPrecaution($event)"
+      (deleteTaskPrecaution)="onDeleteTaskPrecaution($event)"
+    ></app-ui-tasks-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.contractors) }">
+      <mat-panel-title> 8. Alt Yükleniciler </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.contractors)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.contractors)">warning</mat-icon>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-contractors-list
+      [(data)]="methodDoc"
+      [(contractors)]="subContractors"
+      (addContractor)="onAddContractor()"
+      (editContractor)="onEditContractor($event)"
+      (deleteContractor)="onDeleteContractor($event)"
+    ></app-ui-contractors-list>
+  </mat-expansion-panel>
+</div>
+
+<div class="actions" *ngIf="ready">
+  <div>
+    <button mat-raised-button color="accent" (click)="onSave()">Taslak Olarak Kaydet</button>
+    <button mat-raised-button color="primary" (click)="onSaveAndPublish()" [disabled]="!isReadyToPublish">
+      <mat-icon>check</mat-icon>
+      Onaya Gönder
+    </button>
+  </div>
+</div>

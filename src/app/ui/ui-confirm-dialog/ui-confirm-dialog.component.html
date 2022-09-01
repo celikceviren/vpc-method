@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content>
+  <p>{{ body }}</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1">{{ closeBtn }}</button>
+  <button mat-flat-button color="primary" tabindex="-1" *ngIf="hasConfirm" (click)="onConfirm()">
+    {{ confirmBtn }}
+  </button>
+</div>

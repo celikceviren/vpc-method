@@ -1,0 +1,166 @@
+<div class="container">
+  <mat-expansion-panel
+    class="task-item"
+    [ngClass]="{ warning: !isValidTask(task) }"
+    *ngFor="let task of tasks; trackBy: trackTasksBy"
+  >
+    <mat-expansion-panel-header>
+      <mat-panel-title> İş Adımı {{ task.Priority }} </mat-panel-title>
+      <mat-panel-description *ngIf="isValidTask(task)">
+        <mat-icon>check</mat-icon>
+      </mat-panel-description>
+      <mat-panel-description *ngIf="!isValidTask(task)">
+        <mat-icon>warning</mat-icon>
+        <span>Eksik alanları doldurunuz.</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <span class="task-text">{{ task.Name }}</span>
+
+    <mat-divider class="pb-8 mt-12"></mat-divider>
+    <p class="task-title">Gerekli İş İzinleri</p>
+    <span class="task-text" *ngIf="task.NoWorkPermits">Bu iş adımı için herhangi bir iş izni gerekmemektedir.</span>
+    <span class="task-text" *ngIf="!task.NoWorkPermits">{{ getWorkPermits(task.Id) }}</span>
+
+    <mat-divider class="pb-8 mt-12"></mat-divider>
+    <p class="task-title">Özel Yetkinlik Gerekliliği</p>
+    <span class="task-text" *ngIf="task.NoRequiredSkills"
+      >Bu iş adımı için herhangi bir özel yetkinlik gerekliliği yoktur.</span
+    >
+    <span class="task-text" *ngIf="!task.NoRequiredSkills">{{ getRequiredSkills(task.Id) }}</span>
+
+    <mat-divider class="pb-8 mt-12"></mat-divider>
+    <div class="buttons-container">
+      <button mat-stroked-button color="primary" (click)="editTask.emit(task.Id)">Düzenle</button>
+      <button mat-stroked-button color="primary" (click)="deleteTask.emit(task.Id)">Sil</button>
+    </div>
+
+    <div class="content-container">
+      <div class="heading">
+        <span [ngClass]="{ warning: !task?.NoTaskRisks && task?.TaskRisks?.length === 0 }"
+          >Tehlike / Tehdit / Kaza</span
+        >
+        <mat-slide-toggle [(ngModel)]="task.NoTaskRisks" (change)="onNoTaskRisksChange($event, task.Id)"
+          >Bu iş adımı herhangi bir risk içermemektedir.</mat-slide-toggle
+        >
+      </div>
+      <div class="items" *ngIf="!task?.NoTaskRisks && (task?.TaskRisks?.length ?? 0) > 0">
+        <div class="item" *ngFor="let item of task.TaskRisks; trackBy: trackTaskRisksBy">
+          <div class="item-row">
+            <span class="priority">{{ item.Priority }}</span>
+            <div class="desc">
+              {{ item.Name }}
+            </div>
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="primary"
+                [matTooltip]="'Düzenle'"
+                matTooltipPosition="above"
+                (click)="editTaskRisk.emit({ taskId: task.Id, item: item })"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="primary"
+                [matTooltip]="'Sil'"
+                matTooltipPosition="above"
+                (click)="onDeleteRisk(task, item)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="item-row center">
+            <div class="rating">
+              <div class="rating-details">
+                <span class="heading">Olasılık</span>
+                <span class="value">{{ item.Rating.ProbabilityName }}</span>
+              </div>
+              <div class="rating-details">
+                <span class="heading">Potansiyel Şiddet</span>
+                <span class="value">{{ item.Rating.IntensityName }}</span>
+              </div>
+              <div class="risk-value" [ngClass]="getRiskValueColor(item.Rating)">{{ item.Rating.RiskValueName }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer" *ngIf="!task.NoTaskRisks">
+        <button mat-stroked-button color="primary" (click)="addTaskRisk.emit(task.Id)">Ekle</button>
+      </div>
+    </div>
+
+    <div class="content-container" *ngIf="!task?.NoTaskRisks && (task?.TaskRisks?.length ?? 0) > 0">
+      <div class="heading">
+        <span [ngClass]="{ warning: hasMissingPrecautions }">Alınacak Önlemler</span>
+        <span class="warning" *ngIf="hasMissingPrecautions"
+          >Tüm «Tehlike / Tehdit / Kaza» maddeleri için önlem girmelisiniz!</span
+        >
+      </div>
+      <div class="items" *ngIf="!task?.NoPrecautions && (task?.Precautions?.length ?? 0 > 0)">
+        <div class="item" *ngFor="let item of task.Precautions; trackBy: trackTaskRisksBy">
+          <div class="item-row">
+            <span class="priority">{{ item.Priority }}</span>
+            <div class="desc">
+              {{ item.Name }}
+              <ng-container *ngIf="getParentTaskForPrecaution(task, item)">
+                <br />
+                <span
+                  ><small
+                    ><i>
+                      ({{ getParentTaskForPrecaution(task, item) }}. sıradaki «Tehlike / Tehdit / Kaza» için alınacak
+                      önlem)
+                    </i></small
+                  ></span
+                >
+              </ng-container>
+            </div>
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="primary"
+                [matTooltip]="'Düzenle'"
+                matTooltipPosition="above"
+                (click)="editTaskPrecaution.emit({ taskId: task.Id, item: item })"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="primary"
+                [matTooltip]="'Sil'"
+                matTooltipPosition="above"
+                (click)="onDeletePrecaution(task, item)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="item-row center">
+            <div class="rating">
+              <div class="rating-details">
+                <span class="heading">Olasılık</span>
+                <span class="value">{{ item.Rating.ProbabilityName }}</span>
+              </div>
+              <div class="rating-details">
+                <span class="heading">Potansiyel Şiddet</span>
+                <span class="value">{{ item.Rating.IntensityName }}</span>
+              </div>
+              <div class="risk-value" [ngClass]="getRiskValueColor(item.Rating)">{{ item.Rating.RiskValueName }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer" *ngIf="!task.NoPrecautions">
+        <button mat-stroked-button color="primary" (click)="addTaskPrecaution.emit(task.Id)">Ekle</button>
+      </div>
+    </div>
+  </mat-expansion-panel>
+
+  <div>
+    <button mat-stroked-button color="primary" (click)="addTask.emit()">Yeni İş Adımı Ekle</button>
+  </div>
+</div>

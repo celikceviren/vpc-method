@@ -1,0 +1,47 @@
+<form [formGroup]="form">
+  <div class="col">
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>Taşeron Yetkilisi</mat-label>
+      <input matInput type="text" formControlName="ContractorOfficial" />
+      <mat-hint>İlgili taşeron yetkilisinin adını ve soyadını giriniz.</mat-hint>
+      <mat-error *ngIf="form.controls.ContractorOfficial.hasError('required')"
+        >İlgili taşeron yetkilisinin adını ve soyadını giriniz.</mat-error
+      >
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100-p mt-16">
+      <mat-label>Yetkili Telefon</mat-label>
+      <input matInput type="text" formControlName="ContractorOfficialPhone" />
+      <mat-hint>İlgili taşeron yetkilisinin telefon numarasını giriniz.</mat-hint>
+      <mat-error *ngIf="form.controls.ContractorOfficialPhone.hasError('required')"
+        >İlgili taşeron yetkilisinin telefon numarasını giriniz.</mat-error
+      >
+    </mat-form-field>
+  </div>
+  <div class="col">
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>Yapılacak Çalışmanın Tanımı</mat-label>
+      <textarea matInput formControlName="WorkDefinition" class="h-108"></textarea>
+      <mat-hint>Yapılacak çalışma ile ilgili bilgi veriniz.</mat-hint>
+      <mat-error *ngIf="form.controls.WorkDefinition.hasError('required')"
+        >Yapılacak çalışma ile ilgili bilgi veriniz.</mat-error
+      >
+    </mat-form-field>
+  </div>
+  <div class="col">
+    <div class="select-list-title">
+      <span [ngClass]="{ warning: form.controls.WorkAreas.touched && form.controls.WorkAreas.hasError('required') }"
+        >Çalışmanın Yapılacağı Yer</span
+      >
+      <span *ngIf="form.controls.WorkAreas.valid">{{ selectedWorkAreaName }}</span>
+      <span class="warning" *ngIf="form.controls.WorkAreas.touched && form.controls.WorkAreas.hasError('required')"
+        >Boş bırakılamaz</span
+      >
+    </div>
+    <mat-selection-list formControlName="WorkAreas" [multiple]="true">
+      <mat-list-option *ngFor="let item of workAreasList" [value]="item.item">
+        {{ item.item.Value }}
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+</form>

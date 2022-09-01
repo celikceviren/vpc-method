@@ -1,0 +1,287 @@
+<div class="general-info">
+  <h3 class="mat-h4">{{ methodVersionCode }}</h3>
+  <span class="accent-color">{{ methodVersionStatus }}</span>
+</div>
+
+<mat-card>
+  <mat-card-title class="primary-color">Genel Bilgiler</mat-card-title>
+  <mat-card-content class="mt-16">
+    <div class="row">
+      <div class="mat-body-strong pr-8" color="primary">İşi Veren Firma :</div>
+      <span class="mat-body" *ngIf="project">{{ project.CompanyName }}</span>
+      <span class="mat-caption" *ngIf="project">({{ project.FacilityName }})</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">İşi Veren Firma Yetkilisi :</div>
+      <span class="mat-body" *ngIf="project">{{ project.ProjectOwner }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">İşin Tanımı :</div>
+      <span class="mat-body" *ngIf="project">
+        {{ project.ProjectName }} <br />
+        <span class="mat-caption" style="font-style: italic">{{ project.ProjectDesc }}</span>
+      </span>
+    </div>
+    <ng-container *ngIf="companyCode === 'PLADIS'">
+      <mat-divider></mat-divider>
+      <div class="row">
+        <div class="mat-body-strong pr-8">İşe Başlama Tarihi :</div>
+        <span class="mat-body" *ngIf="project">{{ project.ProjectStartDate | date: 'dd.MM.yyyy' }}</span>
+      </div>
+    </ng-container>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Taşeron Firma :</div>
+      <span class="mat-body" *ngIf="project">{{ project.ContractorName }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Taşeron Firma Yekilisi :</div>
+      <span class="mat-body"
+        >{{ methodDoc?.ContractorOfficial ?? '-' }}
+        <ng-container *ngIf="methodDoc?.ContractorOfficialPhone">
+          <br />
+          <span class="mat-caption" style="font-style: italic">
+            Telefon: {{ methodDoc?.ContractorOfficialPhone }}
+          </span>
+        </ng-container>
+      </span>
+    </div>
+    <ng-container *ngIf="companyCode === 'NESTLE'">
+      <mat-divider></mat-divider>
+      <div class="row">
+        <div class="mat-body-strong pr-8">İşin Yapılacağı Süre :</div>
+        <span class="mat-body" *ngIf="project"
+          >{{ project.ProjectStartDate | date: 'dd.MM.yyyy' }} - {{ project.ProjectEndDate | date: 'dd.MM.yyyy' }}</span
+        >
+      </div>
+      <mat-divider></mat-divider>
+      <div class="row">
+        <div class="mat-body-strong pr-8">Yapılacak Çalışmanın Tanımı :</div>
+        <span class="mat-body">{{ methodDoc?.WorkDefinition ?? '-' }}</span>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="row">
+        <div class="mat-body-strong pr-8">Uygulama Bölgesi :</div>
+        <span class="mat-body">{{ workArea }}</span>
+      </div>
+    </ng-container>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="companyCode === 'PLADIS'">
+  <mat-card-title class="primary-color">Yapılacak Çalışma</mat-card-title>
+  <mat-card-content class="mt-16">
+    <div class="row">
+      <div class="mat-body-strong pr-8">Yapılacak Çalışmanın Tanımı :</div>
+      <span class="mat-body">{{ methodDoc?.WorkDefinition ?? '-' }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Çalışmanın Yapılacağı Yer :</div>
+      <span class="mat-body">{{ workArea }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Yapılacak İş Türü :</div>
+      <span class="mat-body">{{ workType }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">
+        Tehlike; Kazaya veya Gıda güvenliğine sebep olabilecek potansiyel ortam ve şartlar :
+      </div>
+      <span class="mat-body" *ngIf="!noRisks">{{ risks }}</span>
+      <span class="mat-body" *ngIf="noRisks">-</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Kullanılacak Ekipmanlar :</div>
+      <span class="mat-body" *ngIf="!noEquipments">{{ equipments }}</span>
+      <span class="mat-body" *ngIf="noEquipments">-</span>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="row">
+      <div class="mat-body-strong pr-8">Yapılacak İşe Göre Kullanılması Gereken Kişisel Koruyucu Donanımlar :</div>
+      <span class="mat-body" *ngIf="!noPpe">{{ ppe }}</span>
+      <span class="mat-body" *ngIf="noPpe">-</span>
+    </div>
+    <mat-divider></mat-divider>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-title class="primary-color">Yapım Metodu ve Risk Analizi</mat-card-title>
+  <mat-card-content class="mt-16">
+    <div class="work-task" *ngFor="let item of tasks">
+      <h4 class="mat-h4">İş Adımı {{ item.Priority }}</h4>
+      <mat-divider class="pb-12"></mat-divider>
+      <p class="px-12">{{ item.Name }}</p>
+      <div class="row">
+        <div class="mat-body-strong pr-8">Gerekli İş İzinleri :</div>
+        <span class="mat-body" *ngIf="!item.NoWorkPermits">{{ getWorkPermits(item) }}</span>
+        <span class="mat-body" *ngIf="item.NoWorkPermits">Bu iş adımı için herhangi bir iş izni gerekmemektedir</span>
+      </div>
+      <div class="row">
+        <div class="mat-body-strong pr-8">Özel Yetkinlik Gerekliliği :</div>
+        <span class="mat-body" *ngIf="!item.NoRequiredSkills">{{ getRequiredSkills(item) }}</span>
+        <span class="mat-body" *ngIf="item.NoRequiredSkills"
+          >Bu iş adımı için herhangi bir özel yetkinlik gerekliliği yoktur</span
+        >
+      </div>
+      <div class="details-table">
+        <h4 class="mat-h4">Tehlike / Tehdit / Kaza</h4>
+        <span class="accent-color" *ngIf="item.NoTaskRisks"> Bu iş adımı herhangi bir risk içermemektedir. </span>
+
+        <div class="task-items">
+          <div class="item" *ngFor="let subItem of item.TaskRisks">
+            <div class="item-row">
+              <span class="priority">{{ subItem.Priority }}</span>
+              <div class="desc">
+                {{ subItem.Name }}
+              </div>
+            </div>
+
+            <div class="item-row center">
+              <div class="rating">
+                <div class="rating-details">
+                  <span class="heading">Olasılık</span>
+                  <span class="value">{{ subItem.Rating.ProbabilityName }}</span>
+                </div>
+                <div class="rating-details">
+                  <span class="heading">Potansiyel Şiddet</span>
+                  <span class="value">{{ subItem.Rating.IntensityName }}</span>
+                </div>
+                <div class="risk-value" [ngClass]="getRiskValueColor(subItem.Rating)">
+                  {{ subItem.Rating.RiskValueName }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="details-table">
+        <h4 class="mat-h4">Alınacak Önlemler</h4>
+        <span class="accent-color" *ngIf="item.NoPrecautions">
+          Bu iş adımı için alınması gereken bir önlem yoktur.
+        </span>
+        <div class="task-items">
+          <div class="item" *ngFor="let subItem of item.Precautions">
+            <div class="item-row">
+              <span class="priority">{{ subItem.Priority }}</span>
+              <div class="desc">
+                {{ subItem.Name }}
+                <ng-container *ngIf="getParentTaskForPrecaution(item, subItem)">
+                  <br />
+                  <span
+                    ><small
+                      ><i>
+                        ({{ getParentTaskForPrecaution(item, subItem) }}. sıradaki «Tehlike / Tehdit / Kaza» için
+                        alınacak önlem)
+                      </i></small
+                    ></span
+                  >
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="item-row center">
+              <div class="rating">
+                <div class="rating-details">
+                  <span class="heading">Olasılık</span>
+                  <span class="value">{{ subItem.Rating.ProbabilityName }}</span>
+                </div>
+                <div class="rating-details">
+                  <span class="heading">Potansiyel Şiddet</span>
+                  <span class="value">{{ subItem.Rating.IntensityName }}</span>
+                </div>
+                <div class="risk-value" [ngClass]="getRiskValueColor(subItem.Rating)">
+                  {{ subItem.Rating.RiskValueName }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="nestleSection1">
+  <mat-card-title class="primary-color">{{ nestleSection1.Title }}</mat-card-title>
+  <mat-card-content class="mt-16">
+    <ng-container *ngIf="nestleSection1.Questions?.length">
+      <div class="work-task mb-0">
+        <h4 class="mat-h4">{{ nestleSection1.Questions[0].Title }}</h4>
+        <p class="px-12">{{ nestleSection1.Questions[0].Answer.Value }}</p>
+        <mat-divider class="pb-12"></mat-divider>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="nestleSection1.Questions?.length ?? 0 > 1">
+      <div class="work-task mb-0">
+        <h4 class="mat-h4">{{ nestleSection1.Questions[1].Title }}</h4>
+        <p class="px-12">{{ nestleSection1.Questions[1].Answer.Value }}</p>
+      </div>
+    </ng-container>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-title class="primary-color">Alt Yükleniciler</mat-card-title>
+  <mat-card-content class="mt-16">
+    <p *ngIf="noContractors">Çalışmada herhangi bir alt yüklenici yer almayacaktır.</p>
+    <div class="contractors" *ngIf="!noContractors">
+      <div class="contractor-item" *ngFor="let item of contractors">
+        <div class="row">
+          <div class="mat-body-strong pr-8">Firma {{ item.Priority }}:</div>
+          <span class="mat-body">{{ item.Name }}</span>
+        </div>
+        <div class="row">
+          <div class="mat-body-strong pr-8">Üstleneceği İş Adımları :</div>
+          <span class="mat-body">{{ item.TaskSteps }}</span>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="nestleSection2">
+  <mat-card-title class="primary-color">{{ nestleSection2.Title }}</mat-card-title>
+  <mat-card-content class="mt-16">
+    <ng-container *ngIf="nestleSection2.Questions?.length">
+      <div class="work-task mb-0">
+        <h4 class="mat-h4">{{ nestleSection2.Questions[0].Title }}</h4>
+        <p class="px-12">{{ nestleSection2.Questions[0].Answer.Value }}</p>
+        <mat-divider class="pb-12"></mat-divider>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="nestleSection2.Questions?.length ?? 0 > 1">
+      <div class="work-task mb-0">
+        <h4 class="mat-h4">{{ nestleSection2.Questions[1].Title }}</h4>
+        <p class="px-12">{{ nestleSection2.Questions[1].Answer.Value }}</p>
+        <mat-divider class="pb-12"></mat-divider>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="nestleSection2.Questions?.length ?? 0 > 2">
+      <div class="work-task mb-0">
+        <h4 class="mat-h4">{{ nestleSection2.Questions[2].Title }}</h4>
+        <p class="px-12">{{ nestleSection2.Questions[2].Answer.Value }}</p>
+      </div>
+    </ng-container>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="my-16" *ngIf="versionStatus === 2">
+  <mat-card-title class="primary-color">İstenilen Düzenleme</mat-card-title>
+  <mat-card-content class="mt-16">
+    <p>{{ versionNotes }}</p>
+  </mat-card-content>
+</mat-card>
+
+<div class="general-info">
+  <h3 class="mat-h4">{{ methodVersionCode }}</h3>
+  <span class="accent-color">{{ methodVersionStatus }}</span>
+</div>

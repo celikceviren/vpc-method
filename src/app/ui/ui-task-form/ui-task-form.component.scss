@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.select-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 16px;
+
+  > div.select-list-item {
+    width: calc(33% - 12px);
+    display: flex;
+    height: 36px;
+    align-items: center;
+    margin-right: 12px;
+  }
+}

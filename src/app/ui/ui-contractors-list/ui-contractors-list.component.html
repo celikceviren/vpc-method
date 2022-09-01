@@ -1,0 +1,43 @@
+<div class="content-container">
+  <div class="heading">
+    <span [ngClass]="{ warning: !noSubContractors && !list.length }">Alt Yükleniciler</span>
+    <mat-slide-toggle [(ngModel)]="noSubContractors"
+      >Çalışmada herhangi bir alt yüklenici yer almayacaktır.</mat-slide-toggle
+    >
+  </div>
+  <div class="items" *ngIf="!noSubContractors && list.length">
+    <div class="item" *ngFor="let item of list; trackBy: trackItemsBy">
+      <span class="priority">{{ item.Priority }}</span>
+      <div class="desc">
+        {{ item.Name }}<br />
+        <span style="font-weight: 500; font-size: 11px; line-height: 18px"
+          >Alt İş veren Firmanın Üstleneceği İş Adımları</span
+        ><br />
+        <span style="font-style: italic; font-size: 11px; line-height: 14px">{{ item.TaskSteps }}</span>
+      </div>
+      <div class="actions">
+        <button
+          mat-icon-button
+          color="primary"
+          [matTooltip]="'Düzenle'"
+          matTooltipPosition="above"
+          (click)="editContractor.emit(item.Id)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="primary"
+          [matTooltip]="'Sil'"
+          matTooltipPosition="above"
+          (click)="deleteContractor.emit(item.Id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="footer" *ngIf="!noSubContractors">
+    <button mat-stroked-button color="primary" (click)="addContractor.emit()">Ekle</button>
+  </div>
+</div>

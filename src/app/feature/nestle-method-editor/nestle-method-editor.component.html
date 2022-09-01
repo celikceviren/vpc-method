@@ -1,0 +1,182 @@
+<div class="container" *ngIf="ready">
+  <mat-card class="my-16" *ngIf="versionNotes">
+    <mat-card-title class="primary-color">İstenilen Düzenleme</mat-card-title>
+    <mat-card-content class="mt-16">
+      <p>{{ versionNotes }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header class="valid">
+      <mat-panel-title> 1. Genel Bilgiler </mat-panel-title>
+      <mat-panel-description> {{ methodDoc?.VersionCode }} </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-general-info [data]="methodDoc"></app-ui-general-info>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.workInfo) }">
+      <mat-panel-title> 2. Taşeron ve Çalışmanın Bilgileri </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.workInfo)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.workInfo)">warning</mat-icon>
+        <span>Tüm alanları doldurunuz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-work-info [(data)]="methodDoc"></app-ui-work-info>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.tasks) }">
+      <mat-panel-title> 3. Yapım Metodu ve Risk Analizi </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.tasks)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.tasks)">warning</mat-icon>
+        <span>En az 1 adet iş adımı ekleyiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-tasks-list
+      [companyCode]="companyCode"
+      [(tasks)]="tasks"
+      (addTask)="onAddTaskClick()"
+      (editTask)="onEditTaskClick($event)"
+      (deleteTask)="onDeleteTaskClick($event)"
+      (addTaskRisk)="onAddTaskRisk($event)"
+      (editTaskRisk)="onEditTaskRisk($event)"
+      (deleteTaskRisk)="onDeleteTaskRisk($event)"
+      (addTaskPrecaution)="onAddTaskPrecaution($event)"
+      (editTaskPrecaution)="onEditTaskPrecaution($event)"
+      (deleteTaskPrecaution)="onDeleteTaskPrecaution($event)"
+    ></app-ui-tasks-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: section1Q1Form.valid }">
+      <mat-panel-title> 4. Kullanılacak İş Makinaları ve Elektrikli Ekipmanlar </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="section1Q1Form.valid">check</mat-icon>
+        <mat-icon *ngIf="!section1Q1Form.valid">warning</mat-icon>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <form [formGroup]="section1Q1Form" style="margin-top: -8px">
+      <mat-form-field appearance="outline" class="w-100-p">
+        <textarea
+          matInput
+          formControlName="Question"
+          class="h-108"
+          required
+          placeholder="Kaynak Makinası/Hilti/ Seyyar Kule / İskele Mobil Yükseltici Platform/Mobil Vinç  /Kule Vinç /Caraskal/Transpalet /Akülü transpalet/Ekskavatör vb."
+        ></textarea>
+        <mat-hint
+          >Çalışma yapacağınız alanda bulunması gerekli olan şartlar veya alınması gereken önlemler var ise belirtiniz.
+          (Max: 200 karakter)</mat-hint
+        >
+        <mat-error
+          *ngIf="
+            section1Q1Form.controls.Question.hasError('required') ||
+            section1Q1Form.controls.Question.hasError('maxlength')
+          "
+          >Çalışma yapacağınız alanda bulunması gerekli olan şartlar veya alınması gereken önlemler var ise belirtiniz.
+          (Max: 200 karakter)</mat-error
+        >
+      </mat-form-field>
+    </form>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: section1Q2Form.valid }">
+      <mat-panel-title>
+        5. Çalışma Yapacağınız Alanda Bulunması Gerekli Olan Şartlar/Alınması Gereken Önlemler
+      </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="section1Q2Form.valid">check</mat-icon>
+        <mat-icon *ngIf="!section1Q2Form.valid">warning</mat-icon>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <form [formGroup]="section1Q2Form" style="margin-top: -8px">
+      <mat-form-field appearance="outline" class="w-100-p">
+        <textarea matInput formControlName="Question" class="h-108" required></textarea>
+        <mat-hint>Kullanılacak iş makinası ve elektrikli ekipmanı bu alanda belirtiniz. (Max: 200 karakter)</mat-hint>
+        <mat-error
+          *ngIf="
+            section1Q2Form.controls.Question.hasError('required') ||
+            section1Q2Form.controls.Question.hasError('maxlength')
+          "
+          >Kullanılacak iş makinası ve elektrikli ekipmanı bu alanda belirtiniz. (Max: 200 karakter)</mat-error
+        >
+      </mat-form-field>
+    </form>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.ppe) }">
+      <mat-panel-title> 6. Yapılacak İşe Göre Kullanılması Gereken Kişisel Koruyucu Donanımlar </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.ppe)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.ppe)">warning</mat-icon>
+        <span>En az 1 adet seçiniz</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-checkbox-list [(list)]="ppe"></app-ui-checkbox-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: isFormSectionValid(formSection.contractors) }">
+      <mat-panel-title> 7. Alt Yükleniciler </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="isFormSectionValid(formSection.contractors)">check</mat-icon>
+        <mat-icon *ngIf="!isFormSectionValid(formSection.contractors)">warning</mat-icon>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <app-ui-contractors-list
+      [(data)]="methodDoc"
+      [(contractors)]="subContractors"
+      (addContractor)="onAddContractor()"
+      (editContractor)="onEditContractor($event)"
+      (deleteContractor)="onDeleteContractor($event)"
+    ></app-ui-contractors-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header [ngClass]="{ valid: section2Form.valid }">
+      <mat-panel-title> 8. Çevresel Etmenler </mat-panel-title>
+      <mat-panel-description>
+        <mat-icon *ngIf="section2Form.valid">check</mat-icon>
+        <mat-icon *ngIf="!section2Form.valid">warning</mat-icon>
+        <span>Tüm soruları yanıtlayınız</span>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <form [formGroup]="section2Form" style="margin-top: -8px" class="mb-16">
+      <p>Atık yağlar oluşacak mı ?</p>
+      <mat-radio-group formControlName="Question1" class="horizontal-radio-group">
+        <mat-radio-button value="1">Evet</mat-radio-button>
+        <mat-radio-button value="2">Hayır</mat-radio-button>
+      </mat-radio-group>
+
+      <mat-divider class="pb-8 mt-12"></mat-divider>
+
+      <p>Hafriyat atığı oluşacak mı ?</p>
+      <mat-radio-group formControlName="Question2" class="horizontal-radio-group">
+        <mat-radio-button value="1">Evet</mat-radio-button>
+        <mat-radio-button value="2">Hayır</mat-radio-button>
+      </mat-radio-group>
+
+      <mat-divider class="pb-8 mt-12"></mat-divider>
+
+      <p>Kimyasal atık - kontamine (tiner/boya kutuları /ömrü dolan kesme taşları vb) ambalaj atığı oluşacak mı ?</p>
+      <mat-radio-group formControlName="Question3" class="horizontal-radio-group">
+        <mat-radio-button value="1">Evet</mat-radio-button>
+        <mat-radio-button value="2">Hayır</mat-radio-button>
+      </mat-radio-group>
+    </form>
+  </mat-expansion-panel>
+</div>
+<div class="actions" *ngIf="ready">
+  <div>
+    <button mat-raised-button color="accent" (click)="onSave()">Taslak Olarak Kaydet</button>
+    <button mat-raised-button color="primary" (click)="onSaveAndPublish()" [disabled]="!isReadyToPublish">
+      <mat-icon>check</mat-icon>
+      Onaya Gönder
+    </button>
+  </div>
+</div>

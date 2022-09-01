@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 24px);
+  padding: 12px;
+  padding-bottom: 40px;
+  position: relative;
+  gap: 24px;
+}
+
+div.actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+  min-height: 48px;
+  margin: 16px 0;
+  justify-content: center;
+
+  > button {
+    min-width: 240px;
+  }
+}

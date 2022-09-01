@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 18px;
+
+  > div.col {
+    display: flex;
+    flex-direction: column;
+    width: calc(33% - 12px);
+    &:last-child {
+      width: unset;
+      flex-grow: 1;
+    }
+
+    div.select-list-title {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+
+      > span {
+        font-size: 10.5px;
+        color: rgba(0, 0, 0, 0.6);
+        &.warning {
+          color: #f44336;
+        }
+      }
+    }
+
+    ::ng-deep {
+      .mat-list-single-selected-option,
+      .mat-list-single-selected-option:hover,
+      .mat-list-single-selected-option:focus {
+        background-color: #ff4081;
+        color: #ffffff;
+      }
+    }
+  }
+}

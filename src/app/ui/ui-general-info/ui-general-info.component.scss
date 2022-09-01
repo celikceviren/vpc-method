@@ -1,0 +1,46 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+
+    .cell {
+      display: flex;
+      flex-direction: column;
+      width: calc(25% - 16px);
+      padding: 8px;
+      gap: 8px;
+    }
+
+    > form {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+span.header {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+span.value {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}

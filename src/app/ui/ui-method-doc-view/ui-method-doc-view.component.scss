@@ -1,0 +1,211 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 24px;
+}
+
+div.general-info {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+
+  h3 {
+    padding: 0 12px;
+    font-weight: 500;
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  span {
+    padding-right: 12px;
+    font-weight: 500;
+  }
+}
+
+div.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 4px;
+  align-items: flex-start;
+  padding: 8px 12px;
+
+  span {
+    line-height: 24px;
+  }
+  div {
+    &:first-child {
+      min-width: 180px;
+    }
+  }
+}
+
+div.work-task {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    padding: 0 12px;
+    font-weight: 500;
+  }
+
+  div.details-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin: 12px;
+    padding: 12px 16px;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+
+    h4 {
+      font-weight: 500;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    > div.task-items {
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      > div.item {
+        display: flex;
+        flex-direction: column;
+        padding: 16px 12px;
+        gap: 12px;
+
+        > div.item-row {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          gap: 12px;
+
+          > span.priority {
+            font-weight: 500;
+            font-size: 12px;
+            flex-grow: 0;
+          }
+
+          > div.desc {
+            font-size: 12px;
+            line-height: 18px;
+            flex-grow: 1;
+            max-width: calc(100% - 75px);
+          }
+
+          > div.actions {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 4px;
+            opacity: 0.6;
+
+            .mat-icon-button {
+              width: 18px;
+              height: 18px;
+              font-size: 18px;
+              line-height: 18px;
+              .mat-icon {
+                width: 18px;
+                height: 18px;
+                min-width: 18px;
+                min-height: 18px;
+                max-width: 18px;
+                max-height: 18px;
+                font-size: 18px;
+                line-height: 18px;
+              }
+            }
+          }
+
+          > div.rating {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            align-items: center;
+            border-radius: 4px;
+            gap: 16px;
+
+            > div.rating-details {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              span.heading {
+                font-size: 12px;
+                font-weight: 500;
+                line-height: 16px;
+              }
+
+              span.value {
+                font-size: 11px;
+              }
+            }
+
+            > div.risk-value {
+              font-size: 14px;
+              line-height: 24px;
+              width: 180px;
+              border-radius: 4px;
+              height: 44px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              &.green {
+                background-color: rgba(0, 128, 0, 0.25);
+                color: green;
+              }
+
+              &.yellow {
+                background-color: rgba(255, 255, 0, 0.034);
+                color: yellow;
+              }
+
+              &.orange {
+                background-color: rgba(255, 166, 0, 0.25);
+                color: orange;
+              }
+
+              &.red {
+                background-color: rgba(255, 0, 0, 0.25);
+                color: red;
+              }
+            }
+          }
+        }
+
+        &:not(:last-child) {
+          border-bottom: 1px solid #f0f0f0;
+        }
+      }
+    }
+  }
+}
+
+div.contractors {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  > div.contractor-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 24px;
+  }
+}

@@ -1,0 +1,49 @@
+/* You can add global styles to this file, and also import other style files */
+
+@use '@angular/material' as mat;
+@import '@angular/material/theming';
+@import 'assets/scss/common/breakpoints';
+@import 'assets/scss/common/responsive';
+@import 'assets/scss/common/normalize';
+@import 'assets/scss/common/helpers';
+
+@include mat.core();
+
+$my-primary: mat.define-palette(mat.$indigo-palette, 500);
+$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+
+$my-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $my-primary,
+      accent: $my-accent,
+    ),
+  )
+);
+
+@include mat.all-component-themes($my-theme);
+
+html,
+body {
+  display: flex;
+  flex: 1 0 auto;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.accent-color {
+  color: mat-color($my-accent) !important;
+}
+.primary-color {
+  color: mat-color($my-primary) !important;
+}

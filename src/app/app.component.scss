@@ -1,0 +1,17 @@
+:host {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+::ng-deep {
+  .cdk-overlay-pane {
+    &.form-editor {
+      min-height: 240px;
+      .mat-dialog-content {
+        max-height: calc(100vh - 180px);
+      }
+    }
+  }
+}

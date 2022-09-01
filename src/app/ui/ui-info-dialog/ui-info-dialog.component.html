@@ -1,0 +1,9 @@
+<h1 mat-dialog-title *ngIf="heading">{{ heading }}</h1>
+<div mat-dialog-content>
+  <h4 *ngIf="title" [innerHTML]="title"></h4>
+  <p *ngIf="body" [innerHTML]="body"></p>
+  <mat-spinner color="primary" [diameter]="32" class="my-12" *ngIf="loading"></mat-spinner>
+</div>
+<div mat-dialog-actions *ngIf="dismissable">
+  <button mat-button mat-dialog-close tabindex="-1" (click)="dialogRef.close()">{{ dismissBtn }}</button>
+</div>

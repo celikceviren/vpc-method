@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="select-list-item" *ngFor="let listItem of list">
+    <mat-checkbox
+      class="checkbox-margin"
+      [disabled]="isNoneSelected && listItem.item.Code !== codeNone"
+      [checked]="listItem.selected"
+      [value]="listItem.item.Code"
+      (change)="onChange($event)"
+      >{{ listItem.item.Value }}</mat-checkbox
+    >
+  </div>
+</div>

@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.task-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-radio-button {
+  margin: 5px;
+}
+
+.risk-form-cols {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 12px;
+
+  > div.col {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 6px);
+
+    h4 {
+      margin: 0;
+      padding: 0 32px;
+      font-weight: 500;
+    }
+  }
+}
+
+.risk-value-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  height: 24px;
+  gap: 12px;
+  span {
+    font-weight: 500;
+    font-size: 1.2em;
+  }
+}
+
+::ng-deep {
+  .mat-tooltip {
+    font-size: 12px;
+    background-color: darkblue;
+  }
+}

@@ -1,0 +1,17 @@
+$responsivebreakpoints: (
+  'phone': 480px,
+  'small-tablet': 640px,
+  'medium-tablet': 780px,
+  'tablet': 1024px,
+) !default;
+
+@mixin screen($breakpoint) {
+  @if map-has-key($responsivebreakpoints, $breakpoint) {
+    @media (max-width: map-get($responsivebreakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Responsive `#{$breakpoint}` breakpoint can not be found"
+            + "Available responsive breakpoints are: #{map-keys($breakpoints)}.";
+  }
+}

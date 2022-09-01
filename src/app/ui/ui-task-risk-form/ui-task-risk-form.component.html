@@ -1,0 +1,74 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field *ngIf="type === 'precaution'" appearance="outline" class="w-100-p">
+      <mat-label>{{ parentPlaceholder }}</mat-label>
+      <mat-select formControlName="ParentTaskId" required>
+        <mat-option *ngFor="let option of parents" [value]="option.Id">
+          {{ option.Priority }}. {{ option.Name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>{{ namePlaceholder }}</mat-label>
+      <textarea matInput required formControlName="Name" class="h-72"></textarea>
+      <mat-hint>(Max: 500 karakter)</mat-hint>
+      <mat-error *ngIf="form.controls.Name.hasError('required') || form.controls.Name.hasError('maxlength')"
+        >(Max: 500 karakter)</mat-error
+      >
+    </mat-form-field>
+
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+
+    <div class="risk-form-cols">
+      <div class="col">
+        <h4>Olasılık</h4>
+      </div>
+      <div class="col">
+        <h4>Potansiyel Şiddet</h4>
+      </div>
+    </div>
+
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+
+    <div class="risk-form-cols">
+      <div class="col">
+        <mat-radio-group formControlName="Probability" class="task-radio-group">
+          <mat-radio-button
+            class="task-radio-button"
+            *ngFor="let option of probabiltyList"
+            [value]="option.value"
+            [matTooltip]="option.tooltip ?? ''"
+            [matTooltipPosition]="'before'"
+          >
+            {{ option.label }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="col">
+        <mat-radio-group formControlName="Intensity" class="task-radio-group">
+          <mat-radio-button
+            class="task-radio-button"
+            *ngFor="let option of intensityList"
+            [value]="option.value"
+            [matTooltip]="option.tooltip ?? ''"
+            [matTooltipPosition]="'before'"
+          >
+            {{ option.label }}
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+    <div class="risk-value-row">
+      <span *ngIf="riskValue" [ngStyle]="{ color: riskValueColor }">{{ riskValue }}</span>
+    </div>
+    <mat-divider class="pb-8 mt-8"></mat-divider>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="!form.valid" tabindex="-1">Kaydet</button>
+</div>
