@@ -1,0 +1,29 @@
+<div class="message-container accent-color" *ngIf="hasWarning">
+  {{ warningMsg }}
+</div>
+
+<div class="device-selector" *ngIf="!hasWarning && devices?.length">
+  <mat-form-field appearance="outline">
+    <mat-label>Aktif Kamera</mat-label>
+    <mat-select [formControl]="activeDevice">
+      <mat-option *ngFor="let device of devices" [value]="device">{{ device.label }}</mat-option>
+    </mat-select>
+    <mat-hint>İş izni oluşturmak için çalışma alanındaki QR kodunu kameraya okutunuz.</mat-hint>
+  </mat-form-field>
+</div>
+
+<div class="scanner-container">
+  <zxing-scanner
+    #scanner
+    [formats]="availableFormats"
+    [enable]="scannerEnabled"
+    [device]="activeDevice.value ?? undefined"
+    (camerasFound)="onCamerasFound($event)"
+    (camerasNotFound)="onCamerasNotFound($event)"
+    (scanSuccess)="onScanSuccess($event)"
+  ></zxing-scanner>
+
+  <div *ngIf="hasWarning" class="camera-cover">
+    <mat-icon> camera </mat-icon>
+  </div>
+</div>

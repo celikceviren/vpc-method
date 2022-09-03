@@ -1,0 +1,55 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+
+div.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px;
+
+  button {
+    ::ng-deep {
+      .mat-button-wrapper {
+        padding-right: 16px;
+      }
+    }
+
+    .mat-icon {
+      position: absolute;
+      right: 4px;
+      top: 6px;
+    }
+
+    &.left {
+      ::ng-deep {
+        .mat-button-wrapper {
+          padding-right: unset;
+        }
+      }
+
+      .mat-icon {
+        right: unset;
+        left: 4px;
+      }
+    }
+  }
+}
+
+span.label {
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid #e0e0e0;
+  line-height: 24px;
+  padding: 0 4px;
+}
+
+span.value {
+  font-size: 14px;
+  padding: 0 4px;
+}

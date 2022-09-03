@@ -1,0 +1,51 @@
+<div class="title">
+  <h3>Çalışma Bilgileri</h3>
+  <h4>İş izni verilecek çalışmaya ait bilgileri giriniz</h4>
+</div>
+<form [formGroup]="form">
+  <mat-form-field appearance="outline">
+    <mat-label>Yer/Tesis</mat-label>
+    <input matInput formControlName="facility" readonly />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>İş Çağrısı</mat-label>
+    <input matInput formControlName="projectName" readonly />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>İş Çağrısını Açan Yetkili</mat-label>
+    <input matInput formControlName="projectOwner" readonly />
+  </mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Çalışmanın Yapılacağı Yer</mat-label>
+    <input matInput formControlName="workArea" readonly />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Çalışmayı Yapacak Kişiler</mat-label>
+    <textarea matInput formControlName="staffList" readonly></textarea>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16">
+    <mat-label>Yapılacak Çalışmanın Tanımı</mat-label>
+    <textarea matInput formControlName="description" class="h-108"></textarea>
+    <mat-hint>Yapılacak çalışma ile ilgili bilgi veriniz. (Max: 250)</mat-hint>
+    <mat-error *ngIf="form.controls.description.hasError('required') || form.controls.description.hasError('maxlength')"
+      >Yapılacak çalışma ile ilgili bilgi veriniz. (Max: 250)</mat-error
+    >
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16">
+    <mat-label>Çalışma Başlangıcı</mat-label>
+    <input type="datetime-local" matInput name="dtStart" formControlName="dtStart" [min]="minDate" [max]="maxDate" />
+    <mat-error *ngIf="form.controls.dtStart.hasError('invalidDate')"
+      >Çalışma başlangıcı geçmiş bir tarih veya 8 saatten daha ileri bir tarih olamaz</mat-error
+    >
+  </mat-form-field>
+</form>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="update.emit(info)" [disabled]="form.invalid">
+    Kaydet ve Devam Et <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

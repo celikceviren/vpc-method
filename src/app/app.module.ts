@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
 import { PladisMethodEditorService } from './data/pladis-method-editor.service';
 import { UiCheckboxListComponent } from './ui/ui-checkbox-list/ui-checkbox-list.component';
@@ -42,6 +43,12 @@ import { UUIDService } from './data/uuid.service';
 import { NestleMethodEditorComponent } from './feature/nestle-method-editor/nestle-method-editor.component';
 import { NestleMethodViewerComponent } from './feature/nestle-method-viewer/nestle-method-viewer.component';
 import { NestleMethodReviewerComponent } from './feature/nestle-method-reviewer/nestle-method-reviewer.component';
+import { PladisWorkpermitNewComponent } from './feature/pladis-workpermit-new/pladis-workpermit-new.component';
+import { WpLocationScannerComponent } from './ui/wp-location-scanner/wp-location-scanner.component';
+import { WpLocationApproveComponent } from './ui/wp-location-approve/wp-location-approve.component';
+import { WpItemSelectorComponent } from './ui/wp-item-selector/wp-item-selector.component';
+import { WpWorkInfoFormComponent } from './ui/wp-work-info-form/wp-work-info-form.component';
+import { WpCheckboxListComponent } from './ui/wp-checkbox-list/wp-checkbox-list.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +71,12 @@ import { NestleMethodReviewerComponent } from './feature/nestle-method-reviewer/
     NestleMethodEditorComponent,
     NestleMethodViewerComponent,
     NestleMethodReviewerComponent,
+    PladisWorkpermitNewComponent,
+    WpLocationScannerComponent,
+    WpLocationApproveComponent,
+    WpItemSelectorComponent,
+    WpWorkInfoFormComponent,
+    WpCheckboxListComponent,
   ],
   imports: [
     BrowserModule,
@@ -86,6 +99,7 @@ import { NestleMethodReviewerComponent } from './feature/nestle-method-reviewer/
     MatRadioModule,
     MatCardModule,
     MatSelectModule,
+    ZXingScannerModule,
   ],
   providers: [PladisMethodEditorService, WindowMsgService, InfoDialogService, DecimalPipe, UUIDService],
   bootstrap: [AppComponent],

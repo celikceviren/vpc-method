@@ -1,0 +1,52 @@
+<div class="title" [ngSwitch]="listKind">
+  <ng-container *ngSwitchCase="'worktype'">
+    <h3>İş Türleri</h3>
+    <h4>Yapılacak çaşlışmanın iş türünü seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'risk'">
+    <h3>Ortam ve Şartlar</h3>
+    <h4>Çalışma sırasında tehlikeye veya kazaya neden olabilecek ortam ve şartları seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'equipment'">
+    <h3>Kullanılacak Ekipmanlar</h3>
+    <h4>Çalışma sırasında kullanılacak ekipmanları seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'ppe'">
+    <h3>Kişisel Koruyucu Donanımlar</h3>
+    <h4>Çalışma sırasında kullanılması gereken kişisel koruyucu donanımları seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'extrawp'">
+    <h3>Verilecek İş İzinleri</h3>
+    <h4>Çalışma için genel iş izni haricinde verilecek iş izinleri varsa seçiniz</h4>
+  </ng-container>
+</div>
+
+<div class="options">
+  <mat-selection-list (selectionChange)="onSelectionChange($event)">
+    <mat-list-option
+      *ngFor="let option of selectList"
+      [value]="option.item"
+      [selected]="option.selected"
+      [disabled]="option.disabled"
+      color="primary"
+    >
+      {{ option.item.name }}
+    </mat-list-option>
+  </mat-selection-list>
+</div>
+
+<div class="info">
+  {{ infoMsg }}
+</div>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="itemsSelected.emit(selectedItems)"
+    [disabled]="!selectedItems.length"
+  >
+    Kaydet ve Devam Et <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

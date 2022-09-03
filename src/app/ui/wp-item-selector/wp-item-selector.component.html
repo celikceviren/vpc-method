@@ -1,0 +1,47 @@
+<div class="title" [ngSwitch]="listKind">
+  <ng-container *ngSwitchCase="'project'">
+    <h3>Aktif iş çağrıları ({{ list.length }})</h3>
+    <h4>İş izni oluşturulacak iş çağrsını seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'contractor'">
+    <h3>İş çağrısında yer alan yükleniciler ({{ list.length }})</h3>
+    <h4>İş izni verilecek çalışanların yüklenicisini seçiniz</h4>
+  </ng-container>
+  <ng-container *ngSwitchCase="'staff'">
+    <h3>İş izni verilebilecek çalışanlar ({{ list.length }})</h3>
+    <h4>İş izni verilecek çalışanları seçiniz</h4>
+  </ng-container>
+</div>
+
+<mat-list>
+  <mat-list-item
+    *ngFor="let option of selectList"
+    (click)="onSelect(option.item)"
+    [ngClass]="{ selected: option.selected }"
+  >
+    <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'project'">folder</mat-icon>
+    <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'contractor'">business</mat-icon>
+    <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'staff'">person</mat-icon>
+
+    <h3 matLine>{{ option.item.name }}</h3>
+
+    <p matLine *ngIf="option.item.kind === 'project'">
+      <span> İş cağrısını açan : {{ option.item.owner }} </span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'project'">
+      <span> {{ option.item.dtStart | date: 'dd.MM.yyyy' }} - {{ option.item.dtEnd | date: 'dd.MM.yyyy' }}</span>
+    </p>
+  </mat-list-item>
+</mat-list>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="itemsSelected.emit(selectedItems)"
+    [disabled]="!selectedItems.length"
+  >
+    Seç ve Devam Et <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

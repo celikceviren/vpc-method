@@ -1,0 +1,233 @@
+<div class="main-container">
+  <div class="step-title">
+    <h2 class="mat-h2 primary-color" [ngClass]="{ 'no-padding': currentStep === steps.SelectLocation }">
+      <mat-icon *ngIf="currentStep !== steps.SelectLocation" (click)="onPreviousStep()">arrow_back</mat-icon>
+      {{ title }}
+    </h2>
+    <h4 class="mat-h4">{{ stepTitle }}</h4>
+  </div>
+
+  <ng-container [ngSwitch]="currentStep">
+    <div class="step-container" *ngSwitchCase="steps.SelectLocation">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-location-scanner
+          *ngSwitchCase="states.ready"
+          (scanSuccess)="onScanSuccess($event)"
+        ></app-wp-location-scanner>
+
+        <app-wp-location-approve
+          *ngSwitchCase="states.done"
+          [location]="stepData.selectedLocation"
+          (approve)="onLocationApprove($event)"
+        ></app-wp-location-approve>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.SelectProject">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-item-selector
+          *ngSwitchCase="states.done"
+          [listKind]="'project'"
+          [list]="stepData.projectsList"
+          [multiselect]="false"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onProjectSelected($event[0])"
+        ></app-wp-item-selector>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.SelectContractor">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-item-selector
+          *ngSwitchCase="states.done"
+          [listKind]="'contractor'"
+          [list]="stepData.contractorsList"
+          [multiselect]="false"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onContractorSelected($event[0])"
+        ></app-wp-item-selector>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.SelectStaff">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-item-selector
+          *ngSwitchCase="states.done"
+          [listKind]="'staff'"
+          [list]="stepData.staffList"
+          [multiselect]="true"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onStaffSelected($event)"
+        ></app-wp-item-selector>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.WorkInfo">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-work-info-form
+          *ngSwitchCase="states.done"
+          [stepData]="stepData"
+          [info]="stepData.workDescription"
+          (cancel)="onConfirmReset()"
+          (update)="onWorkDetailsUpdated($event)"
+        ></app-wp-work-info-form>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.WorkType">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-checkbox-list
+          *ngSwitchCase="states.done"
+          [listKind]="'worktype'"
+          [list]="stepData.workTypeList"
+          [preset]="stepData.selectedWorkTypes"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onWorkTypeSelected($event)"
+        ></app-wp-checkbox-list>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.Risks">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-checkbox-list
+          *ngSwitchCase="states.done"
+          [listKind]="'risk'"
+          [list]="stepData.riskList"
+          [preset]="stepData.selectedRisks"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onRiskSelected($event)"
+        ></app-wp-checkbox-list>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.Equipments">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-checkbox-list
+          *ngSwitchCase="states.done"
+          [listKind]="'equipment'"
+          [list]="stepData.equipmentList"
+          [preset]="stepData.selectedEquipments"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onEquipmentSelected($event)"
+        ></app-wp-checkbox-list>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.Ppe">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-checkbox-list
+          *ngSwitchCase="states.done"
+          [listKind]="'ppe'"
+          [list]="stepData.ppeList"
+          [preset]="stepData.selectedPpe"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onPpeSelected($event)"
+        ></app-wp-checkbox-list>
+      </div>
+    </div>
+
+    <div class="step-container" *ngSwitchCase="steps.ExtraPermissions">
+      <div class="step-content-md" [ngSwitch]="pageState.state">
+        <div class="step-state" *ngSwitchCase="states.inprogress">
+          <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+        </div>
+
+        <div class="step-state" *ngSwitchCase="states.failed">
+          <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+        </div>
+
+        <app-wp-checkbox-list
+          *ngSwitchCase="states.done"
+          [listKind]="'extrawp'"
+          [list]="stepData.extraPermissionList"
+          [preset]="stepData.selectedExtraPermissions"
+          (cancel)="onConfirmReset()"
+          (itemsSelected)="onExtraPermissionSelected($event)"
+        ></app-wp-checkbox-list>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #errorRetry>
+  <p *ngIf="pageState.error?.message">{{ pageState.error?.message }}</p>
+  <small *ngIf="pageState.error?.details" [innerHTML]="pageState.error?.details"></small>
+  <button mat-flat-button color="primary" (click)="onRetryFailedStep()">Tekrar dene</button>
+</ng-template>
+
+<ng-template #inprogress>
+  <mat-spinner color="primary" diameter="20"></mat-spinner>
+  <span> {{ !!inProgressMsg ? inProgressMsg : 'Yükleniyor...' }} </span>
+</ng-template>

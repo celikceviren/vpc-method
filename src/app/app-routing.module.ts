@@ -6,6 +6,7 @@ import { NestleMethodViewerComponent } from './feature/nestle-method-viewer/nest
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
 import { PladisMethodReviewerComponent } from './feature/pladis-method-reviewer/pladis-method-reviewer.component';
 import { PladisMethodViewerComponent } from './feature/pladis-method-viewer/pladis-method-viewer.component';
+import { PladisWorkpermitNewComponent } from './feature/pladis-workpermit-new/pladis-workpermit-new.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
   {
     path: 'doc/review/NESTLE/:versionCode',
     component: NestleMethodReviewerComponent,
+  },
+  {
+    path: 'workpermit/new/PLADIS',
+    component: PladisWorkpermitNewComponent,
   },
 ];
 
