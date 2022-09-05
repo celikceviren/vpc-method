@@ -41,8 +41,8 @@ export class WpQuestionsComponent implements OnInit {
       return;
     }
 
+    //Note: Shortes questions
     /*
-    Note: Shortes questions
     this.controlQuestions.questionGroups.forEach((group) => {
       group.questions = group.questions.slice(0, 2);
     });

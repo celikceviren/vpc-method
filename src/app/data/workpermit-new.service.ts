@@ -194,8 +194,7 @@ export class WorkpermitNewService {
         return of({
           result: false,
           error,
-          items: undefined,
-        } as ServiceItemResult<CodeValueItem>);
+        } as ServiceItemResult<void>);
       })
     );
   }

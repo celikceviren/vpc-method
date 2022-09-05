@@ -111,17 +111,20 @@ export class WpApiService {
     );
   }
 
-  public sendWorPermitToApprove(postData: any): Observable<ServiceListResult<void>> {
-    console.log('sendWorPermitToApprove => postData =>', postData);
-    return of(true).pipe(
-      delay(5000),
-      switchMap(() => {
-        return this.onBackToDashboard();
+  public sendWorPermitToApprove(postData: any): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/form/save?token=` + token;
+        return this.httpClient.post<any>(_url, postData).pipe(
+          switchMap(() => {
+            return this.onBackToDashboard();
+          })
+        );
       })
     );
   }
 
-  private onBackToDashboard(): Observable<any> {
+  private onBackToDashboard(): Observable<ServiceItemResult<void>> {
     this.postMsg('backtodashboard');
     return fromEvent(window, 'message').pipe(
       takeUntil(timer(45000)),
@@ -133,7 +136,10 @@ export class WpApiService {
         return e?.data?.action === 'backtodashboard';
       }),
       take(1),
-      map((e: any) => (e?.data?.action ?? '') as string)
+      map((e: any) => {
+        const resp: ServiceItemResult<void> = { result: true };
+        return resp;
+      })
     );
   }
 

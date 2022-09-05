@@ -41,8 +41,8 @@ export class WpLocationScannerComponent implements OnInit, OnDestroy, AfterViewI
       const activeDevice = this.devices[0];
       this.activeDevice = new FormControl<MediaDeviceInfo>({ value: activeDevice, disabled: false });
 
+      //Note: Mock QR Scan
       /*
-      Note: Mock QR Scan
       setTimeout(() => {
         this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg==');
       }, 3000);
