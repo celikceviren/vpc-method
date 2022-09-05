@@ -1,0 +1,202 @@
+<div class="title">
+  <h3>İş İzni Bilgileri</h3>
+  <h4>İş izni formunu onaya göndermeden önce kontrol edebilirsiniz.</h4>
+</div>
+
+<mat-card *ngIf="location">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışmanın Yapılacağı Yer</h3>
+    <p>{{ location.facilityName }}, {{ location.areaName }}</p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.SelectProject)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="project">
+  <mat-card-content>
+    <h3 class="primary-color">İş Çağrısı</h3>
+    <p>{{ project.name }}</p>
+    <p class="label">İş Çağrısını Açan:</p>
+    <p>{{ project.owner }}</p>
+    <p class="label">Bilgiler:</p>
+    <small>{{ project.desc }}</small> <br />
+    <small>{{ project.dtStart | date: 'dd.MM.YYYY' }} - {{ project.dtEnd | date: 'dd.MM.YYYY' }} </small>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.SelectContractor)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="contractor && (staffList?.length ?? 0 > 0)">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Yapacak Kişiler</h3>
+    <p class="label">Firma:</p>
+    <p>{{ contractor.name }}</p>
+    <p class="label">Kişiler:</p>
+    <p>
+      <span *ngFor="let staff of staffList; let ix = index">
+        {{ staff.name }} {{ (staffList?.length ?? 0) > 1 && ix + 1 < (staffList?.length ?? 0) ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.WorkInfo)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="workDescription">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Bilgileri</h3>
+    <p class="label">Yapılacak Çalışmanın Tanımı :</p>
+    <p>{{ workDescription.description }}</p>
+    <p class="label">Başlangıç Saati:</p>
+    <small>{{ workDescription.dtStart | date: 'dd.MM.YYYY hh:mm' }} </small>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.WorkType)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="workTypes !== undefined && workTypes?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Yapılacak Çalışmanın İş Türleri</h3>
+    <p>
+      <span *ngFor="let item of workTypes; let ix = index">
+        {{ item.name }} {{ workTypes.length > 1 && ix + 1 < workTypes.length ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.Risks)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="risks !== undefined && risks?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Sırasında Tehlikeye / Kazaya Neden Olabilecek Ortam ve Şartlar</h3>
+    <p>
+      <span *ngFor="let item of risks; let ix = index">
+        {{ item.name }} {{ risks.length > 1 && ix + 1 < risks.length ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.Equipments)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="equipments !== undefined && equipments?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Sırasında Kullanılacak Ekipmanlar</h3>
+    <p>
+      <span *ngFor="let item of equipments; let ix = index">
+        {{ item.name }} {{ equipments.length > 1 && ix + 1 < equipments.length ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.Ppe)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="ppe !== undefined && ppe?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Sırasında Kullanılması Gereken Kişisel Koruyucu Donanımlar</h3>
+    <p>
+      <span *ngFor="let item of ppe; let ix = index">
+        {{ item.name }} {{ ppe.length > 1 && ix + 1 < ppe.length ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.ExtraPermissions)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<mat-card *ngIf="permissions !== undefined && permissions?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma İçin Genel İş İzni Haricinde Verilecek İş İzinleri</h3>
+    <p>
+      <span *ngFor="let item of permissions; let ix = index">
+        {{ item.name }} {{ permissions.length > 1 && ix + 1 < permissions.length ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.QuestionsList)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<ng-container *ngIf="questions !== undefined && questions.questionGroups?.length">
+  <mat-card *ngFor="let questionGroup of questions.questionGroups">
+    <mat-card-content>
+      <h3 class="primary-color">{{ questionGroup.name }}</h3>
+      <ng-container *ngFor="let question of questionGroup.questions; let ix = index; let last = last">
+        <p style="padding: 0 4px">{{ question.question }}</p>
+        <p class="label" style="padding: 0 8px">{{ question.answerText }}</p>
+        <mat-divider class="mb-16" *ngIf="!last"></mat-divider>
+      </ng-container>
+    </mat-card-content>
+    <mat-card-footer>
+      <button mat-mini-fab color="accent" (click)="goBack.emit(steps.GasMeasurement)">
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+
+  <mat-card *ngIf="questions.controlNotes">
+    <mat-card-content>
+      <h3 class="primary-color">Yapılan Kontroller İle İlgili Diğer Hususlar</h3>
+      <p>
+        {{ questions.controlNotes }}
+      </p>
+    </mat-card-content>
+    <mat-card-footer>
+      <button mat-mini-fab color="accent" (click)="goBack.emit(steps.GasMeasurement)">
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+</ng-container>
+
+<mat-card *ngIf="gasMeasurements !== undefined && gasMeasurements?.length">
+  <mat-card-content>
+    <h3 class="primary-color">Yapılan Gaz Ölçümünde Elde Edilen Değerler</h3>
+    <ng-container *ngFor="let item of gasMeasurements; let last = last">
+      <p style="padding: 0 4px">{{ item.label }}</p>
+      <p style="padding: 0 8px" class="label">{{ item.value }}</p>
+      <mat-divider class="mb-16" *ngIf="!last"></mat-divider>
+    </ng-container>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.ReviewApprove)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<div class="buttons">
+  <button mat-raised-button color="primary" class="h-64" (click)="appreove.emit()">
+    <mat-icon>check</mat-icon>
+    Onaya Gönder
+  </button>
+</div>

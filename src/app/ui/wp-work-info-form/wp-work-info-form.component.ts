@@ -48,14 +48,20 @@ export class WpWorkInfoFormComponent implements OnInit {
 
   private createForm(): FormGroup<PageForm> {
     const stafflist = this.stepData.selectedStaff.map((x) => x.name).join(', ');
+    const dtNow = moment().tz('Europe/Istanbul').toDate();
+    let dtStart = this.info.dtStart ? this.info.dtStart : dtNow;
+    if (dtStart < dtNow) {
+      dtStart = dtNow;
+    }
+    const dtStartStr = moment(dtStart).format('YYYY-MM-DD[T]HH:mm');
     return this.formBuilder.group({
-      facility: { value: this.stepData.selectedLocation?.faiclityName ?? '', disabled: true },
-      workArea: { value: this.stepData.selectedLocation?.workAreaName ?? '', disabled: true },
+      facility: { value: this.stepData.selectedLocation?.facilityName ?? '', disabled: true },
+      workArea: { value: this.stepData.selectedLocation?.areaName ?? '', disabled: true },
       projectName: { value: this.stepData.selectedProject?.name ?? '', disabled: true },
       projectOwner: { value: this.stepData.selectedProject?.owner ?? '', disabled: true },
       staffList: { value: stafflist, disabled: true },
       description: [this.info.description ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
-      dtStart: [moment().tz('Europe/Istanbul').format('YYYY-MM-DD[T]HH:mm'), [Validators.required]],
+      dtStart: [dtStartStr, [Validators.required]],
     });
   }
 }

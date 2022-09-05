@@ -1,0 +1,43 @@
+<div class="title">
+  <h3 *ngIf="!completed">{{ title }}</h3>
+  <h4 *ngIf="!completed">{{ (questionIx + 1).toString() }}/{{ numTotalQuestions.toString() }}</h4>
+  <h3 *ngIf="completed">Kontrol Notları</h3>
+  <h4 *ngIf="completed">Yapılan kontroller ile ilgili belirtmek istediğiniz diğer hususlar var ise belirtiniz.</h4>
+</div>
+
+<mat-card class="question-box" *ngIf="!completed">
+  <mat-card-title>{{ question.question }}</mat-card-title>
+  <mat-card-actions>
+    <mat-button-toggle-group (change)="onOptionSelected($event)">
+      <mat-button-toggle [value]="optionYes" [checked]="question.answer === optionYes">
+        {{ optionYesText }}
+      </mat-button-toggle>
+      <mat-button-toggle [value]="optionNo" [checked]="question.answer === optionNo">
+        {{ optionNoText }}
+      </mat-button-toggle>
+      <mat-button-toggle [value]="optionNan" [checked]="question.answer === optionNan">
+        {{ optionNanText }}
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </mat-card-actions>
+</mat-card>
+
+<form [formGroup]="form" *ngIf="completed">
+  <mat-form-field appearance="outline" class="mb-16 w-100-p">
+    <mat-label>Not</mat-label>
+    <textarea matInput formControlName="notes" class="h-108" maxlength="250"></textarea>
+    <mat-hint>(Max: 250)</mat-hint>
+  </mat-form-field>
+</form>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="onPreviousQuestion()">
+    <mat-icon>chevron_left</mat-icon> Önceki
+  </button>
+  <button mat-flat-button color="primary" (click)="onNextQuestion()" [disabled]="!question.answer" *ngIf="!completed">
+    Sonraki <mat-icon>chevron_right</mat-icon>
+  </button>
+  <button mat-flat-button color="primary" (click)="onSaveForm()" *ngIf="completed">
+    Kaydet ve ilerle <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

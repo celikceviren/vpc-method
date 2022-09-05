@@ -14,7 +14,7 @@ export class InfoDialogService {
   public show(msg: InfoDialogData): void {
     this.hide();
     this.dialogRef = this.dialog.open(UiInfoDialogComponent, {
-      width: '300px',
+      width: '320px',
       disableClose: true,
       autoFocus: false,
       restoreFocus: false,

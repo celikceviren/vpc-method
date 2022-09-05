@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  sourceOrigins: ['http://localhost:9106/'],
+  sourceOrigins: ['http://localhost:9106/', 'http://localhost:9104'],
+  apiUrl: 'http://localhost:9104/api',
 };
 
 /*

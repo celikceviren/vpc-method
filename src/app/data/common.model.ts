@@ -13,6 +13,27 @@ export enum FormSection {
 export namespace StaticValues {
   export const SELECT_OPTION_NONE_CODE: string = 'NONE';
   export const SELECT_OPTION_NONE_VALUE: string = 'Hiçbiri';
+  export const QUESTION_ANSWER_YES_CODE: number = 1;
+  export const QUESTION_ANSWER_YES_VALUE: string = 'Evet';
+  export const QUESTION_ANSWER_NO_CODE: number = 2;
+  export const QUESTION_ANSWER_NO_VALUE: string = 'Hayır';
+  export const QUESTION_ANSWER_NAN_CODE: number = 3;
+  export const QUESTION_ANSWER_NAN_VALUE: string = 'Gerekli Değil';
+  export const GAS_MEASUREMENT_O2_CODE: string = 'O2';
+  export const GAS_MEASUREMENT_O2_TEXT: string = 'O2 (OKSİJEN) %VOL';
+  export const GAS_MEASUREMENT_O2_HINT: string = '(min %19,5 max %23,5)';
+  export const GAS_MEASUREMENT_CH4_CODE: string = 'CH4';
+  export const GAS_MEASUREMENT_CH4_TEXT: string = 'CH4 (METAN)';
+  export const GAS_MEASUREMENT_CH4_HINT: string = '(min %5, max %15)';
+  export const GAS_MEASUREMENT_CO_CODE: string = 'CO';
+  export const GAS_MEASUREMENT_CO_TEXT: string = 'CO (Karbon Monoksit) PPM';
+  export const GAS_MEASUREMENT_CO_HINT: string = '< (35ppm)';
+  export const GAS_MEASUREMENT_H2S_CODE: string = 'H2S';
+  export const GAS_MEASUREMENT_H2S_TEXT: string = 'H2S (Hidrojen Sülfür) PPM';
+  export const GAS_MEASUREMENT_H2S_HINT: string = '< (35ppm)';
+  export const GAS_MEASUREMENT_VOC_CODE: string = 'VOC';
+  export const GAS_MEASUREMENT_VOC_TEXT: string = 'VOC (LEL)';
+  export const GAS_MEASUREMENT_VOC_HINT: string = '%LEL<1';
 }
 
 export interface CodeValueSelectItem {

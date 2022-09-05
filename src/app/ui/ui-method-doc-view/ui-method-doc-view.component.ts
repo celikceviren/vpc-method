@@ -172,7 +172,7 @@ export class UiMethodDocViewComponent implements OnInit {
       return null;
     }
 
-    return this.methodDoc.Sections.find((x) => x.Code === 'NESTLE_SC_1') ?? null;
+    return (this.methodDoc.Sections ?? []).find((x) => x.Code === 'NESTLE_SC_1') ?? null;
   }
 
   get nestleSection2(): Section | null {
@@ -180,7 +180,7 @@ export class UiMethodDocViewComponent implements OnInit {
       return null;
     }
 
-    return this.methodDoc.Sections.find((x) => x.Code === 'NESTLE_SC_2') ?? null;
+    return (this.methodDoc.Sections ?? []).find((x) => x.Code === 'NESTLE_SC_2') ?? null;
   }
 
   getWorkPermits(item: Task): string {

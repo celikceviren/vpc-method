@@ -1,0 +1,58 @@
+<div class="title">
+  <h3>Gaz Ölçüm Değerleri</h3>
+  <h4>Yapılan gaz ölçümünde elde edilen değerleri giriniz</h4>
+</div>
+
+<form [formGroup]="form">
+  <mat-form-field appearance="outline" class="mb-16" *ngIf="gasO2">
+    <mat-label>{{ gasO2.label }}</mat-label>
+    <input matInput formControlName="gasO2" required autocomplete="off" />
+    <mat-hint>{{ gasO2.hint }}</mat-hint>
+    <mat-error *ngIf="form.controls.gasO2.hasError('required') || form.controls.gasO2.hasError('maxlength')">
+      {{ gasO2.hint }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16" *ngIf="gasCH4">
+    <mat-label>{{ gasCH4.label }}</mat-label>
+    <input matInput formControlName="gasCH4" required autocomplete="off" />
+    <mat-hint>{{ gasCH4.hint }}</mat-hint>
+    <mat-error *ngIf="form.controls.gasCH4.hasError('required') || form.controls.gasCH4.hasError('maxlength')">
+      {{ gasCH4.hint }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16" *ngIf="gasCO">
+    <mat-label>{{ gasCO.label }}</mat-label>
+    <input matInput formControlName="gasCO" required autocomplete="off" />
+    <mat-hint>{{ gasCO.hint }}</mat-hint>
+    <mat-error *ngIf="form.controls.gasCO.hasError('required') || form.controls.gasCO.hasError('maxlength')">
+      {{ gasCO.hint }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16" *ngIf="gasH2S">
+    <mat-label>{{ gasH2S.label }}</mat-label>
+    <input matInput formControlName="gasH2S" required autocomplete="off" />
+    <mat-hint>{{ gasH2S.hint }}</mat-hint>
+    <mat-error *ngIf="form.controls.gasH2S.hasError('required') || form.controls.gasH2S.hasError('maxlength')">
+      {{ gasH2S.hint }}
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="mb-16" *ngIf="gasVOC">
+    <mat-label>{{ gasVOC.label }}</mat-label>
+    <input matInput formControlName="gasVOC" required autocomplete="off" />
+    <mat-hint>{{ gasVOC.hint }}</mat-hint>
+    <mat-error *ngIf="form.controls.gasVOC.hasError('required') || form.controls.gasVOC.hasError('maxlength')">
+      {{ gasVOC.hint }}
+    </mat-error>
+  </mat-form-field>
+</form>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="update.emit(gasMeasurements)" [disabled]="form.invalid">
+    Kaydet ve Devam Et <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

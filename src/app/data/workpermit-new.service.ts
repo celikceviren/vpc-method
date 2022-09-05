@@ -1,13 +1,16 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, delay, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, delay, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { WpApiService } from 'src/_services/api/wp-api.service';
 import { StaticValues } from './common.model';
 import {
   CodeValueItem,
   Project,
+  QuestionGroup,
   ServiceError,
   ServiceItemResult,
   ServiceListResult,
+  StaffListResponse,
   WorkAreaInfo,
   WorkDetails,
   WPNewStep,
@@ -18,7 +21,7 @@ import {
 })
 export class WorkpermitNewService {
   mockErrorRetry: number = 0;
-  constructor() {}
+  constructor(private api: WpApiService) {}
 
   getDefaultErrorMsg(reason?: string): string {
     return `İşlem başarısız. ${reason ?? ''}`;
@@ -50,30 +53,26 @@ export class WorkpermitNewService {
         return 'Adım 9: Çalışmada Kullanılması Gereken Kişisel Koruyucu Donanımlar';
       case WPNewStep.ExtraPermissions:
         return 'Adım 10: İş İzinleri';
-      default:
-        return `Adım ${step.toString()}`;
+      case WPNewStep.QuestionsList:
+        return 'Adım 11: Kontroller';
+      case WPNewStep.GasMeasurement:
+        return 'Adım 12: Gaz Ölçümleri';
+      case WPNewStep.ReviewApprove:
+        return 'Adım 13: Gözden Geçir ve Onaya Gönder';
     }
   }
 
-  searchWorkAreaByQrCode(qrCode: string, companyCode: string): Observable<ServiceItemResult<WorkAreaInfo>> {
-    const item$ = of({
-      result: true,
-      item: {
-        companyCode: companyCode,
-        companyName: 'Pladis Global',
-        facilityCode: '123123123123',
-        faiclityName: 'Ülker Çamlıca Kampüsü',
-        workAreaCode: 'WA_PLADIS_000001',
-        workAreaName: 'Çamlıca - Çalışma Alanı #1',
-      },
-    } as ServiceItemResult<WorkAreaInfo>);
-
-    return item$.pipe(
-      delay(500),
+  searchWorkAreaByQrCode(qrCode: string): Observable<ServiceItemResult<WorkAreaInfo>> {
+    return this.api.searchArea(qrCode).pipe(
       catchError((err) => {
         const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L47';
         const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
           details: this.formatErrorDetails(errorCode, 'searchWorkAreaByQrCode'),
           error: err,
         };
@@ -86,35 +85,17 @@ export class WorkpermitNewService {
     );
   }
 
-  getActiveProjectsForLocation(
-    companyCode: string,
-    facilityCode: string,
-    workAreaCode: string
-  ): Observable<ServiceListResult<Project>> {
-    const mockProjects = [];
-    for (let i = 1; i < 4; i++) {
-      const item = {
-        code: `PRJ_000_${i}`,
-        name: `İş Çağrısı #${i}`,
-        desc: 'İş çağrısı açıklamaları',
-        owner: 'Ali Düztaban',
-        dtStart: new Date('2022-08-24'),
-        dtEnd: new Date('2022-09-14'),
-        kind: 'project',
-      } as Project;
-      mockProjects.push(item);
-    }
-    const items$ = of({
-      result: true,
-      items: mockProjects,
-    } as ServiceListResult<Project>);
-
-    return items$.pipe(
-      delay(500),
+  getActiveProjectsForLocation(areaCode: string): Observable<ServiceListResult<Project>> {
+    return this.api.getActiveProjectsForArea(areaCode).pipe(
       catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L116';
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L88';
         const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
           details: this.formatErrorDetails(errorCode, 'getActiveProjectsForLocation'),
           error: err,
         };
@@ -122,35 +103,22 @@ export class WorkpermitNewService {
           result: false,
           error,
           items: undefined,
-        } as ServiceListResult<Project>);
+        } as ServiceItemResult<Project>);
       })
     );
   }
 
-  getContractorsOfProject(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockContractors = [];
-    for (let i = 1; i < 3; i++) {
-      const item = {
-        code: `CONTRACTOR_${i}`,
-        name: `Mock Yüklenici #${i} Ltd. Şti.`,
-        kind: 'contractor',
-      } as CodeValueItem;
-      mockContractors.push(item);
-    }
-    const items$ = of({
-      result: true,
-      items: mockContractors,
-    } as ServiceListResult<CodeValueItem>);
-    return items$.pipe(
-      delay(500),
+  getContractorsOfProject(projectCode: string): Observable<ServiceListResult<CodeValueItem>> {
+    return this.api.getContractorsOfProject(projectCode).pipe(
       catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L134';
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L110';
         const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
           details: this.formatErrorDetails(errorCode, 'getContractorsOfProject'),
           error: err,
         };
@@ -158,301 +126,76 @@ export class WorkpermitNewService {
           result: false,
           error,
           items: undefined,
-        } as ServiceListResult<CodeValueItem>);
+        } as ServiceItemResult<CodeValueItem>);
       })
     );
   }
 
-  getStaffList(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockStaffList = [];
-    for (let i = 1; i < 7; i++) {
-      const item = {
-        code: `STAFF_${i}`,
-        name: `Çalışan İsmi #${i}`,
-        kind: 'staff',
-      } as CodeValueItem;
-      mockStaffList.push(item);
-    }
-    const items$ = of({
-      result: true,
-      items: mockStaffList,
-    } as ServiceListResult<CodeValueItem>);
-    return items$.pipe(
-      delay(500),
+  getStaffList(projectCode: string, contractorCode: string): Observable<ServiceItemResult<StaffListResponse>> {
+    return this.api.getStaffList(projectCode, contractorCode).pipe(
       catchError((err) => {
         const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L134';
         const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
           details: this.formatErrorDetails(errorCode, 'getStaffList'),
           error: err,
         };
         return of({
           result: false,
           error,
+          item: undefined,
+        } as ServiceItemResult<StaffListResponse>);
+      })
+    );
+  }
+
+  getQuestionsForPermissions(permissions: string[]): Observable<ServiceListResult<QuestionGroup>> {
+    return this.api.getQuestionsForPermissions(permissions).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L156';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'getQuestionsForPermissions'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
           items: undefined,
-        } as ServiceListResult<CodeValueItem>);
+        } as ServiceItemResult<CodeValueItem>);
       })
     );
   }
 
-  getWorkInfo(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceItemResult<WorkDetails>> {
-    const item$ = of({
-      result: true,
-      item: {
-        description: 'Çalışma açıklamaları burada yer alacak',
-        dtStart: new Date(),
-      },
-    } as ServiceItemResult<{ description: string; dtStart: Date }>);
-
-    return item$.pipe(
-      delay(500),
+  sendWorPermitToApprove(postData: any): Observable<any> {
+    return this.api.sendWorPermitToApprove(postData).pipe(
       catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L223';
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L183';
         const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getWorkInfo'),
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'sendWorPermitToApprove'),
           error: err,
         };
         return of({
           result: false,
           error,
-          item: undefined,
-        } as ServiceItemResult<WorkDetails>);
-      })
-    );
-  }
-
-  getWorkTypes(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockList = [];
-    for (let i = 1; i < 18; i++) {
-      const item = {
-        code: `WORKTYPE_${i}`,
-        name: `İş Türü #${i}`,
-        kind: 'worktype',
-      } as CodeValueItem;
-      mockList.push(item);
-    }
-
-    mockList.push({
-      code: StaticValues.SELECT_OPTION_NONE_CODE,
-      name: StaticValues.SELECT_OPTION_NONE_VALUE,
-      kind: 'worktype',
-    });
-
-    const items$ = of({
-      result: true,
-      items: mockList,
-    } as ServiceListResult<CodeValueItem>);
-
-    return items$.pipe(
-      delay(500),
-      catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L261';
-        const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getWorkTypes'),
-          error: err,
-        };
-        return of({
-          result: false,
-          error,
-          item: undefined,
-        } as ServiceListResult<CodeValueItem>);
-      })
-    );
-  }
-
-  getRisks(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockList = [];
-    for (let i = 1; i < 6; i++) {
-      const item = {
-        code: `RISK_${i}`,
-        name: `Tehlike veya kaza riski #${i}`,
-        kind: 'risk',
-      } as CodeValueItem;
-      mockList.push(item);
-    }
-
-    mockList.push({
-      code: StaticValues.SELECT_OPTION_NONE_CODE,
-      name: StaticValues.SELECT_OPTION_NONE_VALUE,
-      kind: 'risk',
-    });
-
-    const items$ = of({
-      result: true,
-      items: mockList,
-    } as ServiceListResult<CodeValueItem>);
-
-    return items$.pipe(
-      delay(500),
-      catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L326';
-        const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getRisks'),
-          error: err,
-        };
-        return of({
-          result: false,
-          error,
-          item: undefined,
-        } as ServiceListResult<CodeValueItem>);
-      })
-    );
-  }
-
-  getEquipments(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockList = [];
-    for (let i = 1; i < 6; i++) {
-      const item = {
-        code: `EQUIPMENT_${i}`,
-        name: `Makine veya ekipman #${i}`,
-        kind: 'equipment',
-      } as CodeValueItem;
-      mockList.push(item);
-    }
-
-    mockList.push({
-      code: StaticValues.SELECT_OPTION_NONE_CODE,
-      name: StaticValues.SELECT_OPTION_NONE_VALUE,
-      kind: 'equipment',
-    });
-
-    const items$ = of({
-      result: true,
-      items: mockList,
-    } as ServiceListResult<CodeValueItem>);
-
-    return items$.pipe(
-      delay(500),
-      catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L355';
-        const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getEquipments'),
-          error: err,
-        };
-        return of({
-          result: false,
-          error,
-          item: undefined,
-        } as ServiceListResult<CodeValueItem>);
-      })
-    );
-  }
-
-  getPpe(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockList = [];
-    for (let i = 1; i < 6; i++) {
-      const item = {
-        code: `PPE_${i}`,
-        name: `Kişisel koruyucu donanım #${i}`,
-        kind: 'ppe',
-      } as CodeValueItem;
-      mockList.push(item);
-    }
-
-    mockList.push({
-      code: StaticValues.SELECT_OPTION_NONE_CODE,
-      name: StaticValues.SELECT_OPTION_NONE_VALUE,
-      kind: 'ppe',
-    });
-
-    const items$ = of({
-      result: true,
-      items: mockList,
-    } as ServiceListResult<CodeValueItem>);
-
-    return items$.pipe(
-      delay(500),
-      catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L400';
-        const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getPpe'),
-          error: err,
-        };
-        return of({
-          result: false,
-          error,
-          item: undefined,
-        } as ServiceListResult<CodeValueItem>);
-      })
-    );
-  }
-
-  getExtraPermissions(
-    companyCode: string,
-    facilityCode: string,
-    projectCode: string,
-    contractorCode: string
-  ): Observable<ServiceListResult<CodeValueItem>> {
-    const mockList = [];
-    for (let i = 1; i < 6; i++) {
-      const item = {
-        code: `WORK_PERMIT_${i}`,
-        name: `Özel iş izni #${i}`,
-        kind: 'extrawp',
-      } as CodeValueItem;
-      mockList.push(item);
-    }
-
-    mockList.push({
-      code: StaticValues.SELECT_OPTION_NONE_CODE,
-      name: StaticValues.SELECT_OPTION_NONE_VALUE,
-      kind: 'extrawp',
-    });
-
-    const items$ = of({
-      result: true,
-      items: mockList,
-    } as ServiceListResult<CodeValueItem>);
-
-    return items$.pipe(
-      delay(500),
-      catchError((err) => {
-        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L445';
-        const error: ServiceError = {
-          message: err.error?.message ?? err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'getExtraPermissions'),
-          error: err,
-        };
-        return of({
-          result: false,
-          error,
-          item: undefined,
-        } as ServiceListResult<CodeValueItem>);
+          items: undefined,
+        } as ServiceItemResult<CodeValueItem>);
       })
     );
   }

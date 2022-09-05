@@ -10,9 +10,10 @@ import { CodeValueItem } from 'src/app/data/workpermit.model';
 })
 export class WpCheckboxListComponent implements OnInit {
   readonly defaultMsg = 'En az bir seçim yapmalısınız';
-  @Input() listKind: 'worktype' | 'risk' | 'equipment' | 'ppe' | 'extrawp' | undefined;
+  @Input() listKind: 'contractor' | 'staff' | 'worktype' | 'risk' | 'equipment' | 'ppe' | 'extrawp' | undefined;
   @Input() list: Array<CodeValueItem> = [];
   @Input() preset: Array<CodeValueItem> = [];
+  @Input() addNone: boolean = true;
   @Output() itemsSelected: EventEmitter<Array<CodeValueItem>> = new EventEmitter<Array<CodeValueItem>>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
 
@@ -30,6 +31,19 @@ export class WpCheckboxListComponent implements OnInit {
         item: x,
       };
     });
+
+    if (this.addNone) {
+      const optionNone: CodeValueItem = {
+        kind: this.listKind ? this.listKind : 'contractor',
+        code: StaticValues.SELECT_OPTION_NONE_CODE,
+        name: StaticValues.SELECT_OPTION_NONE_VALUE,
+      };
+      this.selectList.push({
+        item: optionNone,
+        selected: this.preset.some((y) => y.code === optionNone.code),
+        disabled: false,
+      });
+    }
 
     this.selectedItems = this.selectList.filter((x) => x.selected).map((x) => x.item);
   }

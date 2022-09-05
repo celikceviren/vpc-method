@@ -15,7 +15,8 @@ export class WindowMsgService {
 
   public isValidSourceOrigin(event: any): boolean {
     const origin = event?.origin ?? '';
-    if (!this.sourceOrigin) {
+
+    if (this.sourceOrigin === '*') {
       const isValid = this.allowedSourceOrigins.some((x) => origin.startsWith(this.sourceOrigin));
       if (isValid) {
         this.sourceOrigin = origin;

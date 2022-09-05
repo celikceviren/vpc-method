@@ -6,4 +6,5 @@ export const environment = {
     'https://nestleyuklenici.visitpro.net/',
     'http://localhost:9106/',
   ],
+  apiUrl: 'https://easy.visitpro.net/api',
 };

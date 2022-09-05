@@ -1,3 +1,5 @@
+import { StaticValues } from './common.model';
+
 export enum WPNewStep {
   SelectLocation = 1,
   SelectProject,
@@ -10,6 +12,7 @@ export enum WPNewStep {
   Ppe,
   ExtraPermissions,
   QuestionsList,
+  GasMeasurement,
   ReviewApprove,
 }
 
@@ -42,16 +45,17 @@ export interface WpPageState {
   state: PageState;
   error?: ServiceError;
 }
-
 export class WPNewStepsData {
   qrCode: string = '';
   selectedLocation: WorkAreaInfo = {
     companyCode: '',
     companyName: '',
     facilityCode: '',
-    faiclityName: '',
-    workAreaCode: '',
-    workAreaName: '',
+    facilityName: '',
+    areaGroupCode: '',
+    areaGroupName: '',
+    areaCode: '',
+    areaName: '',
   };
   projectsList: Project[] = [];
   selectedProject?: Project;
@@ -73,15 +77,55 @@ export class WPNewStepsData {
   selectedPpe: CodeValueItem[] = [];
   extraPermissionList: CodeValueItem[] = [];
   selectedExtraPermissions: CodeValueItem[] = [];
+  controlQuestions: ControlQuestions = {
+    questionGroups: [],
+    controlNotes: '',
+  };
+  gasMeasurements: GasMeasurement[] = [];
+
+  constructor() {
+    this.gasMeasurements.push({
+      code: StaticValues.GAS_MEASUREMENT_O2_CODE,
+      label: StaticValues.GAS_MEASUREMENT_O2_TEXT,
+      hint: StaticValues.GAS_MEASUREMENT_O2_HINT,
+      value: '',
+    });
+    this.gasMeasurements.push({
+      code: StaticValues.GAS_MEASUREMENT_CH4_CODE,
+      label: StaticValues.GAS_MEASUREMENT_CH4_TEXT,
+      hint: StaticValues.GAS_MEASUREMENT_CH4_HINT,
+      value: '',
+    });
+    this.gasMeasurements.push({
+      code: StaticValues.GAS_MEASUREMENT_CO_CODE,
+      label: StaticValues.GAS_MEASUREMENT_CO_TEXT,
+      hint: StaticValues.GAS_MEASUREMENT_CO_HINT,
+      value: '',
+    });
+    this.gasMeasurements.push({
+      code: StaticValues.GAS_MEASUREMENT_H2S_CODE,
+      label: StaticValues.GAS_MEASUREMENT_H2S_TEXT,
+      hint: StaticValues.GAS_MEASUREMENT_H2S_HINT,
+      value: '',
+    });
+    this.gasMeasurements.push({
+      code: StaticValues.GAS_MEASUREMENT_VOC_CODE,
+      label: StaticValues.GAS_MEASUREMENT_VOC_TEXT,
+      hint: StaticValues.GAS_MEASUREMENT_VOC_HINT,
+      value: '',
+    });
+  }
 
   clearSelectedLocation(): void {
     this.selectedLocation = {
       companyCode: '',
       companyName: '',
       facilityCode: '',
-      faiclityName: '',
-      workAreaCode: '',
-      workAreaName: '',
+      facilityName: '',
+      areaGroupCode: '',
+      areaGroupName: '',
+      areaCode: '',
+      areaName: '',
     };
   }
 
@@ -91,17 +135,48 @@ export class WPNewStepsData {
       dtStart: new Date(),
     };
   }
-}
 
+  mapStaffListResponse(response: StaffListResponse): void {
+    this.staffList = response?.staffList ?? [];
+    if (response?.lookup) {
+      const { workTypeList, riskList, equipmentList, ppeList, extraPermissionList } = response.lookup;
+      this.workTypeList = workTypeList ?? [];
+      this.riskList = riskList ?? [];
+      this.equipmentList = equipmentList ?? [];
+      this.ppeList = ppeList ?? [];
+      this.extraPermissionList = extraPermissionList ?? [];
+    }
+
+    if (response?.preset) {
+      const {
+        workDescription,
+        selectedWorkTypes,
+        selectedRisks,
+        selectedEquipments,
+        selectedPpe,
+        selectedExtraPermissions,
+      } = response.preset;
+      this.workDescription = this.workDescription.description !== '' ? this.workDescription : workDescription;
+      this.selectedWorkTypes = !this.selectedWorkTypes.length ? selectedWorkTypes : this.selectedWorkTypes;
+      this.selectedRisks = !this.selectedRisks.length ? selectedRisks : this.selectedRisks;
+      this.selectedPpe = !this.selectedPpe.length ? selectedPpe : this.selectedPpe;
+      this.selectedEquipments = !this.selectedEquipments.length ? selectedEquipments : this.selectedEquipments;
+      this.selectedExtraPermissions = !this.selectedExtraPermissions.length
+        ? selectedExtraPermissions
+        : this.selectedExtraPermissions;
+    }
+  }
+}
 export interface WorkAreaInfo {
   companyCode: string;
   companyName: string;
   facilityCode: string;
-  faiclityName: string;
-  workAreaCode: string;
-  workAreaName: string;
+  facilityName: string;
+  areaGroupCode: string;
+  areaGroupName: string;
+  areaCode: string;
+  areaName: string;
 }
-
 export interface Project {
   kind: 'project';
   code: string;
@@ -111,14 +186,53 @@ export interface Project {
   dtStart: Date;
   dtEnd: Date;
 }
-
 export interface CodeValueItem {
   kind: 'contractor' | 'staff' | 'worktype' | 'risk' | 'equipment' | 'ppe' | 'extrawp';
   code: string;
   name: string;
 }
-
 export interface WorkDetails {
   description: string;
   dtStart: Date;
+}
+export interface StaffListResponse {
+  staffList: CodeValueItem[];
+  lookup: {
+    workTypeList: CodeValueItem[];
+    riskList: CodeValueItem[];
+    equipmentList: CodeValueItem[];
+    ppeList: CodeValueItem[];
+    extraPermissionList: CodeValueItem[];
+  };
+  preset: {
+    workDescription: WorkDetails;
+    selectedWorkTypes: CodeValueItem[];
+    selectedRisks: CodeValueItem[];
+    selectedEquipments: CodeValueItem[];
+    selectedPpe: CodeValueItem[];
+    selectedExtraPermissions: CodeValueItem[];
+  };
+}
+export interface ControlQuestions {
+  questionGroups: Array<QuestionGroup>;
+  controlNotes: string;
+}
+export interface QuestionGroup {
+  code: string;
+  name: string;
+  priority: number;
+  questions: Question[];
+}
+export interface Question {
+  code: string;
+  question: string;
+  priority: string;
+  answer: number;
+  answerText: string;
+}
+export interface GasMeasurement {
+  code: string;
+  label: string;
+  hint: string;
+  value: string;
 }

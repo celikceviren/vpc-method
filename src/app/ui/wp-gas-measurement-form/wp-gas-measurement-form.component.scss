@@ -1,8 +1,36 @@
-:host {
+@import '../../../assets/scss/common/breakpoints';
+
+form {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 8px;
+
+  ::ng-deep {
+    .mat-input-element {
+      @include media-breakpoint('lt-sm') {
+        font-size: 16px;
+      }
+      &:disabled {
+        color: currentColor;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+div.title {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  h3 {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: 500;
+  }
+  h4 {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.54);
+  }
 }
 
 div.buttons {
@@ -12,6 +40,7 @@ div.buttons {
   justify-content: space-between;
   gap: 16px;
   padding: 8px;
+  margin-top: 24px;
 
   button {
     ::ng-deep {
@@ -39,17 +68,4 @@ div.buttons {
       }
     }
   }
-}
-
-span.label {
-  font-weight: 500;
-  font-size: 14px;
-  border-bottom: 1px solid #e0e0e0;
-  line-height: 24px;
-  padding: 0 4px;
-}
-
-span.value {
-  font-size: 14px;
-  padding: 0 4px;
 }

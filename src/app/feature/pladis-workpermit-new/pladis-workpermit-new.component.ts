@@ -1,12 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, take, takeUntil } from 'rxjs';
-import { ConfirmDialogData } from 'src/app/data/common.model';
+import { ConfirmDialogData, StaticValues } from 'src/app/data/common.model';
 import { WorkpermitNewService } from 'src/app/data/workpermit-new.service';
 import {
   CodeValueItem,
+  ControlQuestions,
+  GasMeasurement,
   PageState,
   Project,
+  QuestionGroup,
   ServiceError,
   WorkDetails,
   WPNewStep,
@@ -63,7 +66,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     this.onNewPageState(PageState.inprogress);
 
     this.service
-      .searchWorkAreaByQrCode(qrCode, this.companyCode)
+      .searchWorkAreaByQrCode(qrCode)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result || !response?.item) {
@@ -71,7 +74,10 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
             PageState.failed,
             response?.error ??
               ({
-                message: 'Veriler alınamadı',
+                message:
+                  response?.result && !response.item
+                    ? 'Okutulan koda ait bir çalışma alanı bulunamadı'
+                    : 'Veriler alınamadı',
                 details: this.service.formatErrorDetails('L54', 'searchWorkAreaByQrCode'),
               } as ServiceError)
           );
@@ -107,49 +113,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    switch (this.currentStep) {
-      case WPNewStep.SelectProject:
-        this.moveToStep(WPNewStep.SelectLocation);
-        this.stepData.clearSelectedLocation();
-        this.onResetPageState();
-        break;
-      case WPNewStep.SelectContractor:
-        this.moveToStep(WPNewStep.SelectProject);
-        this.stepData.selectedProject = undefined;
-        this.loadStep();
-        break;
-      case WPNewStep.SelectStaff:
-        this.moveToStep(WPNewStep.SelectContractor);
-        this.stepData.selectedContractor = undefined;
-        this.loadStep();
-        break;
-      case WPNewStep.WorkInfo:
-        this.moveToStep(WPNewStep.SelectStaff);
-        this.stepData.selectedStaff = [];
-        this.stepData.clearWorkDescription();
-        this.loadStep();
-        break;
-      case WPNewStep.WorkType:
-        this.moveToStep(WPNewStep.WorkInfo);
-        this.loadStep();
-        break;
-      case WPNewStep.Risks:
-        this.moveToStep(WPNewStep.WorkType);
-        this.loadStep();
-        break;
-      case WPNewStep.Equipments:
-        this.moveToStep(WPNewStep.Risks);
-        this.loadStep();
-        break;
-      case WPNewStep.Ppe:
-        this.moveToStep(WPNewStep.Equipments);
-        this.loadStep();
-        break;
-      case WPNewStep.ExtraPermissions:
-        this.moveToStep(WPNewStep.Ppe);
-        this.loadStep();
-        break;
-    }
+    this.backToStep(this.currentStep);
   }
 
   onConfirmReset(): void {
@@ -244,10 +208,155 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     this.loadStep();
   }
 
+  onQuestionsAnswered(control: ControlQuestions): void {
+    this.stepData.controlQuestions.questionGroups = control.questionGroups;
+    this.stepData.controlQuestions.controlNotes = control.controlNotes ?? '';
+    this.moveToStep(WPNewStep.GasMeasurement);
+    this.loadStep();
+  }
+
+  onUpdateGasMeasurements(measurements: GasMeasurement[]): void {
+    this.stepData.gasMeasurements = measurements;
+    this.moveToStep(WPNewStep.ReviewApprove);
+    this.loadStep();
+  }
+
+  onConfirmApprove(): void {
+    const dialogData: ConfirmDialogData = {
+      title: '',
+      body: 'İş izni formunu onaya göndermek istediğinize emin misiniz?',
+      hasConfirmBtn: true,
+      confirmBtnText: 'Evet',
+      closeBtnText: 'Vazgeç',
+    };
+    const dialogRef = this.dialog.open(UiConfirmDialogComponent, {
+      width: '320px',
+      data: dialogData,
+    });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (!resp || !resp?.confirmed) {
+        return;
+      }
+
+      const postData = {
+        project: this.stepData.selectedProject?.code,
+        contractor: this.stepData.selectedContractor?.code,
+        staff: this.stepData.selectedStaff.map((x) => x.code),
+        workDescription: this.stepData.workDescription.description,
+        dtStart: this.stepData.workDescription.dtStart,
+        workTypes: this.stepData.selectedWorkTypes.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
+        equipments: this.stepData.selectedEquipments.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
+        risks: this.stepData.selectedRisks.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
+        ppe: this.stepData.selectedPpe.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
+        workPermits: this.stepData.selectedExtraPermissions.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
+        controlNotes: this.stepData.controlQuestions.controlNotes ?? '',
+        questions: this.stepData.controlQuestions.questionGroups.flatMap((x) =>
+          x.questions.map((y) => {
+            return { code: y.code, answer: y.answer, answerText: y.answerText };
+          })
+        ),
+        gasMeasurements: this.stepData.gasMeasurements.map((x) => {
+          return { code: x.code, value: x.value };
+        }),
+      };
+
+      this.onNewPageState(PageState.inprogress);
+      this.service
+        .sendWorPermitToApprove(postData)
+        .pipe(takeUntil(this.unsubscribeAll), take(1))
+        .subscribe((response) => {
+          if (!response?.result) {
+            this.onNewPageState(
+              PageState.failed,
+              response?.error ??
+                ({
+                  message: 'Veriler alınamadı',
+                  details: this.service.formatErrorDetails('L284', 'sendWorPermitToApprove'),
+                } as ServiceError)
+            );
+            return;
+          }
+        });
+    });
+  }
+
+  onBackToStep(step: WPNewStep): void {
+    this.currentStep = step;
+    this.backToStep(this.currentStep);
+  }
+
+  private backToStep(step: WPNewStep): void {
+    switch (step) {
+      case WPNewStep.SelectProject:
+        this.moveToStep(WPNewStep.SelectLocation);
+        this.stepData.clearSelectedLocation();
+        this.onResetPageState();
+        break;
+      case WPNewStep.SelectContractor:
+        this.moveToStep(WPNewStep.SelectProject);
+        this.stepData.selectedProject = undefined;
+        this.loadStep();
+        break;
+      case WPNewStep.SelectStaff:
+        this.moveToStep(WPNewStep.SelectContractor);
+        this.stepData.selectedContractor = undefined;
+        this.loadStep();
+        break;
+      case WPNewStep.WorkInfo:
+        this.moveToStep(WPNewStep.SelectStaff);
+        this.stepData.selectedStaff = [];
+        this.stepData.clearWorkDescription();
+        this.loadStep();
+        break;
+      case WPNewStep.WorkType:
+        this.moveToStep(WPNewStep.WorkInfo);
+        this.loadStep();
+        break;
+      case WPNewStep.Risks:
+        this.moveToStep(WPNewStep.WorkType);
+        this.loadStep();
+        break;
+      case WPNewStep.Equipments:
+        this.moveToStep(WPNewStep.Risks);
+        this.loadStep();
+        break;
+      case WPNewStep.Ppe:
+        this.moveToStep(WPNewStep.Equipments);
+        this.loadStep();
+        break;
+      case WPNewStep.ExtraPermissions:
+        this.moveToStep(WPNewStep.Ppe);
+        this.loadStep();
+        break;
+      case WPNewStep.QuestionsList:
+        this.moveToStep(WPNewStep.ExtraPermissions);
+        this.loadStep();
+        break;
+      case WPNewStep.GasMeasurement:
+        this.moveToStep(WPNewStep.QuestionsList);
+        this.loadStep();
+        break;
+      case WPNewStep.ReviewApprove:
+        this.moveToStep(WPNewStep.GasMeasurement);
+        this.loadStep();
+        break;
+    }
+  }
+
   private getActiveProjects(): void {
-    const { companyCode, facilityCode, workAreaCode } = this.stepData.selectedLocation;
+    const { companyCode, facilityCode, areaCode } = this.stepData.selectedLocation;
     this.service
-      .getActiveProjectsForLocation(companyCode, facilityCode, workAreaCode)
+      .getActiveProjectsForLocation(areaCode)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -265,7 +374,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
         if (!response.items?.length) {
           this.onNewPageState(PageState.failed, {
             message: 'Seçilen çalışma alanında aktif iş çağrısı yok.',
-            details: this.service.formatErrorDetails('L119', `${facilityCode}:${workAreaCode}`),
+            details: this.service.formatErrorDetails('L119', `${companyCode}:${facilityCode}:${areaCode}`),
           } as ServiceError);
           return;
         }
@@ -284,7 +393,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     const { companyCode, facilityCode } = this.stepData.selectedLocation;
     const { code } = this.stepData.selectedProject;
     this.service
-      .getContractorsOfProject(companyCode, facilityCode, code)
+      .getContractorsOfProject(code)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -302,7 +411,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
         if (!response.items?.length) {
           this.onNewPageState(PageState.failed, {
             message: 'Seçilen iş çağrısı için kayıtlı yüklenici bulunamdı.',
-            details: this.service.formatErrorDetails('L187', `${facilityCode}:${code}`),
+            details: this.service.formatErrorDetails('L187', `${companyCode}:${facilityCode}:${code}`),
           } as ServiceError);
           return;
         }
@@ -322,7 +431,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     const { code: projecCode } = this.stepData.selectedProject;
     const { code: contractorCode } = this.stepData.selectedContractor;
     this.service
-      .getStaffList(companyCode, facilityCode, projecCode, contractorCode)
+      .getStaffList(projecCode, contractorCode)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -337,30 +446,35 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
           return;
         }
 
-        if (!response.items?.length) {
+        if (!response.item?.staffList?.length) {
           this.onNewPageState(PageState.failed, {
             message: 'Seçilen yüklenici için iş çağrısında çalışacak kişi kaydı bulunamadı.',
-            details: this.service.formatErrorDetails('L187', `${facilityCode}:${projecCode}:${contractorCode}`),
+            details: this.service.formatErrorDetails(
+              'L347',
+              `${companyCode}:${facilityCode}:${projecCode}:${contractorCode}`
+            ),
           } as ServiceError);
           return;
         }
 
-        this.stepData.staffList = response.items;
-        this.stepData.selectedStaff = [];
+        this.stepData.mapStaffListResponse(response.item);
         this.onNewPageState(PageState.done);
       });
   }
 
-  private getWorkInfo(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
+  private getQuestionsList(): void {
+    if (!this.stepData.selectedProject?.code || !this.stepData.selectedExtraPermissions?.length) {
       return;
     }
 
+    const permissions =
+      this.stepData.selectedExtraPermissions
+        .filter((x) => x.code !== StaticValues.SELECT_OPTION_NONE_CODE)
+        .map((x) => x.code) ?? [];
     const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
+    const { code } = this.stepData.selectedProject;
     this.service
-      .getWorkInfo(companyCode, facilityCode, projecCode, contractorCode)
+      .getQuestionsForPermissions(permissions)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -369,39 +483,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
             response?.error ??
               ({
                 message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L230', 'getStaffList'),
-              } as ServiceError)
-          );
-          return;
-        }
-
-        this.stepData.workDescription = {
-          description: response?.item?.description ?? '',
-          dtStart: response?.item?.dtStart ?? new Date(),
-        };
-        this.onNewPageState(PageState.done);
-      });
-  }
-
-  private getWorkTypes(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
-      return;
-    }
-
-    const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
-    this.service
-      .getWorkTypes(companyCode, facilityCode, projecCode, contractorCode)
-      .pipe(takeUntil(this.unsubscribeAll), take(1))
-      .subscribe((response) => {
-        if (!response?.result) {
-          this.onNewPageState(
-            PageState.failed,
-            response?.error ??
-              ({
-                message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L353', 'getWorkTypes'),
+                details: this.service.formatErrorDetails('L178', 'getContractorsOfProject'),
               } as ServiceError)
           );
           return;
@@ -409,161 +491,13 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
 
         if (!response.items?.length) {
           this.onNewPageState(PageState.failed, {
-            message: 'İş türleri listesinde kayıt bulunamadı.',
-            details: this.service.formatErrorDetails('L362', `${facilityCode}:${projecCode}:${contractorCode}`),
+            message: 'Seçilen iş izinleri için herhangi bir soru bulunamadı.',
+            details: this.service.formatErrorDetails('L389', `${companyCode}:${facilityCode}:${code}`),
           } as ServiceError);
           return;
         }
 
-        this.stepData.workTypeList = response.items;
-        this.onNewPageState(PageState.done);
-      });
-  }
-
-  private getRisks(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
-      return;
-    }
-
-    const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
-    this.service
-      .getRisks(companyCode, facilityCode, projecCode, contractorCode)
-      .pipe(takeUntil(this.unsubscribeAll), take(1))
-      .subscribe((response) => {
-        if (!response?.result) {
-          this.onNewPageState(
-            PageState.failed,
-            response?.error ??
-              ({
-                message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L402', 'getRisks'),
-              } as ServiceError)
-          );
-          return;
-        }
-
-        if (!response.items?.length) {
-          this.onNewPageState(PageState.failed, {
-            message: 'Tehlike ve kaza riskleri listesinde kayıt bulunamadı.',
-            details: this.service.formatErrorDetails('L411', `${facilityCode}:${projecCode}:${contractorCode}`),
-          } as ServiceError);
-          return;
-        }
-
-        this.stepData.riskList = response.items;
-        this.onNewPageState(PageState.done);
-      });
-  }
-
-  private getEquipments(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
-      return;
-    }
-
-    const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
-    this.service
-      .getEquipments(companyCode, facilityCode, projecCode, contractorCode)
-      .pipe(takeUntil(this.unsubscribeAll), take(1))
-      .subscribe((response) => {
-        if (!response?.result) {
-          this.onNewPageState(
-            PageState.failed,
-            response?.error ??
-              ({
-                message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L450', 'getEquipments'),
-              } as ServiceError)
-          );
-          return;
-        }
-
-        if (!response.items?.length) {
-          this.onNewPageState(PageState.failed, {
-            message: 'Ekipmanlar listesinde kayıt bulunamadı.',
-            details: this.service.formatErrorDetails('L459', `${facilityCode}:${projecCode}:${contractorCode}`),
-          } as ServiceError);
-          return;
-        }
-
-        this.stepData.equipmentList = response.items;
-        this.onNewPageState(PageState.done);
-      });
-  }
-
-  private getPpe(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
-      return;
-    }
-
-    const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
-    this.service
-      .getPpe(companyCode, facilityCode, projecCode, contractorCode)
-      .pipe(takeUntil(this.unsubscribeAll), take(1))
-      .subscribe((response) => {
-        if (!response?.result) {
-          this.onNewPageState(
-            PageState.failed,
-            response?.error ??
-              ({
-                message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L488', 'getPpe'),
-              } as ServiceError)
-          );
-          return;
-        }
-
-        if (!response.items?.length) {
-          this.onNewPageState(PageState.failed, {
-            message: 'Kişisel koruyucu donanımlar listesinde kayıt bulunamadı.',
-            details: this.service.formatErrorDetails('L497', `${facilityCode}:${projecCode}:${contractorCode}`),
-          } as ServiceError);
-          return;
-        }
-
-        this.stepData.ppeList = response.items;
-        this.onNewPageState(PageState.done);
-      });
-  }
-
-  private getExtraPermissions(): void {
-    if (!this.stepData.selectedProject?.code || !this.stepData.selectedContractor?.code) {
-      return;
-    }
-
-    const { companyCode, facilityCode } = this.stepData.selectedLocation;
-    const { code: projecCode } = this.stepData.selectedProject;
-    const { code: contractorCode } = this.stepData.selectedContractor;
-    this.service
-      .getExtraPermissions(companyCode, facilityCode, projecCode, contractorCode)
-      .pipe(takeUntil(this.unsubscribeAll), take(1))
-      .subscribe((response) => {
-        if (!response?.result) {
-          this.onNewPageState(
-            PageState.failed,
-            response?.error ??
-              ({
-                message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L526', 'getExtraPermissions'),
-              } as ServiceError)
-          );
-          return;
-        }
-
-        if (!response.items?.length) {
-          this.onNewPageState(PageState.failed, {
-            message: 'Özel iş izinleri listesinde kayıt bulunamadı.',
-            details: this.service.formatErrorDetails('L535', `${facilityCode}:${projecCode}:${contractorCode}`),
-          } as ServiceError);
-          return;
-        }
-
-        this.stepData.extraPermissionList = response.items;
+        this.stepData.controlQuestions.questionGroups = response.items;
         this.onNewPageState(PageState.done);
       });
   }
@@ -594,39 +528,30 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
         this.retryProcessFn = this.loadStep.bind(this);
         break;
       case WPNewStep.WorkInfo:
-        this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getWorkInfo();
-        this.retryProcessFn = this.loadStep.bind(this);
-        break;
       case WPNewStep.WorkType:
-        this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getWorkTypes();
-        this.retryProcessFn = this.loadStep.bind(this);
-        break;
       case WPNewStep.Risks:
-        this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getRisks();
-        this.retryProcessFn = this.loadStep.bind(this);
-        break;
       case WPNewStep.Equipments:
-        this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getEquipments();
-        this.retryProcessFn = this.loadStep.bind(this);
-        break;
       case WPNewStep.Ppe:
+      case WPNewStep.ExtraPermissions:
+      case WPNewStep.GasMeasurement:
         this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getPpe();
+        this.onNewPageState(PageState.done);
         this.retryProcessFn = this.loadStep.bind(this);
         break;
-      case WPNewStep.ExtraPermissions:
+      case WPNewStep.QuestionsList:
+        this.onNewPageState(PageState.done);
         this.inProgressMsg = 'Veriler alınıyor...';
-        this.onNewPageState(PageState.inprogress);
-        this.getExtraPermissions();
+        if (!this.stepData.controlQuestions.questionGroups?.length) {
+          this.onNewPageState(PageState.inprogress);
+          this.getQuestionsList();
+        } else {
+          this.onNewPageState(PageState.done);
+        }
+        this.retryProcessFn = this.loadStep.bind(this);
+        break;
+      case WPNewStep.ReviewApprove:
+        this.onNewPageState(PageState.done);
+        this.inProgressMsg = 'İş izni formu kaydediliyor...';
         this.retryProcessFn = this.loadStep.bind(this);
         break;
     }

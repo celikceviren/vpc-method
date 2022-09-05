@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
 import { PladisMethodEditorService } from './data/pladis-method-editor.service';
@@ -49,7 +50,11 @@ import { WpLocationApproveComponent } from './ui/wp-location-approve/wp-location
 import { WpItemSelectorComponent } from './ui/wp-item-selector/wp-item-selector.component';
 import { WpWorkInfoFormComponent } from './ui/wp-work-info-form/wp-work-info-form.component';
 import { WpCheckboxListComponent } from './ui/wp-checkbox-list/wp-checkbox-list.component';
-
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApiNoauthInterceptor } from 'src/_helpers/api-noauth-interceptor';
+import { WpQuestionsComponent } from './ui/wp-questions/wp-questions.component';
+import { WpGasMeasurementFormComponent } from './ui/wp-gas-measurement-form/wp-gas-measurement-form.component';
+import { WpReviewApproveComponent } from './ui/wp-review-approve/wp-review-approve.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -77,12 +82,16 @@ import { WpCheckboxListComponent } from './ui/wp-checkbox-list/wp-checkbox-list.
     WpItemSelectorComponent,
     WpWorkInfoFormComponent,
     WpCheckboxListComponent,
+    WpQuestionsComponent,
+    WpGasMeasurementFormComponent,
+    WpReviewApproveComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     CommonModule,
+    HttpClientModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
     MatIconModule,
@@ -99,9 +108,17 @@ import { WpCheckboxListComponent } from './ui/wp-checkbox-list/wp-checkbox-list.
     MatRadioModule,
     MatCardModule,
     MatSelectModule,
+    MatButtonToggleModule,
     ZXingScannerModule,
   ],
-  providers: [PladisMethodEditorService, WindowMsgService, InfoDialogService, DecimalPipe, UUIDService],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ApiNoauthInterceptor, multi: true },
+    PladisMethodEditorService,
+    WindowMsgService,
+    InfoDialogService,
+    DecimalPipe,
+    UUIDService,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -41,9 +41,12 @@ export class WpLocationScannerComponent implements OnInit, OnDestroy, AfterViewI
       const activeDevice = this.devices[0];
       this.activeDevice = new FormControl<MediaDeviceInfo>({ value: activeDevice, disabled: false });
 
+      /*
+      Note: Mock QR Scan
       setTimeout(() => {
-        this.scanSuccess.emit('TEST_BARCODE');
+        this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg==');
       }, 3000);
+      */
     }
   }
 
@@ -69,7 +72,9 @@ export class WpLocationScannerComponent implements OnInit, OnDestroy, AfterViewI
           }, 5000);
         } else {
           this.hasWarning = false;
-          this.scannerEnabled = true;
+          setTimeout(() => {
+            this.scannerEnabled = true;
+          }, 500);
         }
       });
   }
