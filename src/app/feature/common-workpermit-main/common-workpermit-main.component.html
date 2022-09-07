@@ -202,7 +202,7 @@
       </div>
       <div
         class="menu-item"
-        (click)="onConfirmDelete(item.id)"
+        (click)="onConfirmDelete(item?.id)"
         *ngIf="role === roles.OWNER && visibleStatus === statuses.PENDING"
       >
         <mat-icon class="accent-color">info_outline</mat-icon>

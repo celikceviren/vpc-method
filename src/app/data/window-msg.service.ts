@@ -33,4 +33,14 @@ export class WindowMsgService {
     }
     return `${this.sourceOrigin}${path}`;
   }
+
+  public postMsg(action: string, data?: any): void {
+    parent.postMessage(
+      {
+        action,
+        data,
+      },
+      '*'
+    );
+  }
 }

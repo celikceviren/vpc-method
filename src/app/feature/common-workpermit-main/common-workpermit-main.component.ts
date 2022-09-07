@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, forkJoin, map, of, Subject, take, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, forkJoin, map, of, Subject, take, takeUntil, tap, distinctUntilChanged } from 'rxjs';
 import { ConfirmDialogData, InfoDialogData } from 'src/app/data/common.model';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
 import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
@@ -13,6 +13,7 @@ import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confir
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 import { InfoDialogService } from 'src/app/data/info-dialog.service';
+import { WindowMsgService } from 'src/app/data/window-msg.service';
 
 @Component({
   selector: 'app-common-workpermit-main',
@@ -21,7 +22,7 @@ import { InfoDialogService } from 'src/app/data/info-dialog.service';
 })
 export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit {
   private unsubscribeAll = new Subject<void>();
-
+  private height$ = new Subject<number>();
   companyCode!: string;
   hideDashboard!: boolean;
   showStatus!: WpStatus[];
@@ -48,10 +49,12 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   constructor(
     private splashService: SplashScreenService,
     private service: WpMainService,
+    private windowService: WindowMsgService,
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
     private dialogService: InfoDialogService,
-    private api: WpApiService
+    private api: WpApiService,
+    private host: ElementRef
   ) {}
 
   get pendingTab(): boolean {
@@ -129,6 +132,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
   ngAfterViewInit() {
     this.isMobileView = window.innerWidth < this.mobileViewBreak;
+    this.awaitHeightChange();
   }
 
   onTabChange(event: MatTabChangeEvent): void {
@@ -141,7 +145,10 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
     setTimeout(() => this.tableInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
 
-  onConfirmDelete(id: number): void {
+  onConfirmDelete(id?: number): void {
+    if (id === undefined) {
+      throw new Error('onConfirmDelete => id undefined');
+    }
     const dialogData: ConfirmDialogData = {
       title: '',
       body: 'Onay bekleyen iş iznini geri almak istediğinize emin misiniz?',
@@ -226,5 +233,18 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
   private initTable(status: WpStatus): void {
     this.tableDs = new WpMainTableDataSource(this.service, status, this.scope, this.areaGroup);
+  }
+
+  private awaitHeightChange(): void {
+    this.height$.pipe(distinctUntilChanged(), debounceTime(200)).subscribe((newHeight) => {
+      this.windowService.postMsg('newheight', { height: newHeight });
+    });
+
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0].contentRect.height;
+      this.height$.next(height);
+    });
+
+    observer.observe(this.host.nativeElement);
   }
 }
