@@ -45,5 +45,5 @@ export interface WpListItem {
   workArea: string;
   workAreaGroup: string;
   isgApproved?: boolean;
-  areaApprove?: boolean;
+  areaApproved?: boolean;
 }

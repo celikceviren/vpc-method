@@ -110,6 +110,12 @@
           <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
             <mat-icon>more_vert</mat-icon>
           </button>
+          <mat-icon class="desktop-approve-check isg" *ngIf="item.isgApproved" matTooltip="Onaylandı (İSG)">
+            task_alt
+          </mat-icon>
+          <mat-icon class="desktop-approve-check" *ngIf="item.areaApproved" matTooltip="Onaylandı (Alan Sorumlusu)">
+            task_alt
+          </mat-icon>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="mobiledata">
@@ -117,6 +123,12 @@
         <mat-cell *matCellDef="let item" class="mobile-cell">
           <div class="id-row">
             <h3>#{{ item.id }}</h3>
+            <mat-icon class="desktop-approve-check isg" *ngIf="item.isgApproved" matTooltip="Onaylandı (İSG)">
+              task_alt
+            </mat-icon>
+            <mat-icon class="desktop-approve-check" *ngIf="item.areaApproved" matTooltip="Onaylandı (Alan Sorumlusu)">
+              task_alt
+            </mat-icon>
             <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
               <mat-icon>more_vert</mat-icon>
             </button>

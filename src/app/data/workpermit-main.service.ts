@@ -24,6 +24,8 @@ export class WpMainService {
         dtCreate: new Date(),
         dtStart: new Date(),
         dtEnd: new Date(),
+        isgApproved: true,
+        areaApproved: true,
       };
       list.push(wp);
     }
