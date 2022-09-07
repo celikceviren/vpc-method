@@ -68,6 +68,10 @@ export class WpMainTableDataSource implements DataSource<WpListItem> {
     this.load();
   }
 
+  reloadPage(): void {
+    this.load();
+  }
+
   private load(): void {
     this._loading = true;
     this._failed = false;

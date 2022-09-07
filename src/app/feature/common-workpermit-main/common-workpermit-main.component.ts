@@ -1,14 +1,18 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, forkJoin, map, of, Subject, take, takeUntil } from 'rxjs';
+import { catchError, forkJoin, map, of, Subject, take, takeUntil, tap } from 'rxjs';
+import { ConfirmDialogData, InfoDialogData } from 'src/app/data/common.model';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
 import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
 import { WpMainService } from 'src/app/data/workpermit-main.service';
-import { ServiceItemResult, SummaryStatsItem } from 'src/app/data/workpermit.model';
+import { ServiceError, ServiceItemResult, SummaryStatsItem } from 'src/app/data/workpermit.model';
+import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confirm-dialog.component';
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
+import { InfoDialogService } from 'src/app/data/info-dialog.service';
 
 @Component({
   selector: 'app-common-workpermit-main',
@@ -45,6 +49,8 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
     private splashService: SplashScreenService,
     private service: WpMainService,
     private activatedRoute: ActivatedRoute,
+    private dialog: MatDialog,
+    private dialogService: InfoDialogService,
     private api: WpApiService
   ) {}
 
@@ -133,6 +139,62 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   onPaginatorChanged(event: PageEvent): void {
     this.tableDs.changePage(event.pageIndex + 1, event.pageSize);
     setTimeout(() => this.tableInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }
+
+  onConfirmDelete(id: number): void {
+    const dialogData: ConfirmDialogData = {
+      title: '',
+      body: 'Onay bekleyen iş iznini geri almak istediğinize emin misiniz?',
+      hasConfirmBtn: true,
+      confirmBtnText: 'Evet',
+      closeBtnText: 'Vazgeç',
+    };
+    const dialogRef = this.dialog.open(UiConfirmDialogComponent, {
+      width: '320px',
+      autoFocus: false,
+      restoreFocus: false,
+      data: dialogData,
+    });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (!resp || !resp?.confirmed) {
+        return;
+      }
+
+      const dialogData: InfoDialogData = {
+        body: 'Kaydediliyor...',
+        isLoading: true,
+      };
+      this.dialogService.show(dialogData);
+      this.service
+        .deleteWorkPermit(id)
+        .pipe(
+          takeUntil(this.unsubscribeAll),
+          take(1),
+          tap(() => this.dialogService.hide())
+        )
+        .subscribe((resp) => {
+          if (!resp?.result) {
+            const msg =
+              resp?.error ??
+              ({
+                message: 'Veriler alınamadı',
+                details: this.service.formatErrorDetails('L175', 'onConfirmDelete'),
+              } as ServiceError);
+
+            const dialogData: InfoDialogData = {
+              title: 'İşlem başarısız',
+              body: `${msg.message}<br /><small>${msg.details}</small>`,
+              dismissable: true,
+            };
+            setTimeout(() => {
+              this.dialogService.show(dialogData);
+            }, 500);
+            return;
+          }
+
+          this.tableDs.reloadPage();
+        });
+    });
   }
 
   private init(): void {

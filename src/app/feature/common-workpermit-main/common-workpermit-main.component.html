@@ -200,7 +200,11 @@
         <mat-icon class="accent-color">info_outline</mat-icon>
         <span>Görüntüle</span>
       </div>
-      <div class="menu-item" *ngIf="role === roles.OWNER && visibleStatus === statuses.PENDING">
+      <div
+        class="menu-item"
+        (click)="onConfirmDelete(item.id)"
+        *ngIf="role === roles.OWNER && visibleStatus === statuses.PENDING"
+      >
         <mat-icon class="accent-color">info_outline</mat-icon>
         <span>Geri Al</span>
       </div>

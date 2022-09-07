@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, timer } from 'rxjs';
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { PaginatedListResult, WpListItem, WpStatus } from './workpermit-main.model';
-import { ServiceError } from './workpermit.model';
+import { ServiceError, ServiceItemResult } from './workpermit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +49,29 @@ export class WpMainService {
           size: 0,
           total: 0,
         } as PaginatedListResult<WpListItem>);
+      })
+    );
+  }
+
+  public deleteWorkPermit(id: number): Observable<ServiceItemResult<void>> {
+    return this.api.deleteWp(id).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L156';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'deleteWorkPermit'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: undefined,
+        } as ServiceItemResult<void>);
       })
     );
   }

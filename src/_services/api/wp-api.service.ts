@@ -207,6 +207,21 @@ export class WpApiService {
     );
   }
 
+  public deleteWp(id: number): Observable<ServiceItemResult<void>> {
+    let _url = `${environment.apiUrl}/workpermit/item/` + id.toString();
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        return this.httpClient.delete<any>(_url, { params }).pipe(
+          map(() => {
+            return { result: true } as ServiceItemResult<void>;
+          })
+        );
+      })
+    );
+  }
+
   private onBackToDashboard(): Observable<ServiceItemResult<void>> {
     this.postMsg('backtodashboard');
     return fromEvent(window, 'message').pipe(
