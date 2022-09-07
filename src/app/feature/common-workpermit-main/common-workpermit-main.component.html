@@ -59,7 +59,7 @@
 </div>
 
 <ng-template #table>
-  <div class="table-container" *ngIf="tableDs">
+  <div class="table-container" [ngClass]="{ 'single-tab': singleTab }" *ngIf="tableDs">
     <mat-table class="table-striped desktop" [dataSource]="tableDs">
       <ng-container matColumnDef="id">
         <mat-header-cell *matHeaderCellDef class="w-56">ID</mat-header-cell>

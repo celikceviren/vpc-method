@@ -92,6 +92,10 @@ div.main-container {
     width: 100%;
     margin-bottom: 32px;
 
+    &.single-tab {
+      margin-top: 16px;
+    }
+
     > .mat-spinner {
       margin: 32px;
     }
