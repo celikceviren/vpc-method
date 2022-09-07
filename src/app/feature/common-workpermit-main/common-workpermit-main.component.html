@@ -131,7 +131,7 @@
             <mat-icon class="desktop-approve-check" *ngIf="item.areaApproved" matTooltip="Onaylandı (Alan Sorumlusu)">
               task_alt
             </mat-icon>
-            <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
+            <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
               <mat-icon>more_vert</mat-icon>
             </button>
           </div>
@@ -196,7 +196,7 @@
 
   <mat-menu #actions="matMenu" xPosition="before">
     <ng-template matMenuContent let-item="item">
-      <div class="menu-item">
+      <div class="menu-item" (click)="onGetWorkPermitItem(item?.id)">
         <mat-icon class="accent-color">info_outline</mat-icon>
         <span>Görüntüle</span>
       </div>

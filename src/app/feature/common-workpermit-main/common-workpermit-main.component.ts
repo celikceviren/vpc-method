@@ -3,7 +3,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, debounceTime, forkJoin, map, of, Subject, take, takeUntil, tap, distinctUntilChanged } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  forkJoin,
+  map,
+  of,
+  Subject,
+  take,
+  takeUntil,
+  tap,
+  distinctUntilChanged,
+  delay,
+} from 'rxjs';
 import { ConfirmDialogData, InfoDialogData } from 'src/app/data/common.model';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
 import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
@@ -204,6 +216,49 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
+  onGetWorkPermitItem(id?: number): void {
+    if (!id) {
+      throw new Error('onConfirmDelete => id undefined');
+    }
+
+    const dialogData: InfoDialogData = {
+      body: 'Veriler alınıyor...',
+      isLoading: true,
+    };
+    this.dialogService.show(dialogData);
+
+    this.service
+      .getWorkPermitItem(id)
+      .pipe(
+        takeUntil(this.unsubscribeAll),
+        take(1),
+        delay(1000),
+        tap(() => this.dialogService.hide())
+      )
+      .subscribe((resp) => {
+        if (!resp?.result) {
+          const msg =
+            resp?.error ??
+            ({
+              message: 'Veriler alınamadı',
+              details: this.service.formatErrorDetails('L230', 'onGetWorkPermitItem'),
+            } as ServiceError);
+
+          const dialogData: InfoDialogData = {
+            title: 'İşlem başarısız',
+            body: `${msg.message}<br /><small>${msg.details}</small>`,
+            dismissable: true,
+          };
+          setTimeout(() => {
+            this.dialogService.show(dialogData);
+          }, 500);
+          return;
+        }
+
+        console.log('item =>', resp.item);
+      });
+  }
+
   private init(): void {
     this.splashService.hide();
     this.visibleStatus = this.showStatus[0];
@@ -237,7 +292,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
   private awaitHeightChange(): void {
     this.height$.pipe(distinctUntilChanged(), debounceTime(200)).subscribe((newHeight) => {
-      this.windowService.postMsg('newheight', { height: newHeight });
+      //this.windowService.postMsg('newheight', { height: newHeight });
     });
 
     const observer = new ResizeObserver((entries) => {

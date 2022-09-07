@@ -12,6 +12,7 @@ import {
   StaffListResponse,
   SummaryStatsItem,
   WorkAreaInfo,
+  WorkPermitItem,
 } from 'src/app/data/workpermit.model';
 import { environment } from 'src/environments/environment';
 
@@ -216,6 +217,21 @@ export class WpApiService {
         return this.httpClient.delete<any>(_url, { params }).pipe(
           map(() => {
             return { result: true } as ServiceItemResult<void>;
+          })
+        );
+      })
+    );
+  }
+
+  public getWorkPermitItem(id: number): Observable<ServiceItemResult<WorkPermitItem>> {
+    let _url = `${environment.apiUrl}/workpermit/itemget/` + id;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        return this.httpClient.get<WorkPermitItem>(_url, { params }).pipe(
+          map((item) => {
+            return { result: true, item } as ServiceItemResult<WorkPermitItem>;
           })
         );
       })

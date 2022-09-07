@@ -187,7 +187,7 @@ export interface Project {
   dtEnd: Date;
 }
 export interface CodeValueItem {
-  kind: 'contractor' | 'staff' | 'worktype' | 'risk' | 'equipment' | 'ppe' | 'extrawp';
+  kind: 'contractor' | 'staff' | 'worktype' | 'risk' | 'equipment' | 'ppe' | 'extrawp' | 'gasm';
   code: string;
   name: string;
 }
@@ -242,4 +242,20 @@ export interface SummaryStatsItem {
   active: number;
   closed: number;
   rejected: number;
+}
+
+export interface WorkPermitItem {
+  id: number;
+  location: WorkAreaInfo;
+  project: Project;
+  contractor: CodeValueItem;
+  staff: CodeValueItem[];
+  workTypes: CodeValueItem[];
+  equipments: CodeValueItem[];
+  risks: CodeValueItem[];
+  ppe: CodeValueItem[];
+  workPermits: CodeValueItem[];
+  gasMeasurements: CodeValueItem[];
+  workDescription: WorkDetails;
+  controlQuestions: ControlQuestions;
 }

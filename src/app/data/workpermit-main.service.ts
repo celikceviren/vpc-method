@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, timer } from 'rxjs';
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { PaginatedListResult, WpListItem, WpStatus } from './workpermit-main.model';
-import { ServiceError, ServiceItemResult } from './workpermit.model';
+import { ServiceError, ServiceItemResult, WorkPermitItem } from './workpermit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -72,6 +72,29 @@ export class WpMainService {
           error,
           items: undefined,
         } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  public getWorkPermitItem(id: number): Observable<ServiceItemResult<WorkPermitItem>> {
+    return this.api.getWorkPermitItem(id).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L82';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'getWorkPermitItem'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: undefined,
+        } as ServiceItemResult<WorkPermitItem>);
       })
     );
   }
