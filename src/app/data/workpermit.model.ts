@@ -236,3 +236,10 @@ export interface GasMeasurement {
   hint: string;
   value: string;
 }
+
+export interface SummaryStatsItem {
+  pending: number;
+  active: number;
+  closed: number;
+  rejected: number;
+}

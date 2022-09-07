@@ -2,10 +2,12 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 import { PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { ActivatedRoute } from '@angular/router';
-import { forkJoin, map, Subject, take } from 'rxjs';
+import { catchError, forkJoin, map, of, Subject, take, takeUntil } from 'rxjs';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
 import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
 import { WpMainService } from 'src/app/data/workpermit-main.service';
+import { ServiceItemResult, SummaryStatsItem } from 'src/app/data/workpermit.model';
+import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 
 @Component({
@@ -30,13 +32,15 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   isMobileView!: boolean;
   columns: string[] = ['id', 'owner', 'project', 'dtWp', 'permissions', 'staff', 'action'];
   mobileColumns: string[] = ['mobiledata'];
+  stats!: SummaryStatsItem;
 
   @ViewChild('focus', { read: ElementRef }) tableInput!: ElementRef;
 
   constructor(
     private splashService: SplashScreenService,
     private service: WpMainService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private api: WpApiService
   ) {}
 
   get pendingTab(): boolean {
@@ -128,9 +132,26 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
     this.splashService.hide();
     this.initTable(this.showStatus[0]);
 
-    setTimeout(() => {
-      this.dashboardLoading = false;
-    }, 3000);
+    if (!this.hideDashboard) {
+      this.api
+        .getSummaryStats(this.scope)
+        .pipe(
+          takeUntil(this.unsubscribeAll),
+          take(1),
+          catchError(() => {
+            return of({
+              result: true,
+              item: { pending: 0, closed: 0, active: 0, rejected: 0 } as SummaryStatsItem,
+            } as ServiceItemResult<SummaryStatsItem>);
+          })
+        )
+        .subscribe((stats) => {
+          this.stats = stats.item ?? ({ pending: 0, closed: 0, active: 0, rejected: 0 } as SummaryStatsItem);
+          setTimeout(() => {
+            this.dashboardLoading = false;
+          }, 0);
+        });
+    }
   }
 
   private initTable(status: WpStatus): void {

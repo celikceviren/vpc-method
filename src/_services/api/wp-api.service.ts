@@ -9,6 +9,7 @@ import {
   ServiceItemResult,
   ServiceListResult,
   StaffListResponse,
+  SummaryStatsItem,
   WorkAreaInfo,
 } from 'src/app/data/workpermit.model';
 import { environment } from 'src/environments/environment';
@@ -118,6 +119,25 @@ export class WpApiService {
         return this.httpClient.post<any>(_url, postData).pipe(
           switchMap(() => {
             return this.onBackToDashboard();
+          })
+        );
+      })
+    );
+  }
+
+  public getSummaryStats(scope: string, aregroup?: string): Observable<ServiceItemResult<SummaryStatsItem>> {
+    let _url = `${environment.apiUrl}/workpermit/summary/stats`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('scope', scope);
+        if (aregroup?.length) {
+          params = params.append('aregroup', aregroup);
+        }
+        params = params.append('token', token);
+        return this.httpClient.get<SummaryStatsItem>(_url, { params }).pipe(
+          map((response) => {
+            return { result: true, item: response } as ServiceItemResult<SummaryStatsItem>;
           })
         );
       })
