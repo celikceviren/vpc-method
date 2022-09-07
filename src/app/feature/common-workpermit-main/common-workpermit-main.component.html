@@ -44,16 +44,16 @@
 
   <mat-tab-group *ngIf="!singleTab; else table" (selectedTabChange)="onTabChange($event)">
     <mat-tab label="ONAY BEKLYEN" *ngIf="pendingTab">
-      <ng-container [ngTemplateOutlet]="table"></ng-container>
+      <ng-container *ngIf="visibleStatus === statuses.PENDING" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
     <mat-tab label="AKTİF" *ngIf="activeTab">
-      <ng-container [ngTemplateOutlet]="table"></ng-container>
+      <ng-container *ngIf="visibleStatus === statuses.ACTIVE" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
     <mat-tab label="KAPALI" *ngIf="closedTab">
-      <ng-container [ngTemplateOutlet]="table"></ng-container>
+      <ng-container *ngIf="visibleStatus === statuses.CLOSED" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
     <mat-tab label="ONAYLANMAYAN" *ngIf="rejectedTab">
-      <ng-container [ngTemplateOutlet]="table"></ng-container>
+      <ng-container *ngIf="visibleStatus === statuses.REJECTED" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
   </mat-tab-group>
 </div>
@@ -107,7 +107,7 @@
       <ng-container matColumnDef="action">
         <mat-header-cell *matHeaderCellDef class="w-56">&nbsp;</mat-header-cell>
         <mat-cell *matCellDef="let item" class="w-56">
-          <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
+          <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-icon class="desktop-approve-check isg" *ngIf="item.isgApproved" matTooltip="Onaylandı (İSG)">
@@ -187,14 +187,16 @@
   </div>
 
   <mat-menu #actions="matMenu" xPosition="before">
-    <div class="menu-item">
-      <mat-icon class="accent-color">info_outline</mat-icon>
-      <span>Görüntüle</span>
-    </div>
-    <div class="menu-item">
-      <mat-icon class="accent-color">info_outline</mat-icon>
-      <span>Geri Al</span>
-    </div>
+    <ng-template matMenuContent let-item="item">
+      <div class="menu-item">
+        <mat-icon class="accent-color">info_outline</mat-icon>
+        <span>Görüntüle</span>
+      </div>
+      <div class="menu-item" *ngIf="role === roles.OWNER && visibleStatus === statuses.PENDING">
+        <mat-icon class="accent-color">info_outline</mat-icon>
+        <span>Geri Al</span>
+      </div>
+    </ng-template>
   </mat-menu>
 </ng-template>
 

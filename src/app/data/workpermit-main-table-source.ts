@@ -12,7 +12,12 @@ export class WpMainTableDataSource implements DataSource<WpListItem> {
   private _loading!: boolean;
   private _failed!: boolean;
 
-  constructor(private service: WpMainService, private status: WpStatus) {}
+  constructor(
+    private service: WpMainService,
+    private status: WpStatus,
+    private scope: string,
+    private areaGroup: string
+  ) {}
 
   get total(): number {
     return this._total ?? 0;
@@ -67,7 +72,7 @@ export class WpMainTableDataSource implements DataSource<WpListItem> {
     this._loading = true;
     this._failed = false;
     this.service
-      .loadTablePage(this.status, this.page, this.size)
+      .loadTablePage(this.status, this.scope, this.areaGroup, this.page, this.size)
       .pipe(takeUntil(this.unsubscribe), take(1))
       .subscribe((response) => {
         if (!response?.result) {

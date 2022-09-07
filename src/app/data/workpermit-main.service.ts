@@ -1,54 +1,54 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable, timer } from 'rxjs';
+import { catchError, map, Observable, of, timer } from 'rxjs';
+import { WpApiService } from 'src/_services/api/wp-api.service';
 import { PaginatedListResult, WpListItem, WpStatus } from './workpermit-main.model';
+import { ServiceError } from './workpermit.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WpMainService {
-  private mockList: WpListItem[] = [];
-  private mockListData(status: WpStatus): WpListItem[] {
-    const list: WpListItem[] = [];
-    for (var i = 0; i < 36; i++) {
-      const wp: WpListItem = {
-        id: i + 1,
-        project: `İş Çağrısı #${i}`,
-        projectOwner: `İş Sahibi #${i}`,
-        owner: `İzin Oluşturan #${i}`,
-        ownerCode: '',
-        status,
-        workArea: `Alan #${i}`,
-        workAreaGroup: `Bölge #${i}`,
-        permissions: ['Genel', 'Yüksekte Çalışma'],
-        staff: ['John Doe', 'Alissa Martin', 'Anton Hirsch'],
-        dtCreate: new Date(),
-        dtStart: new Date(),
-        dtEnd: new Date(),
-        isgApproved: true,
-        areaApproved: true,
-      };
-      list.push(wp);
-    }
-    return list;
+  constructor(private api: WpApiService) {}
+
+  getDefaultErrorMsg(reason?: string): string {
+    return `İşlem başarısız. ${reason ?? ''}`;
   }
 
-  public loadTablePage(status: WpStatus, page?: number, size?: number): Observable<PaginatedListResult<WpListItem>> {
+  formatErrorDetails(errorCode: string, errorDesc: string): string {
+    return `[${errorCode}] - ${errorDesc}`;
+  }
+
+  public loadTablePage(
+    status: WpStatus,
+    scope: string,
+    areaGroup?: string,
+    page?: number,
+    size?: number
+  ): Observable<PaginatedListResult<WpListItem>> {
     const currentPage = page ?? 1;
     const currentSize = currentPage && (size ?? 10);
-    this.mockList = []; //this.mockListData(status);
-    return timer(1500).pipe(
-      map(() => {
-        const sliceStart = (currentPage - 1) * currentSize;
-        const sliceEnd =
-          sliceStart + currentSize > this.mockList.length ? this.mockList.length : sliceStart + currentSize;
-        const item: PaginatedListResult<WpListItem> = {
-          result: true,
-          page: currentPage,
-          size: currentSize,
-          total: this.mockList.length,
-          items: this.mockList.slice(sliceStart, sliceEnd),
+    return this.api.getWpListByStatus(status as number, scope, areaGroup, currentPage, currentSize).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L47';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'searchWorkAreaByQrCode'),
+          error: err,
         };
-        return item;
+        return of({
+          result: false,
+          error,
+          items: [],
+          page: 0,
+          size: 0,
+          total: 0,
+        } as PaginatedListResult<WpListItem>);
       })
     );
   }

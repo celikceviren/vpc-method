@@ -243,7 +243,9 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
         contractor: this.stepData.selectedContractor?.code,
         areaCode: this.stepData.selectedLocation.areaCode,
         areaGroupCode: this.stepData.selectedLocation.areaGroupCode,
-        staff: this.stepData.selectedStaff.map((x) => x.code),
+        staff: this.stepData.selectedStaff.map((x) => {
+          return { code: x.code, name: x.name };
+        }),
         workDescription: this.stepData.workDescription.description,
         dtStart: this.stepData.workDescription.dtStart,
         workTypes: this.stepData.selectedWorkTypes.map((x) => {

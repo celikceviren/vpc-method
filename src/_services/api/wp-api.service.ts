@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { delay, filter, fromEvent, map, Observable, of, switchMap, take, takeUntil, timer } from 'rxjs';
+import { filter, fromEvent, map, Observable, switchMap, take, takeUntil, timer } from 'rxjs';
 import { WindowMsgService } from 'src/app/data/window-msg.service';
+import { PaginatedListResult, WpListItem, WpStatus } from 'src/app/data/workpermit-main.model';
 import {
   CodeValueItem,
   Project,
@@ -140,6 +141,67 @@ export class WpApiService {
             return { result: true, item: response } as ServiceItemResult<SummaryStatsItem>;
           })
         );
+      })
+    );
+  }
+
+  public getWpListByStatus(
+    status: WpStatus,
+    scope: string,
+    aregroup?: string,
+    page: number = 1,
+    size: number = 50
+  ): Observable<PaginatedListResult<WpListItem>> {
+    let _url = `${environment.apiUrl}/workpermit/list/byStatus`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('status', status.toString());
+        params = params.append('scope', scope);
+        params = params.append('page', page.toString());
+        params = params.append('size', size.toString());
+        if (aregroup?.length) {
+          params = params.append('aregroup', aregroup);
+        }
+        params = params.append('token', token);
+        return this.httpClient.get<any>(_url, { params }).pipe(
+          map((response) => {
+            const { page, size, total, items } = response;
+            return { page, size, total, items } as PaginatedListResult<WpListItem>;
+          })
+        );
+      }),
+      map((page: any) => {
+        const items = page.items ?? [];
+        const list: WpListItem[] = [];
+        items.forEach((item: any) => {
+          const mapped: WpListItem = {
+            id: item.Id,
+            dtCreate: item.dtCreate,
+            dtEnd: item.dtStart,
+            dtStart: item.dtEnd,
+            owner: item.ownerName,
+            ownerCode: item.ownerCode,
+            status: item.status,
+            workArea: item.area,
+            workAreaGroup: item.areaGroupName,
+            staff: (item.staff ?? []).map((p: any) => p.name),
+            permissions: (item.permissions ?? []).map((p: any) => p.name),
+            project: item.project,
+            projectOwner: item.projectOwner,
+            areaApproved: (item.isgApproved ?? 0) > 0,
+            isgApproved: (item.isAreaApproved ?? 0) > 0,
+          };
+          list.push(mapped);
+        });
+        const result: PaginatedListResult<WpListItem> = {
+          result: true,
+          total: page.total,
+          page: page.page,
+          size: page.size,
+          items: list,
+        };
+        return result;
       })
     );
   }

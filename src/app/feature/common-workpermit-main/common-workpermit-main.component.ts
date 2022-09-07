@@ -23,6 +23,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   showStatus!: WpStatus[];
   scope!: WpScope;
   role!: WpRole;
+  areaGroup!: string;
   dashboardLoading: boolean = true;
   listPage!: WpListItem[];
   tableDs!: WpMainTableDataSource;
@@ -33,6 +34,10 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   columns: string[] = ['id', 'owner', 'project', 'dtWp', 'permissions', 'staff', 'action'];
   mobileColumns: string[] = ['mobiledata'];
   stats!: SummaryStatsItem;
+  scopes = WpScope;
+  roles = WpRole;
+  statuses = WpStatus;
+  visibleStatus!: WpStatus;
 
   @ViewChild('focus', { read: ElementRef }) tableInput!: ElementRef;
 
@@ -88,6 +93,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
         } else {
           this.role = WpRole.VIEWER;
         }
+        this.areaGroup = queryMap.get('areaGroup') ?? '';
         return true;
       })
     );
@@ -120,7 +126,8 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   onTabChange(event: MatTabChangeEvent): void {
-    this.initTable(this.showStatus[event.index]);
+    this.visibleStatus = this.showStatus[event.index];
+    this.initTable(this.visibleStatus);
   }
 
   onPaginatorChanged(event: PageEvent): void {
@@ -130,7 +137,8 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
   private init(): void {
     this.splashService.hide();
-    this.initTable(this.showStatus[0]);
+    this.visibleStatus = this.showStatus[0];
+    this.initTable(this.visibleStatus);
 
     if (!this.hideDashboard) {
       this.api
@@ -155,6 +163,6 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private initTable(status: WpStatus): void {
-    this.tableDs = new WpMainTableDataSource(this.service, status);
+    this.tableDs = new WpMainTableDataSource(this.service, status, this.scope, this.areaGroup);
   }
 }

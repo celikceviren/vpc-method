@@ -127,7 +127,6 @@ export class WpQuestionsComponent implements OnInit {
 
   onSaveForm(): void {
     this.controlQuestions.controlNotes = this.form.controls.notes.value ?? '';
-    console.log('complete', this.controlQuestions);
     this.complete.emit(this.controlQuestions);
   }
 }
