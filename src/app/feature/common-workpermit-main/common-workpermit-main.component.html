@@ -1,0 +1,209 @@
+<div class="main-container" #focus>
+  <div class="stats-container" *ngIf="!this.hideDashboard">
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">pending_actions</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading">12</span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>ONAY BEKLEYEN<br />İŞ ÇAĞRISI</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">verified</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading">4</span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>AÇIK<br />İŞ ÇAĞRISI</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">history_toggle_off</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading">12689</span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>KAPALI<br />İŞ ÇAĞRISI</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">disabled_visible</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading">987</span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>ONAYLANMAYAN<br />İŞ ÇAĞRISI</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-tab-group *ngIf="!singleTab; else table" (selectedTabChange)="onTabChange($event)">
+    <mat-tab label="ONAY BEKLYEN" *ngIf="pendingTab">
+      <ng-container [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+    <mat-tab label="AKTİF" *ngIf="activeTab">
+      <ng-container [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+    <mat-tab label="KAPALI" *ngIf="closedTab">
+      <ng-container [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+    <mat-tab label="ONAYLANMAYAN" *ngIf="rejectedTab">
+      <ng-container [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<ng-template #table>
+  <div class="table-container" *ngIf="tableDs">
+    <mat-table class="table-striped desktop" [dataSource]="tableDs">
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef class="w-56">ID</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <span> {{ item.id }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="owner">
+        <mat-header-cell *matHeaderCellDef>Oluşturan</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.owner }} </span>
+          <small> {{ item.dtCreate | date: 'dd.MM.yyyy HH:mm' }} </small>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="dtWp">
+        <mat-header-cell *matHeaderCellDef>Çalışma</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <small class="label">Başlangıç :</small>
+          <span> {{ item.dtStart | date: 'dd.MM.yyyy HH:mm' }} </span>
+          <small class="label">Bitiş :</small>
+          <span> {{ item.dtEnd | date: 'dd.MM.yyyy HH:mm' }} </span>
+          <small class="label">Yer :</small>
+          <span> {{ item.workArea }} ( {{ item.workAreaGroup }} ) </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="project">
+        <mat-header-cell *matHeaderCellDef>İş Çağrısı</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.project }} </span>
+          <small> ( {{ item.projectOwner }} ) </small>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="permissions">
+        <mat-header-cell *matHeaderCellDef>İzinler</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.permissions.join(', ') }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="staff">
+        <mat-header-cell *matHeaderCellDef>Kişiler</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.staff.join(', ') }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef class="w-56">&nbsp;</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="mobiledata">
+        <mat-header-cell *matHeaderCellDef>&nbsp;</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="mobile-cell">
+          <div class="id-row">
+            <h3>#{{ item.id }}</h3>
+            <button mat-icon-button [matMenuTriggerFor]="actions" color="accent">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+          <div>
+            <div>
+              <small class="label primary-color">Oluşturan</small>
+              <span>{{ item.owner }}</span>
+              <small> {{ item.dtCreate | date: 'dd.MM.yyyy HH:mm' }} </small>
+            </div>
+            <div>
+              <small class="label primary-color">İş Çağrısı</small>
+              <span>{{ item.project }}</span>
+              <small> {{ item.projectOwner }} </small>
+            </div>
+          </div>
+          <div>
+            <div>
+              <small class="label primary-color">Çalışma Yeri</small>
+              <span>{{ item.workArea }}</span>
+              <small> {{ item.workAreaGroup }} </small>
+            </div>
+            <div>
+              <small class="label primary-color">Çalışma Saati</small>
+              <span>{{ item.dtStart | date: 'dd.MM.yyyy HH:mm' }}</span>
+              <small> {{ item.dtEnd | date: 'dd.MM.yyyy HH:mm' }} </small>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <div>
+              <small class="label primary-color">İzinler</small>
+              <span>{{ item.permissions.join(', ') }}</span>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <div>
+              <small class="label primary-color">Kişiler</small>
+              <span>{{ item.staff.join(', ') }}</span>
+            </div>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        class="p-4"
+        style="min-height: 42px"
+        [ngStyle]="{ 'min-height: 60px': isMobileView }"
+        *matHeaderRowDef="!isMobileView ? columns : mobileColumns"
+      ></mat-header-row>
+      <mat-row *matRowDef="let item; columns: !isMobileView ? columns : mobileColumns" class="p-4"> </mat-row>
+      <div class="no-data" *matNoDataRow>
+        <ng-container *ngIf="!tableDs.loading; else loading"> Kayıt yok </ng-container>
+      </div>
+    </mat-table>
+    <ng-container [ngTemplateOutlet]="paginator"></ng-container>
+  </div>
+
+  <mat-menu #actions="matMenu" xPosition="before">
+    <div class="menu-item">
+      <mat-icon class="accent-color">info_outline</mat-icon>
+      <span>Görüntüle</span>
+    </div>
+    <div class="menu-item">
+      <mat-icon class="accent-color">info_outline</mat-icon>
+      <span>Geri Al</span>
+    </div>
+  </mat-menu>
+</ng-template>
+
+<ng-template #paginator>
+  <div class="paginator-row">
+    <div class="loading">
+      <mat-spinner [diameter]="16" *ngIf="tableDs.loading && tableDs.total > 0"></mat-spinner>
+    </div>
+    <mat-paginator
+      showFirstLastButtons
+      [disabled]="tableDs.loading"
+      [length]="tableDs.total"
+      [pageSize]="tableDs.size"
+      [pageIndex]="tableDs.page - 1"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPaginatorChanged($event)"
+    >
+    </mat-paginator>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <mat-spinner [diameter]="16"></mat-spinner>
+</ng-template>

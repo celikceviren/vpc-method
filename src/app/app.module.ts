@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
@@ -55,6 +56,11 @@ import { ApiNoauthInterceptor } from 'src/_helpers/api-noauth-interceptor';
 import { WpQuestionsComponent } from './ui/wp-questions/wp-questions.component';
 import { WpGasMeasurementFormComponent } from './ui/wp-gas-measurement-form/wp-gas-measurement-form.component';
 import { WpReviewApproveComponent } from './ui/wp-review-approve/wp-review-approve.component';
+import { WorkpermitMainComponent } from './feature/common-workpermit-main/common-workpermit-main.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
+import { MatMenuModule } from '@angular/material/menu';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -85,6 +91,7 @@ import { WpReviewApproveComponent } from './ui/wp-review-approve/wp-review-appro
     WpQuestionsComponent,
     WpGasMeasurementFormComponent,
     WpReviewApproveComponent,
+    WorkpermitMainComponent,
   ],
   imports: [
     BrowserModule,
@@ -109,6 +116,10 @@ import { WpReviewApproveComponent } from './ui/wp-review-approve/wp-review-appro
     MatCardModule,
     MatSelectModule,
     MatButtonToggleModule,
+    MatTabsModule,
+    MatPaginatorModule,
+    MatTableModule,
+    MatMenuModule,
     ZXingScannerModule,
   ],
   providers: [

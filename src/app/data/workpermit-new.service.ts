@@ -1,8 +1,7 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, delay, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, delay, map, Observable, of } from 'rxjs';
 import { WpApiService } from 'src/_services/api/wp-api.service';
-import { StaticValues } from './common.model';
 import {
   CodeValueItem,
   Project,
@@ -12,7 +11,6 @@ import {
   ServiceListResult,
   StaffListResponse,
   WorkAreaInfo,
-  WorkDetails,
   WPNewStep,
 } from './workpermit.model';
 
