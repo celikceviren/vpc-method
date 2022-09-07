@@ -35,7 +35,7 @@ export class WpMainService {
   public loadTablePage(status: WpStatus, page?: number, size?: number): Observable<PaginatedListResult<WpListItem>> {
     const currentPage = page ?? 1;
     const currentSize = currentPage && (size ?? 10);
-    this.mockList = this.mockListData(status);
+    this.mockList = []; //this.mockListData(status);
     return timer(1500).pipe(
       map(() => {
         const sliceStart = (currentPage - 1) * currentSize;

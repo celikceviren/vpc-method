@@ -11,10 +11,10 @@ div.main-container {
   display: flex;
   flex-direction: column;
   width: calc(100% - 48px);
-  max-width: 1040px;
   padding: 0 24px;
   min-height: 320px;
   gap: 16px;
+  margin-top: 16px;
 
   > div.page-title {
     display: flex;
