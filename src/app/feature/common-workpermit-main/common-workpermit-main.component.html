@@ -102,6 +102,8 @@
         <mat-header-cell *matHeaderCellDef>Kişiler</mat-header-cell>
         <mat-cell *matCellDef="let item">
           <span> {{ item.staff.join(', ') }} </span>
+          <small class="label"> Yüklenici:</small>
+          <span> {{ item.contractor }} </span>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="action">
@@ -161,6 +163,12 @@
             <div>
               <small class="label primary-color">İzinler</small>
               <span>{{ item.permissions.join(', ') }}</span>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <div>
+              <small class="label primary-color">Yüklenici</small>
+              <span>{{ item.contractor }}</span>
             </div>
           </div>
           <div style="width: 100%">

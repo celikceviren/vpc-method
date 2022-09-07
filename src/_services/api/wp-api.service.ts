@@ -178,10 +178,11 @@ export class WpApiService {
           const mapped: WpListItem = {
             id: item.Id,
             dtCreate: item.dtCreate,
-            dtEnd: item.dtStart,
-            dtStart: item.dtEnd,
+            dtEnd: item.dtEnd,
+            dtStart: item.dtStart,
             owner: item.ownerName,
             ownerCode: item.ownerCode,
+            contractor: item.contractor,
             status: item.status,
             workArea: item.area,
             workAreaGroup: item.areaGroupName,

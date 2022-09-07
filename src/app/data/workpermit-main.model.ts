@@ -34,6 +34,7 @@ export interface WpListItem {
   id: number;
   owner: string;
   ownerCode: string;
+  contractor: string;
   project: string;
   projectOwner: string;
   dtCreate: Date;
