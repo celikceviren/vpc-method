@@ -8,6 +8,7 @@ import { PladisMethodEditorComponent } from './feature/pladis-method-editor/plad
 import { PladisMethodReviewerComponent } from './feature/pladis-method-reviewer/pladis-method-reviewer.component';
 import { PladisMethodViewerComponent } from './feature/pladis-method-viewer/pladis-method-viewer.component';
 import { PladisWorkpermitNewComponent } from './feature/pladis-workpermit-new/pladis-workpermit-new.component';
+import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/pladis-workpermit-view.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,10 @@ const routes: Routes = [
   {
     path: 'workpermit/main/:company',
     component: WorkpermitMainComponent,
+  },
+  {
+    path: 'workpermit/view/PLADIS/:id/:role',
+    component: PladisWorkpermitViewComponent,
   },
 ];
 

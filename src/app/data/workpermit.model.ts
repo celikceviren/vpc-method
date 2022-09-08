@@ -194,6 +194,18 @@ export interface CodeValueItem {
 export interface WorkDetails {
   description: string;
   dtStart: Date;
+  dtEnd?: Date;
+  dtCreate?: Date;
+  owner?: string;
+  ownerCode?: string;
+  status?: number;
+  isgApprove?: boolean;
+  isgApproveText?: string;
+  areaApprove?: boolean;
+  areaApproveText?: string;
+  rejectedBy?: string;
+  rejectReason?: string;
+  rejectKind?: string;
 }
 export interface StaffListResponse {
   staffList: CodeValueItem[];

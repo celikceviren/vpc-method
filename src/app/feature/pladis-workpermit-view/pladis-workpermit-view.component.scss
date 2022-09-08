@@ -1,0 +1,95 @@
+@import '../../../assets/scss/common/breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+div.main-container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 48px);
+  padding: 0 24px;
+  gap: 16px;
+  margin-top: 16px;
+
+  div.title {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+
+    > h2,
+    > h4 {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    > h2 {
+      padding-left: 24px;
+      position: relative;
+
+      &.no-padding {
+        padding-left: 0;
+      }
+
+      .mat-icon {
+        position: absolute;
+        bottom: 4px;
+        left: -6px;
+        cursor: pointer;
+      }
+    }
+    > h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }
+
+  div.tab-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    background: #fff;
+  }
+
+  div.general-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 16px 8px;
+
+    > div {
+      width: calc(50% - 8px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      @include media-breakpoint('lt-sm') {
+        width: 100%;
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+
+        @include media-breakpoint('lt-md') {
+          span {
+            font-size: 1.25em;
+          }
+        }
+
+        small {
+          font-size: 12px;
+          padding-bottom: 4px;
+        }
+      }
+    }
+  }
+}

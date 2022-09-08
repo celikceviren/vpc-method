@@ -98,4 +98,18 @@ export class WpMainService {
       })
     );
   }
+
+  public getStatusText(status: string): string {
+    switch (status) {
+      case WpStatus.ACTIVE.toString():
+        return 'AKTİF';
+      case WpStatus.PENDING.toString():
+        return 'ONAY BEKLİYOR';
+      case WpStatus.CLOSED.toString():
+        return 'KAPALI';
+      case WpStatus.REJECTED.toString():
+        return 'ONAYLANMADI';
+    }
+    return status;
+  }
 }

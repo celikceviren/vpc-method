@@ -2,20 +2,8 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent } from '@angular/material/tabs';
-import { ActivatedRoute } from '@angular/router';
-import {
-  catchError,
-  debounceTime,
-  forkJoin,
-  map,
-  of,
-  Subject,
-  take,
-  takeUntil,
-  tap,
-  distinctUntilChanged,
-  delay,
-} from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, debounceTime, forkJoin, map, of, Subject, take, takeUntil, tap, distinctUntilChanged } from 'rxjs';
 import { ConfirmDialogData, InfoDialogData } from 'src/app/data/common.model';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
 import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
@@ -25,7 +13,6 @@ import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confir
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 import { InfoDialogService } from 'src/app/data/info-dialog.service';
-import { WindowMsgService } from 'src/app/data/window-msg.service';
 
 @Component({
   selector: 'app-common-workpermit-main',
@@ -61,7 +48,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   constructor(
     private splashService: SplashScreenService,
     private service: WpMainService,
-    private windowService: WindowMsgService,
+    private router: Router,
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
     private dialogService: InfoDialogService,
@@ -221,42 +208,11 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
       throw new Error('onConfirmDelete => id undefined');
     }
 
-    const dialogData: InfoDialogData = {
-      body: 'Veriler alınıyor...',
-      isLoading: true,
-    };
-    this.dialogService.show(dialogData);
-
-    this.service
-      .getWorkPermitItem(id)
-      .pipe(
-        takeUntil(this.unsubscribeAll),
-        take(1),
-        delay(1000),
-        tap(() => this.dialogService.hide())
-      )
-      .subscribe((resp) => {
-        if (!resp?.result) {
-          const msg =
-            resp?.error ??
-            ({
-              message: 'Veriler alınamadı',
-              details: this.service.formatErrorDetails('L230', 'onGetWorkPermitItem'),
-            } as ServiceError);
-
-          const dialogData: InfoDialogData = {
-            title: 'İşlem başarısız',
-            body: `${msg.message}<br /><small>${msg.details}</small>`,
-            dismissable: true,
-          };
-          setTimeout(() => {
-            this.dialogService.show(dialogData);
-          }, 500);
-          return;
-        }
-
-        console.log('item =>', resp.item);
-      });
+    this.splashService.show();
+    setTimeout(() => {
+      this.router.navigate(['/', 'workpermit', 'view', this.companyCode, id.toString(), this.role.toString()]);
+    });
+    return;
   }
 
   private init(): void {

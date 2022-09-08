@@ -60,6 +60,7 @@ import { WorkpermitMainComponent } from './feature/common-workpermit-main/common
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
+import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/pladis-workpermit-view.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import { MatMenuModule } from '@angular/material/menu';
     WpGasMeasurementFormComponent,
     WpReviewApproveComponent,
     WorkpermitMainComponent,
+    PladisWorkpermitViewComponent,
   ],
   imports: [
     BrowserModule,

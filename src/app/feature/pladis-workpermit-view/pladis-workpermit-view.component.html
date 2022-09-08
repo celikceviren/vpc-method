@@ -1,0 +1,172 @@
+<div class="main-container">
+  <div class="title">
+    <h2 class="mat-h2 primary-color">
+      <mat-icon (click)="onBackClick()">arrow_back</mat-icon>
+      İş İzni Detayları
+    </h2>
+    <h4 class="mat-h4">İŞ İZNİ : #{{ id }}</h4>
+  </div>
+
+  <div *ngIf="ready">
+    <mat-tab-group (selectedTabChange)="onTabChange($event)">
+      <mat-tab label="GENEL">
+        <div class="tab-container" *ngIf="activeTab === 0">
+          <ng-container [ngTemplateOutlet]="general"></ng-container>
+        </div>
+      </mat-tab>
+      <mat-tab label="ÇALIŞMA DETAYLARI">
+        <div class="tab-container" *ngIf="activeTab === 1">
+          <ng-container [ngTemplateOutlet]="details"></ng-container>
+        </div>
+      </mat-tab>
+      <mat-tab label="KONTROLLER">
+        <div class="tab-container" *ngIf="activeTab === 2">
+          <ng-container [ngTemplateOutlet]="questions"></ng-container>
+        </div>
+      </mat-tab>
+      <mat-tab label="GAZ ÖLÇÜMÜ">
+        <div class="tab-container" *ngIf="activeTab === 3">
+          <ng-container [ngTemplateOutlet]="gasMeasurement"></ng-container>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+
+<ng-template #general>
+  <div class="general-info">
+    <div style="width: 100%">
+      <div>
+        <span class="accent-color" style="font-weight: 500"> {{ status }} </span>
+      </div>
+    </div>
+    <div>
+      <div>
+        <small class="label primary-color">Oluşturan</small>
+        <span> {{ owner }} </span>
+        <small *ngIf="createdAt"> {{ createdAt | date: 'dd.MM.yyyy HH:mm' }} </small>
+      </div>
+      <div>
+        <small class="label primary-color">İş Çağrısı</small>
+        <span>{{ item.project.name }}</span>
+        <small> {{ item.project.owner }} </small>
+      </div>
+    </div>
+    <div>
+      <div>
+        <small class="label primary-color">Çalışma Yeri</small>
+        <span>{{ item.location.areaName }}</span>
+        <small> {{ item.location.areaGroupName }} </small>
+      </div>
+      <div>
+        <small class="label primary-color">Çalışma Saati</small>
+        <span>{{ item.workDescription.dtStart | date: 'dd.MM.yyyy HH:mm' }}</span>
+        <small>{{ item.workDescription.dtEnd | date: 'dd.MM.yyyy HH:mm' }}</small>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">İzinler</small>
+        <span> {{ permissions }} </span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Yüklenici</small>
+        <span>{{ item.contractor.name }}</span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Kişiler</small>
+        <span> {{ staff }} </span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Çalışmanın Tanımı</small>
+        <span> {{ item.workDescription.description }} </span>
+      </div>
+    </div>
+    <div>
+      <div>
+        <small class="label primary-color">İSG Onayı</small>
+        <span *ngIf="!item.workDescription?.isgApprove"> - </span>
+        <span *ngIf="item.workDescription?.isgApprove"> {{ item.workDescription.isgApproveText ?? '-' }} </span>
+      </div>
+    </div>
+    <div>
+      <div>
+        <small class="label primary-color">Alan Sorumlusu Onayı</small>
+        <span *ngIf="!item.workDescription?.areaApprove"> - </span>
+        <span *ngIf="item.workDescription?.areaApprove"> {{ item.workDescription.areaApproveText ?? '-' }} </span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #details>
+  <div class="general-info">
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Yapılacak çaşlışmanın iş türü</small>
+        <span> {{ workTypes }} </span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color"
+          >Çalışma sırasında tehlikeye veya kazaya neden olabilecek ortam ve şartlar</small
+        >
+        <span> {{ risks }} </span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Çalışma sırasında kullanılacak ekipmanlar</small>
+        <span> {{ equipments }} </span>
+      </div>
+    </div>
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color">Çalışma sırasında kullanılması gereken kişisel koruyucu donanımlar</small>
+        <span> {{ ppe }} </span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #questions>
+  <div class="general-info">
+    <ng-container *ngFor="let group of questionGroups">
+      <div style="width: 100%">
+        <div>
+          <small class="label primary-color"> {{ group.name }} </small>
+          <ng-container *ngFor="let question of group.questions; let ix = index">
+            <span> {{ ix + 1 }}. {{ question.question }} </span>
+            <small class="py-4 accent-color" style="font-weight: 500"> {{ question.answerText }} </small>
+          </ng-container>
+        </div>
+      </div>
+    </ng-container>
+
+    <div style="width: 100%">
+      <div>
+        <small class="label primary-color"> Yapılan kontroller ile ilgili diğer hususlar </small>
+        <span> {{ controlNotes }} </span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #gasMeasurement>
+  <div class="general-info">
+    <div *ngFor="let measurement of gasMeasurements">
+      <div>
+        <small class="label primary-color"> {{ measurement.label }}</small>
+        <span> {{ measurement.value }} </span>
+        <small> {{ measurement.hint }} </small>
+      </div>
+    </div>
+  </div>
+</ng-template>
