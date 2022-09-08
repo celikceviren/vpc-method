@@ -101,7 +101,7 @@ export class WorkpermitNewService {
           result: false,
           error,
           items: undefined,
-        } as ServiceItemResult<Project>);
+        } as ServiceListResult<Project>);
       })
     );
   }

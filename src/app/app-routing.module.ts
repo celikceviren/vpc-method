@@ -7,6 +7,7 @@ import { NestleMethodViewerComponent } from './feature/nestle-method-viewer/nest
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
 import { PladisMethodReviewerComponent } from './feature/pladis-method-reviewer/pladis-method-reviewer.component';
 import { PladisMethodViewerComponent } from './feature/pladis-method-viewer/pladis-method-viewer.component';
+import { PladisWorkpermitApproveComponent } from './feature/pladis-workpermit-approve/pladis-workpermit-approve.component';
 import { PladisWorkpermitNewComponent } from './feature/pladis-workpermit-new/pladis-workpermit-new.component';
 import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/pladis-workpermit-view.component';
 
@@ -36,12 +37,16 @@ const routes: Routes = [
     component: NestleMethodReviewerComponent,
   },
   {
+    path: 'workpermit/main/:company',
+    component: WorkpermitMainComponent,
+  },
+  {
     path: 'workpermit/new/PLADIS',
     component: PladisWorkpermitNewComponent,
   },
   {
-    path: 'workpermit/main/:company',
-    component: WorkpermitMainComponent,
+    path: 'workpermit/approve/PLADIS/:kind',
+    component: PladisWorkpermitApproveComponent,
   },
   {
     path: 'workpermit/view/PLADIS/:id/:role',

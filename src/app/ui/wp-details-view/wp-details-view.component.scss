@@ -1,0 +1,118 @@
+@import '../../../assets/scss/common/breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 48px);
+  padding: 0 24px;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+div.title {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  h3 {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.54);
+    font-weight: 500;
+  }
+  h4 {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.54);
+  }
+}
+
+div.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px;
+  margin-top: 0;
+
+  button {
+    ::ng-deep {
+      .mat-button-wrapper {
+        padding-right: 16px;
+      }
+    }
+
+    .mat-icon {
+      position: absolute;
+      right: 4px;
+      top: 6px;
+    }
+
+    &.left {
+      ::ng-deep {
+        .mat-button-wrapper {
+          padding-right: unset;
+        }
+      }
+
+      .mat-icon {
+        right: unset;
+        left: 4px;
+      }
+    }
+  }
+}
+
+div.tab-container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+  background: #fff;
+}
+
+div.general-info {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px 8px;
+
+  > div {
+    width: calc(50% - 8px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    @include media-breakpoint('lt-sm') {
+      width: 100%;
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+
+      @include media-breakpoint('lt-md') {
+        span {
+          font-size: 1.25em;
+        }
+      }
+
+      small {
+        font-size: 12px;
+        padding-bottom: 4px;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .mat-tab-group {
+    &.bordered {
+      .mat-tab-body {
+        border: 1px solid rgba(0, 0, 0, 0.02);
+        border-top: 0;
+        border-radius: 0 0 8px 8px;
+      }
+    }
+  }
+}

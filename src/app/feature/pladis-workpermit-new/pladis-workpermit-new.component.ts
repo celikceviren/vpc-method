@@ -9,9 +9,9 @@ import {
   GasMeasurement,
   PageState,
   Project,
-  QuestionGroup,
   ServiceError,
   WorkDetails,
+  WpListSelectItem,
   WPNewStep,
   WPNewStepsData,
   WpPageState,
@@ -142,7 +142,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     });
   }
 
-  onProjectSelected(item: Project | CodeValueItem): void {
+  onProjectSelected(item: Project | CodeValueItem | WpListSelectItem): void {
     if (item.kind !== 'project') {
       return;
     }
@@ -152,7 +152,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     this.loadStep();
   }
 
-  onContractorSelected(item: Project | CodeValueItem): void {
+  onContractorSelected(item: Project | CodeValueItem | WpListSelectItem): void {
     if (item.kind !== 'contractor') {
       return;
     }
@@ -162,7 +162,7 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
     this.loadStep();
   }
 
-  onStaffSelected(items: Array<Project | CodeValueItem>): void {
+  onStaffSelected(items: Array<Project | CodeValueItem | WpListSelectItem>): void {
     this.stepData.selectedStaff = items
       .filter((x) => x.kind === 'staff')
       .map((item) => {

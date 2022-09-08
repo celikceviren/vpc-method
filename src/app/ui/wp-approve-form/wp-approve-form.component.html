@@ -1,0 +1,27 @@
+<div class="title">
+  <h3>Onay</h3>
+  <h4>İş iznini onaylıyor musunuz?</h4>
+</div>
+
+<form [formGroup]="form">
+  <mat-radio-group formControlName="isApprove" class="horizontal-radio-group">
+    <mat-radio-button [value]="true">ONAYLA</mat-radio-button>
+    <mat-radio-button [value]="false">REDDET</mat-radio-button>
+  </mat-radio-group>
+  <mat-form-field appearance="outline" class="mb-16 w-100-p" *ngIf="!form.controls.isApprove.value">
+    <mat-label>Reddetme Gerekçeniz</mat-label>
+    <textarea matInput formControlName="rejectReason" class="h-108"></textarea>
+    <mat-hint>Gerekçenizi belirtiniz. (Max: 250)</mat-hint>
+    <mat-error
+      *ngIf="form.controls.rejectReason.hasError('required') || form.controls.rejectReason.hasError('maxlength')"
+      >Gerekçenizi belirtiniz. (Max: 250)</mat-error
+    >
+  </mat-form-field>
+</form>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="onSubmitform()" [disabled]="form.invalid">
+    Kaydet ve Tamamla <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { CodeValueItem, Project } from 'src/app/data/workpermit.model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CodeValueItem, Project, WpListSelectItem } from 'src/app/data/workpermit.model';
 
 @Component({
   selector: 'app-wp-item-selector',
@@ -7,16 +7,16 @@ import { CodeValueItem, Project } from 'src/app/data/workpermit.model';
   styleUrls: ['./wp-item-selector.component.scss'],
 })
 export class WpItemSelectorComponent implements OnInit {
-  @Input() listKind: 'project' | 'contractor' | 'staff' | undefined;
-  @Input() list: Array<Project | CodeValueItem> = [];
+  @Input() listKind: 'project' | 'contractor' | 'staff' | 'workpermit' | undefined;
+  @Input() list: Array<Project | CodeValueItem | WpListSelectItem> = [];
   @Input() multiselect: boolean = false;
-  @Output() itemsSelected: EventEmitter<Array<Project | CodeValueItem>> = new EventEmitter<
-    Array<Project | CodeValueItem>
+  @Output() itemsSelected: EventEmitter<Array<Project | CodeValueItem | WpListSelectItem>> = new EventEmitter<
+    Array<Project | CodeValueItem | WpListSelectItem>
   >();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
 
-  selectedItems: Array<Project | CodeValueItem> = [];
-  selectList: Array<{ selected: boolean; item: Project | CodeValueItem }> = [];
+  selectedItems: Array<Project | CodeValueItem | WpListSelectItem> = [];
+  selectList: Array<{ selected: boolean; item: Project | CodeValueItem | WpListSelectItem }> = [];
 
   constructor() {}
 
@@ -29,7 +29,7 @@ export class WpItemSelectorComponent implements OnInit {
     });
   }
 
-  onSelect(item: Project | CodeValueItem): void {
+  onSelect(item: Project | CodeValueItem | WpListSelectItem): void {
     if (this.selectedItems.find((x) => x.code === item.code)) {
       this.selectedItems = this.selectedItems.filter((x) => x.code !== item.code);
     } else {

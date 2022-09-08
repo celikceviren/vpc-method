@@ -40,9 +40,7 @@ export class PladisWorkpermitViewComponent implements OnInit {
   id!: number;
   role!: WpRole;
   ready!: boolean;
-  activeTab!: number;
   item!: WorkPermitItem;
-  gasMeasurements!: GasMeasurement[];
 
   constructor(
     private service: WpMainService,
@@ -51,80 +49,6 @@ export class PladisWorkpermitViewComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private location: Location
   ) {}
-
-  get permissions(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.workPermits ?? []).map((x) => x.name).join(', ');
-  }
-
-  get staff(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.staff ?? []).map((x) => x.name).join(', ');
-  }
-
-  get workTypes(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.workTypes ?? []).map((x) => x.name).join(', ');
-  }
-
-  get equipments(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.equipments ?? []).map((x) => x.name).join(', ');
-  }
-
-  get ppe(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.ppe ?? []).map((x) => x.name).join(', ');
-  }
-
-  get risks(): string {
-    if (!this.item) {
-      return '-';
-    }
-
-    return (this.item.risks ?? []).map((x) => x.name).join(', ');
-  }
-
-  get questionGroups(): QuestionGroup[] {
-    return this.item?.controlQuestions?.questionGroups ?? [];
-  }
-
-  get controlNotes(): string {
-    const notes = this.item?.controlQuestions?.controlNotes ?? '-';
-    if (!notes) return '-';
-    return notes;
-  }
-
-  get status(): string {
-    if (!this.item?.workDescription?.status) {
-      return '';
-    }
-
-    return this.service.getStatusText(this.item.workDescription.status.toString());
-  }
-
-  get owner(): string {
-    return this.item?.workDescription?.owner ?? '-';
-  }
-
-  get createdAt(): Date | null {
-    return this.item?.workDescription?.dtCreate ?? null;
-  }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(take(1)).subscribe((paramMap) => {
@@ -142,10 +66,6 @@ export class PladisWorkpermitViewComponent implements OnInit {
 
   onBackClick(): void {
     this.location.back();
-  }
-
-  onTabChange(event: MatTabChangeEvent): void {
-    this.activeTab = event.index;
   }
 
   private init(): void {
@@ -184,43 +104,7 @@ export class PladisWorkpermitViewComponent implements OnInit {
         }
 
         this.item = resp.item;
-        this.gasMeasurements = this.prepareGasMeasurements(this.item?.gasMeasurements);
-        this.activeTab = 0;
         this.ready = true;
       });
-  }
-
-  private prepareGasMeasurements(measurements: any[]): GasMeasurement[] {
-    return (measurements ?? []).map((x) => {
-      const { code, value } = x;
-      let label = code;
-      let hint = '';
-      if (code === StaticValues.GAS_MEASUREMENT_CH4_CODE.toString()) {
-        label = StaticValues.GAS_MEASUREMENT_CH4_TEXT;
-        hint = StaticValues.GAS_MEASUREMENT_CH4_HINT;
-      }
-      if (code === StaticValues.GAS_MEASUREMENT_CO_CODE.toString()) {
-        label = StaticValues.GAS_MEASUREMENT_CO_TEXT;
-        hint = StaticValues.GAS_MEASUREMENT_CO_HINT;
-      }
-      if (code === StaticValues.GAS_MEASUREMENT_H2S_CODE.toString()) {
-        label = StaticValues.GAS_MEASUREMENT_H2S_TEXT;
-        hint = StaticValues.GAS_MEASUREMENT_H2S_HINT;
-      }
-      if (code === StaticValues.GAS_MEASUREMENT_O2_CODE.toString()) {
-        label = StaticValues.GAS_MEASUREMENT_O2_TEXT;
-        hint = StaticValues.GAS_MEASUREMENT_O2_HINT;
-      }
-      if (code === StaticValues.GAS_MEASUREMENT_VOC_CODE.toString()) {
-        label = StaticValues.GAS_MEASUREMENT_VOC_TEXT;
-        hint = StaticValues.GAS_MEASUREMENT_VOC_HINT;
-      }
-      return {
-        code,
-        label,
-        value,
-        hint,
-      } as GasMeasurement;
-    });
   }
 }

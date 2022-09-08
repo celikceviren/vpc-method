@@ -1,4 +1,4 @@
-import { ServiceError } from './workpermit.model';
+import { CodeValueItem, ServiceError } from './workpermit.model';
 
 export enum WpStatus {
   PENDING = 1,
@@ -41,7 +41,7 @@ export interface WpListItem {
   dtStart: Date;
   dtEnd: Date;
   status: number;
-  staff: string[];
+  staff: CodeValueItem[];
   permissions: string[];
   workArea: string;
   workAreaGroup: string;

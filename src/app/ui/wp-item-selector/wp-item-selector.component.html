@@ -11,6 +11,10 @@
     <h3>İş izni verilebilecek çalışanlar ({{ list.length }})</h3>
     <h4>İş izni verilecek çalışanları seçiniz</h4>
   </ng-container>
+  <ng-container *ngSwitchCase="'workpermit'">
+    <h3>İş İzinleri ({{ list.length }})</h3>
+    <h4>İşlem yapacağınız iş iznini seçiniz</h4>
+  </ng-container>
 </div>
 
 <mat-list>
@@ -22,6 +26,7 @@
     <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'project'">folder</mat-icon>
     <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'contractor'">business</mat-icon>
     <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'staff'">person</mat-icon>
+    <mat-icon matListIcon color="primary" *ngIf="option.item.kind === 'workpermit'">assignment</mat-icon>
 
     <h3 matLine>{{ option.item.name }}</h3>
 
@@ -30,6 +35,20 @@
     </p>
     <p matLine *ngIf="option.item.kind === 'project'">
       <span> {{ option.item.dtStart | date: 'dd.MM.yyyy' }} - {{ option.item.dtEnd | date: 'dd.MM.yyyy' }}</span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'workpermit'">
+      <span style="font-weight: 500; padding-bottom: 4px">
+        Başlangıç : {{ option.item.self.dtStart | date: 'dd.MM.yyyy HH:mm' }}
+      </span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'workpermit'">
+      <span style="font-size: 0.85em"> {{ option.item.self.project }} </span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'workpermit'">
+      <span style="font-size: 0.85em"> {{ option.item.staff }} </span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'workpermit'">
+      <span style="font-size: 0.85em"> {{ option.item.self.contractor }} </span>
     </p>
   </mat-list-item>
 </mat-list>

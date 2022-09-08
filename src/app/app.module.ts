@@ -61,6 +61,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/pladis-workpermit-view.component';
+import { PladisWorkpermitApproveComponent } from './feature/pladis-workpermit-approve/pladis-workpermit-approve.component';
+import { WpDetailsViewComponent } from './ui/wp-details-view/wp-details-view.component';
+import { WpApproveFormComponent } from './ui/wp-approve-form/wp-approve-form.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +97,9 @@ import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/
     WpReviewApproveComponent,
     WorkpermitMainComponent,
     PladisWorkpermitViewComponent,
+    PladisWorkpermitApproveComponent,
+    WpDetailsViewComponent,
+    WpApproveFormComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,5 @@
 import { StaticValues } from './common.model';
+import { WpListItem } from './workpermit-main.model';
 
 export enum WPNewStep {
   SelectLocation = 1,
@@ -14,6 +15,13 @@ export enum WPNewStep {
   QuestionsList,
   GasMeasurement,
   ReviewApprove,
+}
+
+export enum WpApproveStep {
+  SelectLocation = 1,
+  SelectWorkPermit,
+  WorkPermitReview,
+  Approval,
 }
 
 export interface ServiceError {
@@ -248,14 +256,12 @@ export interface GasMeasurement {
   hint: string;
   value: string;
 }
-
 export interface SummaryStatsItem {
   pending: number;
   active: number;
   closed: number;
   rejected: number;
 }
-
 export interface WorkPermitItem {
   id: number;
   location: WorkAreaInfo;
@@ -270,4 +276,44 @@ export interface WorkPermitItem {
   gasMeasurements: CodeValueItem[];
   workDescription: WorkDetails;
   controlQuestions: ControlQuestions;
+}
+export interface WpListSelectItem {
+  kind: 'workpermit';
+  code: string;
+  name: string;
+  self: WpListItem;
+  staff: string;
+}
+
+export class WpApproveStepData {
+  kind: string = '';
+  qrCode: string = '';
+  selectedLocation: WorkAreaInfo = {
+    companyCode: '',
+    companyName: '',
+    facilityCode: '',
+    facilityName: '',
+    areaGroupCode: '',
+    areaGroupName: '',
+    areaCode: '',
+    areaName: '',
+  };
+  wpList: WpListSelectItem[] = [];
+  selectedWp: WpListItem | undefined;
+  wpItem: WorkPermitItem | undefined;
+
+  constructor() {}
+
+  clearSelectedLocation(): void {
+    this.selectedLocation = {
+      companyCode: '',
+      companyName: '',
+      facilityCode: '',
+      facilityName: '',
+      areaGroupCode: '',
+      areaGroupName: '',
+      areaCode: '',
+      areaName: '',
+    };
+  }
 }

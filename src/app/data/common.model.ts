@@ -34,6 +34,10 @@ export namespace StaticValues {
   export const GAS_MEASUREMENT_VOC_CODE: string = 'VOC';
   export const GAS_MEASUREMENT_VOC_TEXT: string = 'VOC (LEL)';
   export const GAS_MEASUREMENT_VOC_HINT: string = '%LEL<1';
+  export const WP_APPROVE_KIND_ISG_ID: number = 1;
+  export const WP_APPROVE_KIND_AREA_ID: number = 2;
+  export const WP_APPROVE_KIND_ISG: string = 'isg';
+  export const WP_APPROVE_KIND_AREA: string = 'area';
 }
 
 export interface CodeValueSelectItem {
