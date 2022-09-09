@@ -1,0 +1,67 @@
+<div class="title">
+  <h3>Bilgiler</h3>
+  <h4>İşlemi tamamlamadan önce girdiğiniz bilgileri kontrol edebilirsiniz.</h4>
+</div>
+<mat-card *ngIf="location && contractor && (staffList?.length ?? 0 > 0)">
+  <mat-card-content>
+    <h3 class="primary-color">Çalışma Bilgileri</h3>
+    <p class="label">Çalışmanın Yapıldığı Yer</p>
+    <p>{{ location.facilityName }}, {{ location.areaName }}</p>
+
+    <p class="label">İş İzni Başlangıç - Bitiş</p>
+    <p>{{ dtStart | date: 'dd.MM.yyyy HH:mm' }} - {{ dtEnd | date: 'dd.MM.yyyy HH:mm' }}</p>
+
+    <p class="label">Firma:</p>
+    <p>{{ contractor.name }}</p>
+
+    <p class="label">Kişiler:</p>
+    <p>
+      <span *ngFor="let staff of staffList; let ix = index">
+        {{ staff.name }} {{ (staffList?.length ?? 0) > 1 && ix + 1 < (staffList?.length ?? 0) ? ', ' : '' }}
+      </span>
+    </p>
+  </mat-card-content>
+  <mat-card-footer>
+    <button mat-mini-fab color="accent" (click)="goBack.emit(steps.QuestionsList)">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </mat-card-footer>
+</mat-card>
+
+<ng-container *ngIf="questions !== undefined && questions.questionGroups?.length">
+  <mat-card *ngFor="let questionGroup of questions.questionGroups">
+    <mat-card-content>
+      <h3 class="primary-color">{{ questionGroup.name }}</h3>
+      <ng-container *ngFor="let question of questionGroup.questions; let ix = index; let last = last">
+        <p style="padding: 0 4px">{{ question.question }}</p>
+        <p class="label" style="padding: 0 8px">{{ question.answerText }}</p>
+        <mat-divider class="mb-16" *ngIf="!last"></mat-divider>
+      </ng-container>
+    </mat-card-content>
+    <mat-card-footer>
+      <button mat-mini-fab color="accent" (click)="goBack.emit(steps.ReviewApprove)">
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+
+  <mat-card *ngIf="questions.controlNotes">
+    <mat-card-content>
+      <h3 class="primary-color">Yapılan Kontroller İle İlgili Diğer Hususlar</h3>
+      <p>
+        {{ questions.controlNotes }}
+      </p>
+    </mat-card-content>
+    <mat-card-footer>
+      <button mat-mini-fab color="accent" (click)="goBack.emit(steps.ReviewApprove)">
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    </mat-card-footer>
+  </mat-card>
+</ng-container>
+<div class="buttons">
+  <button mat-raised-button color="primary" class="h-64" (click)="approve.emit()">
+    <mat-icon>check</mat-icon>
+    Formu Kaydet
+  </button>
+</div>

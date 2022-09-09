@@ -13,6 +13,8 @@ import {
   SummaryStatsItem,
   WorkAreaInfo,
   WorkPermitItem,
+  WpFormResponseItem,
+  WpFormType,
 } from 'src/app/data/workpermit.model';
 import { environment } from 'src/environments/environment';
 
@@ -342,6 +344,66 @@ export class WpApiService {
       })
     );
   }
+
+  public sendWpForm(postData: any, formType: WpFormType, id: number): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/formType/${formType}/workpermit/${id}?token=` + token;
+        return this.httpClient.post<any>(_url, postData).pipe(
+          switchMap(() => {
+            return this.onBackToDashboard();
+          })
+        );
+      })
+    );
+  }
+
+  public getWorkPermitsForFormType(
+    areaCode: string,
+    formType: number
+  ): Observable<ServiceItemResult<WpFormResponseItem>> {
+    let _url = `${environment.apiUrl}/workpermit/formType/${formType}/workpermits`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('areacode', areaCode);
+        params = params.append('token', token);
+        return this.httpClient.get<WpFormResponseItem>(_url, { params }).pipe(
+          map((response) => {
+            const list: WpListItem[] = [];
+            const items = response.wplist;
+            items.forEach((item: any) => {
+              const mapped: WpListItem = {
+                id: item.Id,
+                dtCreate: item.dtCreate,
+                dtEnd: item.dtEnd,
+                dtStart: item.dtStart,
+                owner: item.ownerName,
+                ownerCode: item.ownerCode,
+                contractor: item.contractor,
+                status: item.status,
+                workArea: item.area,
+                workAreaGroup: item.areaGroupName,
+                staff: (item.staff ?? []).map((p: any) => p.name),
+                permissions: (item.permissions ?? []).map((p: any) => p.name),
+                project: item.project,
+                projectOwner: item.projectOwner,
+                areaApproved: (item.isAreaApproved ?? 0) > 0,
+                isgApproved: (item.isgApproved ?? 0) > 0,
+              };
+              list.push(mapped);
+            });
+            const item: WpFormResponseItem = {
+              wplist: list,
+              questionGroups: response.questionGroups,
+            };
+            return { result: true, item } as ServiceItemResult<WpFormResponseItem>;
+          })
+        );
+      })
+    );
+  }
+
   private onBackToDashboard(): Observable<ServiceItemResult<void>> {
     this.postMsg('backtodashboard');
     return fromEvent(window, 'message').pipe(

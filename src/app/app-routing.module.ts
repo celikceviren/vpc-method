@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { CommonWorkpermitFormsComponent } from './feature/common-workpermit-forms/common-workpermit-forms.component';
 import { WorkpermitMainComponent } from './feature/common-workpermit-main/common-workpermit-main.component';
 import { NestleMethodEditorComponent } from './feature/nestle-method-editor/nestle-method-editor.component';
 import { NestleMethodReviewerComponent } from './feature/nestle-method-reviewer/nestle-method-reviewer.component';
@@ -56,6 +57,10 @@ const routes: Routes = [
   {
     path: 'workpermit/view/PLADIS/:id/:role',
     component: PladisWorkpermitViewComponent,
+  },
+  {
+    path: 'workpermit/form/:company/:formtype',
+    component: CommonWorkpermitFormsComponent,
   },
 ];
 

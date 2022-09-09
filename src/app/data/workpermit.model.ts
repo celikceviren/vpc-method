@@ -24,6 +24,17 @@ export enum WpApproveStep {
   Approval,
 }
 
+export enum WpFormType {
+  WpCloseForm = 1,
+  WpControlForm,
+}
+
+export enum WpFormStep {
+  SelectLocation = 1,
+  SelectWorkPermit,
+  QuestionsList,
+  ReviewApprove,
+}
 export interface ServiceError {
   message: string;
   details?: string;
@@ -285,7 +296,6 @@ export interface WpListSelectItem {
   self: WpListItem;
   staff: string;
 }
-
 export class WpApproveStepData {
   kind: string = '';
   qrCode: string = '';
@@ -317,4 +327,50 @@ export class WpApproveStepData {
       areaName: '',
     };
   }
+}
+export class WpFormStepData {
+  formType!: WpFormType;
+  qrCode: string = '';
+  selectedLocation: WorkAreaInfo = {
+    companyCode: '',
+    companyName: '',
+    facilityCode: '',
+    facilityName: '',
+    areaGroupCode: '',
+    areaGroupName: '',
+    areaCode: '',
+    areaName: '',
+  };
+  wpList: WpListSelectItem[] = [];
+  selectedWp: WpListItem | undefined;
+  wpItem: WorkPermitItem | undefined;
+  controlQuestions: ControlQuestions = {
+    questionGroups: [],
+    controlNotes: '',
+  };
+
+  constructor() {}
+
+  clearSelectedLocation(): void {
+    this.selectedLocation = {
+      companyCode: '',
+      companyName: '',
+      facilityCode: '',
+      facilityName: '',
+      areaGroupCode: '',
+      areaGroupName: '',
+      areaCode: '',
+      areaName: '',
+    };
+  }
+}
+
+export interface WpFormResponseItem {
+  wplist: WpListItem[];
+  questionGroups: QuestionGroup[];
+}
+
+export interface WpFormDataItem {
+  wplist: WpListSelectItem[];
+  controlQuestions: ControlQuestions;
 }

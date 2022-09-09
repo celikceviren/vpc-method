@@ -1,0 +1,80 @@
+@import '../../../assets/scss/common/breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+div.main-container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 48px);
+  max-width: 1040px;
+  padding: 0 24px;
+  min-height: 320px;
+
+  div.step-title {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    > h2,
+    > h4 {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    > h2 {
+      padding-left: 24px;
+      position: relative;
+
+      &.no-padding {
+        padding-left: 0;
+      }
+
+      .mat-icon {
+        position: absolute;
+        bottom: 4px;
+        left: -6px;
+        cursor: pointer;
+      }
+    }
+    > h4 {
+      font-size: 0.85rem;
+    }
+  }
+
+  div.step-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+
+    > div.step-content {
+      width: 100%;
+
+      &-md {
+        width: 100%;
+        max-width: 420px;
+        @include media-breakpoint('lt-sm') {
+          max-width: unset;
+        }
+      }
+    }
+
+    div.step-state {
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+  }
+}

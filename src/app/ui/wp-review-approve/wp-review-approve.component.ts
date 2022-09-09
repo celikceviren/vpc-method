@@ -18,7 +18,7 @@ import {
 export class WpReviewApproveComponent {
   @Input() values!: WPNewStepsData;
 
-  @Output() appreove: EventEmitter<void> = new EventEmitter<void>();
+  @Output() approve: EventEmitter<void> = new EventEmitter<void>();
   @Output() goBack: EventEmitter<WPNewStep> = new EventEmitter<WPNewStep>();
 
   steps = WPNewStep;
