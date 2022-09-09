@@ -193,6 +193,7 @@ export class WpApiService {
             projectOwner: item.projectOwner,
             areaApproved: (item.isAreaApproved ?? 0) > 0,
             isgApproved: (item.isgApproved ?? 0) > 0,
+            isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
           };
           list.push(mapped);
         });
@@ -277,6 +278,45 @@ export class WpApiService {
     );
   }
 
+  public getWorkPermitsToExtendForArea(areaCode: string): Observable<ServiceListResult<WpListItem>> {
+    let _url = `${environment.apiUrl}/workpermit/extend/items`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('areacode', areaCode);
+        params = params.append('token', token);
+        return this.httpClient.get<WpListItem[]>(_url, { params }).pipe(
+          map((items) => {
+            const list: WpListItem[] = [];
+            items.forEach((item: any) => {
+              const mapped: WpListItem = {
+                id: item.Id,
+                dtCreate: item.dtCreate,
+                dtEnd: item.dtEnd,
+                dtStart: item.dtStart,
+                owner: item.ownerName,
+                ownerCode: item.ownerCode,
+                contractor: item.contractor,
+                status: item.status,
+                workArea: item.area,
+                workAreaGroup: item.areaGroupName,
+                staff: (item.staff ?? []).map((p: any) => p.name),
+                permissions: (item.permissions ?? []).map((p: any) => p.name),
+                project: item.project,
+                projectOwner: item.projectOwner,
+                areaApproved: (item.isAreaApproved ?? 0) > 0,
+                isgApproved: (item.isgApproved ?? 0) > 0,
+                isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
+              };
+              list.push(mapped);
+            });
+            return { result: true, items: list } as ServiceListResult<WpListItem>;
+          })
+        );
+      })
+    );
+  }
+
   public sendApproveResult(postData: any, kind: string): Observable<ServiceItemResult<void>> {
     return this.refreshAccessToken().pipe(
       switchMap((token) => {
@@ -290,6 +330,18 @@ export class WpApiService {
     );
   }
 
+  public sendExtendApprove(postData: any): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/item/${postData.id}/extend?token=` + token;
+        return this.httpClient.post<any>(_url, postData).pipe(
+          switchMap(() => {
+            return this.onBackToDashboard();
+          })
+        );
+      })
+    );
+  }
   private onBackToDashboard(): Observable<ServiceItemResult<void>> {
     this.postMsg('backtodashboard');
     return fromEvent(window, 'message').pipe(

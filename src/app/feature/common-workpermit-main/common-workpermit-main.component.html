@@ -114,14 +114,14 @@
           </button>
           <mat-icon
             class="desktop-approve-check isg"
-            *ngIf="item.status !== statuses.REJECTED && item.isgApproved"
+            *ngIf="item.status === statuses.PENDING && item.isgApproved"
             matTooltip="Onaylandı (İSG)"
           >
             task_alt
           </mat-icon>
           <mat-icon
             class="desktop-approve-check"
-            *ngIf="item.status !== statuses.REJECTED && item.areaApproved"
+            *ngIf="item.status === statuses.PENDING && item.areaApproved"
             matTooltip="Onaylandı (Alan Sorumlusu)"
           >
             task_alt
@@ -133,6 +133,13 @@
           >
             cancel
           </mat-icon>
+          <mat-icon
+            class="desktop-approve-check isg"
+            *ngIf="(item.status === statuses.ACTIVE || item.status === statuses.CLOSED) && item.isExtended"
+            matTooltip="Süresi uzatıldı"
+          >
+            pending_actions
+          </mat-icon>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="mobiledata">
@@ -142,14 +149,14 @@
             <h3>#{{ item.id }}</h3>
             <mat-icon
               class="desktop-approve-check isg"
-              *ngIf="item.status !== statuses.REJECTED && item.isgApproved"
+              *ngIf="item.status === statuses.PENDING && item.isgApproved"
               matTooltip="Onaylandı (İSG)"
             >
               task_alt
             </mat-icon>
             <mat-icon
               class="desktop-approve-check"
-              *ngIf="item.status !== statuses.REJECTED && item.areaApproved"
+              *ngIf="item.status === statuses.PENDING && item.areaApproved"
               matTooltip="Onaylandı (Alan Sorumlusu)"
             >
               task_alt
@@ -160,6 +167,13 @@
               matTooltip="Onaylanmadı"
             >
               cancel
+            </mat-icon>
+            <mat-icon
+              class="desktop-approve-check isg"
+              *ngIf="(item.status === statuses.ACTIVE || item.status === statuses.CLOSED) && item.isExtended"
+              matTooltip="Süresi uzatıldı"
+            >
+              pending_actions
             </mat-icon>
             <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
               <mat-icon>more_vert</mat-icon>

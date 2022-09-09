@@ -42,6 +42,11 @@
       </span>
     </p>
     <p matLine *ngIf="option.item.kind === 'workpermit'">
+      <span style="font-weight: 500; padding-bottom: 4px">
+        Bitiş : {{ option.item.self.dtEnd | date: 'dd.MM.yyyy HH:mm' }}
+      </span>
+    </p>
+    <p matLine *ngIf="option.item.kind === 'workpermit'">
       <span style="font-size: 0.85em"> {{ option.item.self.project }} </span>
     </p>
     <p matLine *ngIf="option.item.kind === 'workpermit'">

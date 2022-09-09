@@ -20,14 +20,14 @@ import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confir
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 
 @Component({
-  selector: 'app-pladis-workpermit-approve',
-  templateUrl: './pladis-workpermit-approve.component.html',
-  styleUrls: ['./pladis-workpermit-approve.component.scss'],
+  selector: 'app-pladis-workpermit-extend',
+  templateUrl: './pladis-workpermit-extend.component.html',
+  styleUrls: ['./pladis-workpermit-extend.component.scss'],
 })
-export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
+export class PladisWorkpermitExtendComponent implements OnInit, OnDestroy {
   private unsubscribeAll = new Subject<void>();
   companyCode = 'PLADIS';
-  title = 'İş İzni Onayı';
+  title = 'İş İzni Süre Uzatma';
   steps = WpApproveStep;
   states = PageState;
   currentStep: WpApproveStep = WpApproveStep.SelectLocation;
@@ -49,11 +49,10 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.pipe(take(1)).subscribe((paramMap) => {
-      this.stepData.kind = paramMap.get('kind') ?? '';
-      this.stepTitle = this.service.getStepTitle(this.currentStep);
+    setTimeout(() => {
+      this.stepTitle = this.service.getExtendStepTitle(this.currentStep);
       this.splashService.hide();
-    });
+    }, 0);
   }
 
   ngOnDestroy(): void {
@@ -136,44 +135,24 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
     this.loadStep();
   }
 
-  onFormSubmitted(event: { id: number; isApprove: boolean; rejectReason: string }): void {
-    const msg = event.isApprove
-      ? 'İş iznini onaylamak istediğinize emin misiniz?'
-      : 'İş iznini reddediyorsunuz, emin misiniz?';
-    const dialogData: ConfirmDialogData = {
-      title: '',
-      body: msg,
-      hasConfirmBtn: true,
-      confirmBtnText: 'Evet',
-      closeBtnText: 'Vazgeç',
-    };
-    const dialogRef = this.dialog.open(UiConfirmDialogComponent, {
-      width: '320px',
-      data: dialogData,
-    });
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (!resp || !resp?.confirmed) {
-        return;
-      }
-
-      this.onNewPageState(PageState.inprogress);
-      this.service
-        .sendApproveResult(event, this.stepData.kind)
-        .pipe(takeUntil(this.unsubscribeAll), take(1))
-        .subscribe((response) => {
-          if (!response?.result) {
-            this.onNewPageState(
-              PageState.failed,
-              response?.error ??
-                ({
-                  message: 'Bilgiler kaydedilemedi',
-                  details: this.service.formatErrorDetails('L173', 'onFormSubmitted:sendApproveResult'),
-                } as ServiceError)
-            );
-            return;
-          }
-        });
-    });
+  onExtendApproved(): void {
+    this.onNewPageState(PageState.inprogress);
+    this.service
+      .sendExtendApprove({ id: this.stepData.wpItem?.id ?? 0 })
+      .pipe(takeUntil(this.unsubscribeAll), take(1))
+      .subscribe((response) => {
+        if (!response?.result) {
+          this.onNewPageState(
+            PageState.failed,
+            response?.error ??
+              ({
+                message: 'Bilgiler kaydedilemedi',
+                details: this.service.formatErrorDetails('L173', 'onExtendApproved:sendExtendApprove'),
+              } as ServiceError)
+          );
+          return;
+        }
+      });
   }
 
   onConfirmReset(): void {
@@ -202,10 +181,10 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getWorkPermitsToApprove(): void {
+  private getWorkPermitsToExtend(): void {
     const { companyCode, facilityCode, areaCode } = this.stepData.selectedLocation;
     this.service
-      .getWorkPermitsToApproveForArea(areaCode, this.stepData.kind)
+      .getWorkPermitsToExtendForArea(areaCode)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -214,7 +193,7 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
             response?.error ??
               ({
                 message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L107', 'getWorkPermitsToApprove'),
+                details: this.service.formatErrorDetails('L171', 'getWorkPermitsToExtend'),
               } as ServiceError)
           );
           return;
@@ -222,7 +201,7 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
 
         if (!response.items?.length) {
           this.onNewPageState(PageState.failed, {
-            message: 'Seçilen çalışma alanında onaylayabileceğiniz iş izni yok.',
+            message: 'Seçilen çalışma alanında süresini uzatabileceğiniz iş izni yok.',
             details: this.service.formatErrorDetails('L116', `${companyCode}:${facilityCode}:${areaCode}`),
           } as ServiceError);
           return;
@@ -279,7 +258,7 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
 
   private moveToStep(newStep: WpApproveStep): void {
     this.currentStep = newStep;
-    this.stepTitle = this.service.getStepTitle(newStep);
+    this.stepTitle = this.service.getExtendStepTitle(newStep);
   }
 
   private loadStep(): void {
@@ -287,7 +266,7 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
       case WpApproveStep.SelectWorkPermit:
         this.inProgressMsg = 'İş izinleri alnıyor...';
         this.onNewPageState(PageState.inprogress);
-        this.getWorkPermitsToApprove();
+        this.getWorkPermitsToExtend();
         this.retryProcessFn = this.loadStep.bind(this);
         break;
       case WpApproveStep.WorkPermitReview:

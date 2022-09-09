@@ -1,0 +1,13 @@
+<div class="title">
+  <h3>Onay</h3>
+  <h4>Çalışmanın yeni bitiş zamanını onaylıyor musunuz?</h4>
+</div>
+
+<p class="my-12" [innerHtml]="extensionMsg"></p>
+
+<div class="buttons">
+  <button mat-flat-button color="default" class="left" (click)="cancel.emit()">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="approve.emit()">
+    Kaydet ve Tamamla <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

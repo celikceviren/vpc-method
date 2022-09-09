@@ -26,7 +26,10 @@
       <div>
         <small class="label primary-color">Çalışma Saati</small>
         <span>{{ item.workDescription.dtStart | date: 'dd.MM.yyyy HH:mm' }}</span>
-        <small>{{ item.workDescription.dtEnd | date: 'dd.MM.yyyy HH:mm' }}</small>
+        <small
+          >{{ item.workDescription.dtEnd | date: 'dd.MM.yyyy HH:mm' }}
+          <ng-container *ngIf="item.workDescription.isExtended"> - (Süresi uzatıldı)</ng-container>
+        </small>
       </div>
     </div>
     <div style="width: 100%">

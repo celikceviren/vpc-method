@@ -38,6 +38,19 @@ export class WorkPermitApproveService {
     }
   }
 
+  getExtendStepTitle(step: WpApproveStep): string {
+    switch (step) {
+      case WpApproveStep.SelectLocation:
+        return 'Adım 1: Çalışma Alanı Seçimi';
+      case WpApproveStep.SelectWorkPermit:
+        return 'Adım 2: İş İzni Seçimi';
+      case WpApproveStep.WorkPermitReview:
+        return 'Adım 3: İş İzni Bilgileri';
+      case WpApproveStep.Approval:
+        return 'Adım 4: Süre Uzatma';
+    }
+  }
+
   getWorkPermitsToApproveForArea(areaCode: string, kind: string): Observable<ServiceListResult<WpListSelectItem>> {
     return this.api.getWorkPermitsToApproveForArea(areaCode, kind).pipe(
       catchError((err) => {
@@ -90,7 +103,7 @@ export class WorkPermitApproveService {
             err instanceof HttpErrorResponse
               ? err.status === HttpStatusCode.Unauthorized
                 ? 'Yetkisiz erişim'
-                : err.error?.Message ?? err.status.toString()
+                : err.error?.Message ?? err.error?.ErrorMessage ?? err.status.toString()
               : err.message ?? 'Bilinmeyen hata.',
           details: this.formatErrorDetails(errorCode, 'sendApproveResult'),
           error: err,
@@ -99,6 +112,71 @@ export class WorkPermitApproveService {
           result: false,
           error,
         } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  sendExtendApprove(postData: { id: number }): Observable<any> {
+    return this.api.sendExtendApprove(postData).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L122';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'sendExtendApprove'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+        } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  getWorkPermitsToExtendForArea(areaCode: string): Observable<ServiceListResult<WpListSelectItem>> {
+    return this.api.getWorkPermitsToExtendForArea(areaCode).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L36';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'getWorkPermitsToExtendForArea'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: undefined,
+        } as ServiceListResult<WpListItem>);
+      }),
+      map((response) => {
+        const mappedResponse = {
+          result: response.result,
+          error: response.error,
+          items: [],
+        } as ServiceListResult<WpListSelectItem>;
+        console.log('map => ', response.items);
+        const mappedItems = (response.items ?? []).map((y) => {
+          const item: WpListSelectItem = {
+            code: y.id.toString(),
+            kind: 'workpermit',
+            name: `#${y.id}`,
+            self: y,
+            staff: (y.staff ?? []).join(', '),
+          };
+          return item;
+        });
+        mappedResponse.items = mappedItems;
+        return mappedResponse;
       })
     );
   }

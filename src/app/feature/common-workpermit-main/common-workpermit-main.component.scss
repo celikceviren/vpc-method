@@ -234,6 +234,10 @@ div.main-container {
           color: red;
         }
 
+        &.extend {
+          color: blue;
+        }
+
         @include media-breakpoint('lt-md') {
           margin: 0;
         }

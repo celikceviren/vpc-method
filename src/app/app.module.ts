@@ -64,6 +64,8 @@ import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/
 import { PladisWorkpermitApproveComponent } from './feature/pladis-workpermit-approve/pladis-workpermit-approve.component';
 import { WpDetailsViewComponent } from './ui/wp-details-view/wp-details-view.component';
 import { WpApproveFormComponent } from './ui/wp-approve-form/wp-approve-form.component';
+import { PladisWorkpermitExtendComponent } from './feature/pladis-workpermit-extend/pladis-workpermit-extend.component';
+import { WpExtendApproveComponent } from './ui/wp-extend-approve/wp-extend-approve.component';
 
 @NgModule({
   declarations: [
@@ -100,6 +102,8 @@ import { WpApproveFormComponent } from './ui/wp-approve-form/wp-approve-form.com
     PladisWorkpermitApproveComponent,
     WpDetailsViewComponent,
     WpApproveFormComponent,
+    PladisWorkpermitExtendComponent,
+    WpExtendApproveComponent,
   ],
   imports: [
     BrowserModule,

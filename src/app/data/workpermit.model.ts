@@ -214,6 +214,7 @@ export interface WorkDetails {
   rejectedBy?: string;
   rejectReason?: string;
   rejectKind?: string;
+  isExtended?: boolean;
 }
 export interface StaffListResponse {
   staffList: CodeValueItem[];
