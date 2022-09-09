@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { BarcodeFormat } from '@zxing/library';
 import { ZXingScannerComponent } from '@zxing/ngx-scanner';
 import { from, Subject, takeUntil } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-wp-location-scanner',
@@ -42,11 +43,11 @@ export class WpLocationScannerComponent implements OnInit, OnDestroy, AfterViewI
       this.activeDevice = new FormControl<MediaDeviceInfo>({ value: activeDevice, disabled: false });
 
       //Note: Mock QR Scan
-      /*
-      setTimeout(() => {
-        this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg==');
-      }, 3000);
-      */
+      if (environment.isDebugScanner) {
+        setTimeout(() => {
+          this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg==');
+        }, 3000);
+      }
     }
   }
 

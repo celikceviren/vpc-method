@@ -53,18 +53,25 @@
         <span> {{ item.workDescription.description }} </span>
       </div>
     </div>
-    <div>
+    <div *ngIf="item.workDescription.status !== wpStatus.REJECTED">
       <div>
         <small class="label primary-color">İSG Onayı</small>
         <span *ngIf="!item.workDescription?.isgApprove"> - </span>
         <span *ngIf="item.workDescription?.isgApprove"> {{ item.workDescription.isgApproveText ?? '-' }} </span>
       </div>
     </div>
-    <div>
+    <div *ngIf="item.workDescription.status !== wpStatus.REJECTED">
       <div>
         <small class="label primary-color">Alan Sorumlusu Onayı</small>
         <span *ngIf="!item.workDescription?.areaApprove"> - </span>
         <span *ngIf="item.workDescription?.areaApprove"> {{ item.workDescription.areaApproveText ?? '-' }} </span>
+      </div>
+    </div>
+    <div style="width: 100%" *ngIf="item.workDescription.status === wpStatus.REJECTED">
+      <div>
+        <small class="label primary-color">Onaylanmama Gerekçesi</small>
+        <span> {{ item.workDescription.rejectReason }} </span>
+        <small class="pt-8"> {{ item.workDescription.rejectedBy }} </small>
       </div>
     </div>
   </div>

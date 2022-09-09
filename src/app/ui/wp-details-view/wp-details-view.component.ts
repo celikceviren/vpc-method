@@ -16,6 +16,8 @@ export class WpDetailsViewComponent implements OnInit {
   @Output() next: EventEmitter<void> = new EventEmitter<void>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
 
+  wpStatus = WpStatus;
+
   get permissions(): string {
     if (!this.item) {
       return '-';

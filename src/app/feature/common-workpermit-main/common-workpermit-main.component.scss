@@ -230,6 +230,10 @@ div.main-container {
           color: green;
         }
 
+        &.reject {
+          color: red;
+        }
+
         @include media-breakpoint('lt-md') {
           margin: 0;
         }

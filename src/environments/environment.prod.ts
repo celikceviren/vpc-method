@@ -7,4 +7,5 @@ export const environment = {
     'http://localhost:9106/',
   ],
   apiUrl: 'https://easy.visitpro.net/api',
+  isDebugScanner: false,
 };

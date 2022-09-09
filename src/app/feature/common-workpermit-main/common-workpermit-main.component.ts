@@ -222,7 +222,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (!this.hideDashboard) {
       this.api
-        .getSummaryStats(this.scope)
+        .getSummaryStats(this.scope, this.areaGroup)
         .pipe(
           takeUntil(this.unsubscribeAll),
           take(1),

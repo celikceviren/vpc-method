@@ -112,11 +112,26 @@
           <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
             <mat-icon>more_vert</mat-icon>
           </button>
-          <mat-icon class="desktop-approve-check isg" *ngIf="item.isgApproved" matTooltip="Onaylandı (İSG)">
+          <mat-icon
+            class="desktop-approve-check isg"
+            *ngIf="item.status !== statuses.REJECTED && item.isgApproved"
+            matTooltip="Onaylandı (İSG)"
+          >
             task_alt
           </mat-icon>
-          <mat-icon class="desktop-approve-check" *ngIf="item.areaApproved" matTooltip="Onaylandı (Alan Sorumlusu)">
+          <mat-icon
+            class="desktop-approve-check"
+            *ngIf="item.status !== statuses.REJECTED && item.areaApproved"
+            matTooltip="Onaylandı (Alan Sorumlusu)"
+          >
             task_alt
+          </mat-icon>
+          <mat-icon
+            class="desktop-approve-check reject"
+            *ngIf="item.status === statuses.REJECTED"
+            matTooltip="Onaylanmadı"
+          >
+            cancel
           </mat-icon>
         </mat-cell>
       </ng-container>
@@ -125,11 +140,26 @@
         <mat-cell *matCellDef="let item" class="mobile-cell">
           <div class="id-row">
             <h3>#{{ item.id }}</h3>
-            <mat-icon class="desktop-approve-check isg" *ngIf="item.isgApproved" matTooltip="Onaylandı (İSG)">
+            <mat-icon
+              class="desktop-approve-check isg"
+              *ngIf="item.status !== statuses.REJECTED && item.isgApproved"
+              matTooltip="Onaylandı (İSG)"
+            >
               task_alt
             </mat-icon>
-            <mat-icon class="desktop-approve-check" *ngIf="item.areaApproved" matTooltip="Onaylandı (Alan Sorumlusu)">
+            <mat-icon
+              class="desktop-approve-check"
+              *ngIf="item.status !== statuses.REJECTED && item.areaApproved"
+              matTooltip="Onaylandı (Alan Sorumlusu)"
+            >
               task_alt
+            </mat-icon>
+            <mat-icon
+              class="desktop-approve-check reject"
+              *ngIf="item.status === statuses.REJECTED"
+              matTooltip="Onaylanmadı"
+            >
+              cancel
             </mat-icon>
             <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
               <mat-icon>more_vert</mat-icon>
