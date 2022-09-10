@@ -68,6 +68,14 @@ export class PladisWorkpermitViewComponent implements OnInit {
     this.location.back();
   }
 
+  onDownloadAsPdf(): void {
+    this.service
+      .getWorkPermitItemPdf(this.id)
+      .pipe(takeUntil(this.unsubscribeAll), take(1))
+      .subscribe(() => {});
+    return;
+  }
+
   private init(): void {
     const dialogData: InfoDialogData = {
       body: 'Veriler alınıyor...',

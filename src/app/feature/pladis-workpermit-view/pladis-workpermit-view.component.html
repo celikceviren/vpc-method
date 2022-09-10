@@ -1,10 +1,16 @@
 <div class="main-container">
-  <div class="title">
-    <h2 class="mat-h2 primary-color">
-      <mat-icon (click)="onBackClick()">arrow_back</mat-icon>
-      İş İzni Detayları
-    </h2>
-    <h4 class="mat-h4">İŞ İZNİ : #{{ id }}</h4>
+  <div class="title-container">
+    <div class="title">
+      <h2 class="mat-h2 primary-color">
+        <mat-icon (click)="onBackClick()">arrow_back</mat-icon>
+        İş İzni Detayları
+      </h2>
+      <h4 class="mat-h4">İŞ İZNİ : #{{ id }}</h4>
+    </div>
+    <button mat-icon-button color="accent" (click)="onDownloadAsPdf()">
+      <mat-icon>file_download</mat-icon>
+    </button>
   </div>
+
   <app-wp-details-view *ngIf="ready" [item]="item"></app-wp-details-view>
 </div>

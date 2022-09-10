@@ -205,13 +205,25 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
   onGetWorkPermitItem(id?: number): void {
     if (!id) {
-      throw new Error('onConfirmDelete => id undefined');
+      throw new Error('onGetWorkPermitItem => id undefined');
     }
 
     this.splashService.show();
     setTimeout(() => {
       this.router.navigate(['/', 'workpermit', 'view', this.companyCode, id.toString(), this.role.toString()]);
     });
+    return;
+  }
+
+  onGetWorkPermitItemAsPdf(id?: number): void {
+    if (!id) {
+      throw new Error('onGetWorkPermitItemAsPdf => id undefined');
+    }
+
+    this.service
+      .getWorkPermitItemPdf(id)
+      .pipe(takeUntil(this.unsubscribeAll), take(1))
+      .subscribe(() => {});
     return;
   }
 

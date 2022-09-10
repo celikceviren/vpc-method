@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { filter, fromEvent, map, Observable, switchMap, take, takeUntil, timer } from 'rxjs';
 import { WindowMsgService } from 'src/app/data/window-msg.service';
@@ -237,6 +237,26 @@ export class WpApiService {
             return { result: true, item } as ServiceItemResult<WorkPermitItem>;
           })
         );
+      })
+    );
+  }
+
+  public getWorkPermitItemPdf(id: number): Observable<any> {
+    let _url = `${environment.apiUrl}/workpermit/itempdf/` + id;
+
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        const options = {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+          }),
+          params,
+          observe: 'response' as 'body',
+          responseType: 'blob' as 'json',
+        };
+        return this.httpClient.get<any>(_url, options);
       })
     );
   }

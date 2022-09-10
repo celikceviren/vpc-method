@@ -15,37 +15,46 @@ div.main-container {
   gap: 16px;
   margin-top: 16px;
 
-  div.title {
-    padding: 4px 8px;
+  div.title-container {
     display: flex;
-    flex-direction: column;
-    margin-bottom: 8px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 
-    > h2,
-    > h4 {
-      padding: 0px;
-      margin: 0px;
-    }
+    div.title {
+      padding: 4px 8px;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+      flex-grow: 1;
 
-    > h2 {
-      padding-left: 24px;
-      position: relative;
-
-      &.no-padding {
-        padding-left: 0;
+      > h2,
+      > h4 {
+        padding: 0px;
+        margin: 0px;
       }
 
-      .mat-icon {
-        position: absolute;
-        bottom: 4px;
-        left: -6px;
-        cursor: pointer;
+      > h2 {
+        padding-left: 24px;
+        position: relative;
+
+        &.no-padding {
+          padding-left: 0;
+        }
+
+        .mat-icon {
+          position: absolute;
+          bottom: 4px;
+          left: -6px;
+          cursor: pointer;
+        }
       }
-    }
-    > h4 {
-      font-size: 12px;
-      font-weight: 600;
-      color: rgba(0, 0, 0, 0.54);
+      > h4 {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.54);
+      }
     }
   }
 }

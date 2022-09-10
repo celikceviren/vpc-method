@@ -244,12 +244,16 @@
         <mat-icon class="accent-color">info_outline</mat-icon>
         <span>Görüntüle</span>
       </div>
+      <div class="menu-item" (click)="onGetWorkPermitItemAsPdf(item?.id)">
+        <mat-icon class="accent-color">file_download</mat-icon>
+        <span>PDF Olarak Kaydet</span>
+      </div>
       <div
         class="menu-item"
         (click)="onConfirmDelete(item?.id)"
         *ngIf="role === roles.OWNER && visibleStatus === statuses.PENDING"
       >
-        <mat-icon class="accent-color">info_outline</mat-icon>
+        <mat-icon class="accent-color">delete_forever</mat-icon>
         <span>Geri Al</span>
       </div>
     </ng-template>
