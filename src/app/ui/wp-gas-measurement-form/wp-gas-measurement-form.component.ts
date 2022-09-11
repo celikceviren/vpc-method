@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { StaticValues } from 'src/app/data/common.model';
 import { GasMeasurement } from 'src/app/data/workpermit.model';
+import { GasMeasurementValidator } from 'src/_helpers/gas-measurement-validator';
 
 interface PageForm {
   gasO2: FormControl<string | null>;
@@ -61,16 +62,52 @@ export class WpGasMeasurementFormComponent implements OnInit {
       if (this.gasVOC) {
         this.gasVOC.value = this.form.controls.gasVOC.value ?? '';
       }
+      console.log('value changed =>', this.form.controls);
     });
   }
 
   private createForm(): FormGroup<PageForm> {
     return this.formBuilder.group({
-      gasO2: [this.gasO2?.value ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
-      gasCH4: [this.gasCH4?.value ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
-      gasCO: [this.gasCO?.value ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
-      gasH2S: [this.gasH2S?.value ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
-      gasVOC: [this.gasVOC?.value ?? '', Validators.compose([Validators.required, Validators.maxLength(250)])],
+      gasO2: [
+        this.gasO2?.value ?? '',
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(8),
+          GasMeasurementValidator(StaticValues.GAS_MEASUREMENT_O2_CODE),
+        ]),
+      ],
+      gasCH4: [
+        this.gasCH4?.value ?? '',
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(8),
+          GasMeasurementValidator(StaticValues.GAS_MEASUREMENT_CH4_CODE),
+        ]),
+      ],
+      gasCO: [
+        this.gasCO?.value ?? '',
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(8),
+          GasMeasurementValidator(StaticValues.GAS_MEASUREMENT_CO_CODE),
+        ]),
+      ],
+      gasH2S: [
+        this.gasH2S?.value ?? '',
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(8),
+          GasMeasurementValidator(StaticValues.GAS_MEASUREMENT_H2S_CODE),
+        ]),
+      ],
+      gasVOC: [
+        this.gasVOC?.value ?? '',
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(8),
+          GasMeasurementValidator(StaticValues.GAS_MEASUREMENT_VOC_CODE),
+        ]),
+      ],
     });
   }
 }

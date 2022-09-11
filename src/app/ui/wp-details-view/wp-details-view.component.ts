@@ -111,7 +111,9 @@ export class WpDetailsViewComponent implements OnInit {
     if (this.item === undefined) {
       return;
     }
-    this.gasMeasurements = this.prepareGasMeasurements(this.item?.gasMeasurements);
+    if (this.item?.gasMeasurements?.length) {
+      this.gasMeasurements = this.prepareGasMeasurements(this.item?.gasMeasurements);
+    }
   }
 
   onTabChange(event: MatTabChangeEvent): void {

@@ -102,7 +102,29 @@ export class WPNewStepsData {
   };
   gasMeasurements: GasMeasurement[] = [];
 
-  constructor() {
+  constructor() {}
+
+  clearSelectedLocation(): void {
+    this.selectedLocation = {
+      companyCode: '',
+      companyName: '',
+      facilityCode: '',
+      facilityName: '',
+      areaGroupCode: '',
+      areaGroupName: '',
+      areaCode: '',
+      areaName: '',
+    };
+  }
+
+  clearWorkDescription(): void {
+    this.workDescription = {
+      description: '',
+      dtStart: new Date(),
+    };
+  }
+
+  populateGasMeasurements(): void {
     this.gasMeasurements.push({
       code: StaticValues.GAS_MEASUREMENT_O2_CODE,
       label: StaticValues.GAS_MEASUREMENT_O2_TEXT,
@@ -133,26 +155,6 @@ export class WPNewStepsData {
       hint: StaticValues.GAS_MEASUREMENT_VOC_HINT,
       value: '',
     });
-  }
-
-  clearSelectedLocation(): void {
-    this.selectedLocation = {
-      companyCode: '',
-      companyName: '',
-      facilityCode: '',
-      facilityName: '',
-      areaGroupCode: '',
-      areaGroupName: '',
-      areaCode: '',
-      areaName: '',
-    };
-  }
-
-  clearWorkDescription(): void {
-    this.workDescription = {
-      description: '',
-      dtStart: new Date(),
-    };
   }
 
   mapStaffListResponse(response: StaffListResponse): void {

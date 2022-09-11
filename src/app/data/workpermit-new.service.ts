@@ -57,7 +57,7 @@ export class WorkpermitNewService {
       case WPNewStep.GasMeasurement:
         return 'Adım 12: Gaz Ölçümleri';
       case WPNewStep.ReviewApprove:
-        return 'Adım 13: Gözden Geçir ve Onaya Gönder';
+        return 'Gözden Geçir ve Onaya Gönder';
     }
   }
 

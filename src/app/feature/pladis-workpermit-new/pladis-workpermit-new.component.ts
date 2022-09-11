@@ -211,7 +211,14 @@ export class PladisWorkpermitNewComponent implements OnInit, OnDestroy {
   onQuestionsAnswered(control: ControlQuestions): void {
     this.stepData.controlQuestions.questionGroups = control.questionGroups;
     this.stepData.controlQuestions.controlNotes = control.controlNotes ?? '';
-    this.moveToStep(WPNewStep.GasMeasurement);
+    if (this.stepData.selectedExtraPermissions.findIndex((p) => p.code === 'PLADIS_WP_3') >= 0) {
+      if (!this.stepData.gasMeasurements.length) {
+        this.stepData.populateGasMeasurements();
+      }
+      this.moveToStep(WPNewStep.GasMeasurement);
+    } else {
+      this.moveToStep(WPNewStep.ReviewApprove);
+    }
     this.loadStep();
   }
 

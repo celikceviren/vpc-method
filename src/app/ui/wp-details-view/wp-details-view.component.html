@@ -167,7 +167,7 @@
       <ng-container [ngTemplateOutlet]="questions"></ng-container>
     </div>
   </mat-tab>
-  <mat-tab label="GAZ ÖLÇÜMÜ">
+  <mat-tab label="GAZ ÖLÇÜMÜ" *ngIf="gasMeasurements?.length">
     <div class="tab-container" *ngIf="activeTab === 3">
       <ng-container [ngTemplateOutlet]="gasMeasurement"></ng-container>
     </div>
