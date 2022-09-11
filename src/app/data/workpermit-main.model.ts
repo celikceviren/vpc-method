@@ -12,6 +12,7 @@ export enum WpScope {
   AREA_GROUP = 'areagroup',
   FACILITY = 'facility',
   COMPANY = 'company',
+  PROJECT = 'project',
 }
 
 export enum WpRole {

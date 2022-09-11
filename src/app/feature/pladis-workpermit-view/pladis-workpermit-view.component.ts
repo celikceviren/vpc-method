@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { InfoDialogData, StaticValues } from 'src/app/data/common.model';
+import { Component, OnInit, ElementRef } from '@angular/core';
+import { InfoDialogData } from 'src/app/data/common.model';
 import { InfoDialogService } from 'src/app/data/info-dialog.service';
 import { WpMainService } from 'src/app/data/workpermit-main.service';
 import {
@@ -26,7 +26,7 @@ import { SplashScreenService } from 'src/_services/common/splash-screen-service'
 import { ActivatedRoute } from '@angular/router';
 import { WpRole } from 'src/app/data/workpermit-main.model';
 import { Location } from '@angular/common';
-import { MatTabChangeEvent } from '@angular/material/tabs';
+import { WindowMsgService } from 'src/app/data/window-msg.service';
 
 @Component({
   selector: 'app-pladis-workpermit-view',
@@ -35,6 +35,7 @@ import { MatTabChangeEvent } from '@angular/material/tabs';
 })
 export class PladisWorkpermitViewComponent implements OnInit {
   private unsubscribeAll = new Subject<void>();
+  private height$ = new Subject<number>();
   private companyCode = 'PLADIS';
 
   id!: number;
@@ -44,10 +45,12 @@ export class PladisWorkpermitViewComponent implements OnInit {
 
   constructor(
     private service: WpMainService,
+    private windowService: WindowMsgService,
     private dialogService: InfoDialogService,
     private splashService: SplashScreenService,
     private activatedRoute: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private host: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -112,7 +115,23 @@ export class PladisWorkpermitViewComponent implements OnInit {
         }
 
         this.item = resp.item;
+        if (this.role === WpRole.VIEWER) {
+          this.awaitHeightChange();
+        }
         this.ready = true;
       });
+  }
+
+  private awaitHeightChange(): void {
+    this.height$.pipe(distinctUntilChanged(), debounceTime(200)).subscribe((newHeight) => {
+      this.windowService.postMsg('newheight', { height: newHeight });
+    });
+
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0].contentRect.height;
+      this.height$.next(height);
+    });
+
+    observer.observe(this.host.nativeElement);
   }
 }

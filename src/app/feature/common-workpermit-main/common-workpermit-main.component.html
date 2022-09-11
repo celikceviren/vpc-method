@@ -46,7 +46,7 @@
     <mat-tab label="ONAY BEKLYEN" *ngIf="pendingTab">
       <ng-container *ngIf="visibleStatus === statuses.PENDING" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
-    <mat-tab label="AKTİF" *ngIf="activeTab">
+    <mat-tab label="AÇIK" *ngIf="activeTab">
       <ng-container *ngIf="visibleStatus === statuses.ACTIVE" [ngTemplateOutlet]="table"></ng-container>
     </mat-tab>
     <mat-tab label="KAPALI" *ngIf="closedTab">

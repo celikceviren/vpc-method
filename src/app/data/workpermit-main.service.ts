@@ -25,12 +25,13 @@ export class WpMainService {
     status: WpStatus,
     scope: string,
     areaGroup?: string,
+    project?: string,
     page?: number,
     size?: number
   ): Observable<PaginatedListResult<WpListItem>> {
     const currentPage = page ?? 1;
     const currentSize = currentPage && (size ?? 10);
-    return this.api.getWpListByStatus(status as number, scope, areaGroup, currentPage, currentSize).pipe(
+    return this.api.getWpListByStatus(status as number, scope, areaGroup, project, currentPage, currentSize).pipe(
       catchError((err) => {
         const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L47';
         const error: ServiceError = {

@@ -129,7 +129,11 @@ export class WpApiService {
     );
   }
 
-  public getSummaryStats(scope: string, aregroup?: string): Observable<ServiceItemResult<SummaryStatsItem>> {
+  public getSummaryStats(
+    scope: string,
+    aregroup?: string,
+    project?: string
+  ): Observable<ServiceItemResult<SummaryStatsItem>> {
     let _url = `${environment.apiUrl}/workpermit/summary/stats`;
     return this.refreshAccessToken().pipe(
       switchMap((token) => {
@@ -137,6 +141,9 @@ export class WpApiService {
         params = params.append('scope', scope);
         if (aregroup?.length) {
           params = params.append('aregroup', aregroup);
+        }
+        if (project?.length) {
+          params = params.append('project', project);
         }
         params = params.append('token', token);
         return this.httpClient.get<SummaryStatsItem>(_url, { params }).pipe(
@@ -152,6 +159,7 @@ export class WpApiService {
     status: WpStatus,
     scope: string,
     aregroup?: string,
+    project?: string,
     page: number = 1,
     size: number = 50
   ): Observable<PaginatedListResult<WpListItem>> {
@@ -165,6 +173,9 @@ export class WpApiService {
         params = params.append('size', size.toString());
         if (aregroup?.length) {
           params = params.append('aregroup', aregroup);
+        }
+        if (project?.length) {
+          params = params.append('project', project);
         }
         params = params.append('token', token);
         return this.httpClient.get<any>(_url, { params }).pipe(

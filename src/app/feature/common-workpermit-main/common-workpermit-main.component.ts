@@ -13,6 +13,7 @@ import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confir
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 import { InfoDialogService } from 'src/app/data/info-dialog.service';
+import { WindowMsgService } from 'src/app/data/window-msg.service';
 
 @Component({
   selector: 'app-common-workpermit-main',
@@ -28,6 +29,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   scope!: WpScope;
   role!: WpRole;
   areaGroup!: string;
+  project!: string;
   dashboardLoading: boolean = true;
   listPage!: WpListItem[];
   tableDs!: WpMainTableDataSource;
@@ -48,6 +50,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   constructor(
     private splashService: SplashScreenService,
     private service: WpMainService,
+    private windowService: WindowMsgService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private dialog: MatDialog,
@@ -102,6 +105,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
           this.role = WpRole.VIEWER;
         }
         this.areaGroup = queryMap.get('areaGroup') ?? '';
+        this.project = queryMap.get('project') ?? '';
         return true;
       })
     );
@@ -234,7 +238,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (!this.hideDashboard) {
       this.api
-        .getSummaryStats(this.scope, this.areaGroup)
+        .getSummaryStats(this.scope, this.areaGroup, this.project)
         .pipe(
           takeUntil(this.unsubscribeAll),
           take(1),
@@ -255,12 +259,14 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   private initTable(status: WpStatus): void {
-    this.tableDs = new WpMainTableDataSource(this.service, status, this.scope, this.areaGroup);
+    this.tableDs = new WpMainTableDataSource(this.service, status, this.scope, this.areaGroup, this.project);
   }
 
   private awaitHeightChange(): void {
     this.height$.pipe(distinctUntilChanged(), debounceTime(200)).subscribe((newHeight) => {
-      //this.windowService.postMsg('newheight', { height: newHeight });
+      if (this.scope === WpScope.PROJECT && this.project !== '') {
+        this.windowService.postMsg('newheight', { height: newHeight });
+      }
     });
 
     const observer = new ResizeObserver((entries) => {

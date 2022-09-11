@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, delay, map, Observable, of } from 'rxjs';
 import { WpApiService } from 'src/_services/api/wp-api.service';
+import { StaticValues } from './common.model';
 import {
   CodeValueItem,
   Project,
@@ -148,6 +149,60 @@ export class WorkpermitNewService {
           error,
           item: undefined,
         } as ServiceItemResult<StaffListResponse>);
+      }),
+      map((response) => {
+        if (response?.item?.preset) {
+          const presetWorkPermits = response.item.preset?.selectedExtraPermissions ?? [];
+          if (!presetWorkPermits.length) {
+            const none: CodeValueItem = {
+              kind: 'extrawp',
+              code: StaticValues.SELECT_OPTION_NONE_CODE,
+              name: StaticValues.SELECT_OPTION_NONE_VALUE,
+            };
+            presetWorkPermits.push(none);
+          }
+
+          const presetEquipments = response.item.preset?.selectedEquipments ?? [];
+          if (!presetEquipments.length) {
+            const none: CodeValueItem = {
+              kind: 'equipment',
+              code: StaticValues.SELECT_OPTION_NONE_CODE,
+              name: StaticValues.SELECT_OPTION_NONE_VALUE,
+            };
+            presetEquipments.push(none);
+          }
+
+          const presetPpe = response.item.preset?.selectedPpe ?? [];
+          if (!presetPpe.length) {
+            const none: CodeValueItem = {
+              kind: 'ppe',
+              code: StaticValues.SELECT_OPTION_NONE_CODE,
+              name: StaticValues.SELECT_OPTION_NONE_VALUE,
+            };
+            presetPpe.push(none);
+          }
+
+          const presetRisks = response.item.preset?.selectedRisks ?? [];
+          if (!presetRisks.length) {
+            const none: CodeValueItem = {
+              kind: 'risk',
+              code: StaticValues.SELECT_OPTION_NONE_CODE,
+              name: StaticValues.SELECT_OPTION_NONE_VALUE,
+            };
+            presetRisks.push(none);
+          }
+
+          const presetWorkTypes = response.item.preset?.selectedWorkTypes ?? [];
+          if (!presetWorkTypes.length) {
+            const none: CodeValueItem = {
+              kind: 'worktype',
+              code: StaticValues.SELECT_OPTION_NONE_CODE,
+              name: StaticValues.SELECT_OPTION_NONE_VALUE,
+            };
+            presetWorkTypes.push(none);
+          }
+        }
+        return response;
       })
     );
   }

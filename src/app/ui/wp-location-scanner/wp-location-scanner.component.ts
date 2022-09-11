@@ -45,7 +45,8 @@ export class WpLocationScannerComponent implements OnInit, OnDestroy, AfterViewI
       //Note: Mock QR Scan
       if (environment.isDebugScanner) {
         setTimeout(() => {
-          this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg==');
+          this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzFfMg=='); //Bolge - 1 - Alan 2
+          //this.scanSuccess.emit('UExBRElTOjEwMjAwMDk3UDE6UExBRElTXzJfMQ=='); //Bolge - 2 - Alan 1
         }, 3000);
       }
     }
