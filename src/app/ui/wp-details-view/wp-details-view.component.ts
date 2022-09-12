@@ -2,7 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { StaticValues } from 'src/app/data/common.model';
 import { WpStatus } from 'src/app/data/workpermit-main.model';
-import { GasMeasurement, QuestionGroup, WorkPermitItem } from 'src/app/data/workpermit.model';
+import {
+  ControlQuestions,
+  GasMeasurement,
+  QuestionGroup,
+  WorkPermitItem,
+  WpFormItem,
+  WpFormType,
+} from 'src/app/data/workpermit.model';
 
 @Component({
   selector: 'app-wp-details-view',
@@ -66,6 +73,10 @@ export class WpDetailsViewComponent implements OnInit {
     return (this.item.risks ?? []).map((x) => x.name).join(', ');
   }
 
+  get controlQuestions(): ControlQuestions | undefined {
+    return this.item?.controlQuestions;
+  }
+
   get questionGroups(): QuestionGroup[] {
     return this.item?.controlQuestions?.questionGroups ?? [];
   }
@@ -100,6 +111,14 @@ export class WpDetailsViewComponent implements OnInit {
 
   get createdAt(): Date | null {
     return this.item?.workDescription?.dtCreate ?? null;
+  }
+
+  get controlForms(): WpFormItem[] {
+    return (this.item?.forms ?? []).filter((x) => x.formType === WpFormType.WpControlForm) ?? [];
+  }
+
+  get closeForm(): WpFormItem | undefined {
+    return (this.item?.forms ?? []).find((x) => x.formType === WpFormType.WpCloseForm) ?? undefined;
   }
 
   activeTab: number = 0;

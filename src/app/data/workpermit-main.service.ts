@@ -79,8 +79,8 @@ export class WpMainService {
     );
   }
 
-  public getWorkPermitItem(id: number): Observable<ServiceItemResult<WorkPermitItem>> {
-    return this.api.getWorkPermitItem(id).pipe(
+  public getWorkPermitItem(id: number, includeForms?: boolean): Observable<ServiceItemResult<WorkPermitItem>> {
+    return this.api.getWorkPermitItem(id, includeForms).pipe(
       catchError((err) => {
         const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L82';
         const error: ServiceError = {

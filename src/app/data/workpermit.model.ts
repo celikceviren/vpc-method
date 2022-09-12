@@ -290,6 +290,7 @@ export interface WorkPermitItem {
   gasMeasurements: CodeValueItem[];
   workDescription: WorkDetails;
   controlQuestions: ControlQuestions;
+  forms?: Array<WpFormItem>;
 }
 export interface WpListSelectItem {
   kind: 'workpermit';
@@ -374,5 +375,13 @@ export interface WpFormResponseItem {
 
 export interface WpFormDataItem {
   wplist: WpListSelectItem[];
+  controlQuestions: ControlQuestions;
+}
+
+export interface WpFormItem {
+  dtCreate: Date;
+  formType: number;
+  owner: string;
+  workPermitId: number;
   controlQuestions: ControlQuestions;
 }

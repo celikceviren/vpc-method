@@ -87,7 +87,7 @@ export class PladisWorkpermitViewComponent implements OnInit {
     this.dialogService.show(dialogData);
 
     this.service
-      .getWorkPermitItem(this.id)
+      .getWorkPermitItem(this.id, true)
       .pipe(
         takeUntil(this.unsubscribeAll),
         take(1),

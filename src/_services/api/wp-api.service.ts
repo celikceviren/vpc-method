@@ -237,12 +237,13 @@ export class WpApiService {
     );
   }
 
-  public getWorkPermitItem(id: number): Observable<ServiceItemResult<WorkPermitItem>> {
+  public getWorkPermitItem(id: number, includeForms?: boolean): Observable<ServiceItemResult<WorkPermitItem>> {
     let _url = `${environment.apiUrl}/workpermit/itemget/` + id;
     return this.refreshAccessToken().pipe(
       switchMap((token) => {
         let params: HttpParams = new HttpParams();
         params = params.append('token', token);
+        params = params.append('includeForms', includeForms ? 'true' : 'false');
         return this.httpClient.get<WorkPermitItem>(_url, { params }).pipe(
           map((item) => {
             return { result: true, item } as ServiceItemResult<WorkPermitItem>;

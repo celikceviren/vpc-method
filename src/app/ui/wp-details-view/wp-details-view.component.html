@@ -111,9 +111,9 @@
   </div>
 </ng-template>
 
-<ng-template #questions>
+<ng-template #questions let-ctxItem>
   <div class="general-info" *ngIf="item">
-    <ng-container *ngFor="let group of questionGroups">
+    <ng-container *ngFor="let group of ctxItem.questionGroups">
       <div style="width: 100%">
         <div>
           <small class="label primary-color"> {{ group.name }} </small>
@@ -128,7 +128,7 @@
     <div style="width: 100%">
       <div>
         <small class="label primary-color"> Yapılan kontroller ile ilgili diğer hususlar </small>
-        <span> {{ controlNotes }} </span>
+        <span> {{ ctxItem?.controlNotes ? ctxItem.controlNotes : '-' }} </span>
       </div>
     </div>
   </div>
@@ -164,12 +164,42 @@
   </mat-tab>
   <mat-tab label="KONTROLLER">
     <div class="tab-container" *ngIf="activeTab === 2">
-      <ng-container [ngTemplateOutlet]="questions"></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="questions"
+        [ngTemplateOutletContext]="{ $implicit: controlQuestions }"
+      ></ng-container>
     </div>
   </mat-tab>
   <mat-tab label="GAZ ÖLÇÜMÜ" *ngIf="gasMeasurements?.length">
     <div class="tab-container" *ngIf="activeTab === 3">
       <ng-container [ngTemplateOutlet]="gasMeasurement"></ng-container>
+    </div>
+  </mat-tab>
+  <mat-tab label="ARA KONTROLLER" *ngIf="controlForms.length">
+    <div class="tab-container" *ngIf="activeTab === (gasMeasurements?.length ? 4 : 3)">
+      <ng-container *ngFor="let form of controlForms">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <span> {{ form.owner }}, {{ form.dtCreate | date: 'dd.MM.yyyy HH:mm' }}</span>
+          </mat-expansion-panel-header>
+
+          <ng-container
+            [ngTemplateOutlet]="questions"
+            [ngTemplateOutletContext]="{ $implicit: form.controlQuestions }"
+          ></ng-container>
+        </mat-expansion-panel>
+      </ng-container>
+    </div>
+  </mat-tab>
+  <mat-tab label="İŞ BİTİRME" *ngIf="closeForm">
+    <div
+      class="tab-container"
+      *ngIf="activeTab === (gasMeasurements?.length ? (controlForms.length ? 5 : 4) : controlForms.length ? 4 : 3)"
+    >
+      <ng-container
+        [ngTemplateOutlet]="questions"
+        [ngTemplateOutletContext]="{ $implicit: closeForm.controlQuestions }"
+      ></ng-container>
     </div>
   </mat-tab>
 </mat-tab-group>

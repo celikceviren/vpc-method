@@ -66,6 +66,11 @@ div.tab-container {
   flex-direction: column;
   padding: 16px 24px;
   background: #fff;
+  gap: 12px;
+
+  .mat-expansion-panel-body {
+    padding: 0 16px 16px;
+  }
 }
 
 div.general-info {
@@ -113,6 +118,11 @@ div.general-info {
         border-top: 0;
         border-radius: 0 0 8px 8px;
       }
+    }
+
+    .mat-expansion-panel-body {
+      padding: 0 16px 16px;
+      margin-top: -16px;
     }
   }
 }
