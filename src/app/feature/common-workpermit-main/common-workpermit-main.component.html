@@ -79,8 +79,12 @@
         <mat-cell *matCellDef="let item">
           <small class="label">Başlangıç :</small>
           <span> {{ item.dtStart | date: 'dd.MM.yyyy HH:mm' }} </span>
-          <small class="label">Bitiş :</small>
+          <small class="label">İş İzni Bitiş :</small>
           <span> {{ item.dtEnd | date: 'dd.MM.yyyy HH:mm' }} </span>
+          <small class="label" *ngIf="item.isPendingClose || item.status === statuses.CLOSED">Çalışma Bitiş :</small>
+          <span *ngIf="item.isPendingClose || item.status === statuses.CLOSED">
+            {{ item.dtClose | date: 'dd.MM.yyyy HH:mm' }}
+          </span>
           <small class="label">Yer :</small>
           <span> {{ item.workArea }} ( {{ item.workAreaGroup }} ) </span>
         </mat-cell>
@@ -140,6 +144,13 @@
           >
             pending_actions
           </mat-icon>
+          <mat-icon
+            class="desktop-approve-check reject"
+            *ngIf="item.status === statuses.ACTIVE && item.isPendingClose"
+            matTooltip="İş Bitirme Onayı Bekliyor"
+          >
+            hourglass_empty
+          </mat-icon>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="mobiledata">
@@ -175,6 +186,13 @@
             >
               pending_actions
             </mat-icon>
+            <mat-icon
+              class="desktop-approve-check reject"
+              *ngIf="item.status === statuses.ACTIVE && item.isPendingClose"
+              matTooltip="İş Bitirme Onayı Bekliyor"
+            >
+              hourglass_empty
+            </mat-icon>
             <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
               <mat-icon>more_vert</mat-icon>
             </button>
@@ -200,7 +218,10 @@
             <div>
               <small class="label primary-color">Çalışma Saati</small>
               <span>{{ item.dtStart | date: 'dd.MM.yyyy HH:mm' }}</span>
-              <small> {{ item.dtEnd | date: 'dd.MM.yyyy HH:mm' }} </small>
+              <small>İş İzni Bitiş : {{ item.dtEnd | date: 'dd.MM.yyyy HH:mm' }} </small>
+              <small *ngIf="item.isPendingClose || item.status === statuses.CLOSED">
+                Çalışma Bitiş : {{ item.dtClose | date: 'dd.MM.yyyy HH:mm' }}
+              </small>
             </div>
           </div>
           <div style="width: 100%">

@@ -178,7 +178,7 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
 
   onConfirmReset(): void {
     const dialogData: ConfirmDialogData = {
-      title: 'Yeni İş İzni - Vazgeç',
+      title: 'İş İzni Onayı - Vazgeç',
       body: 'Girilen veriler silinecek ve en başa döneceksiniz, emin misiniz?',
       hasConfirmBtn: true,
       confirmBtnText: 'Evet',
@@ -196,7 +196,9 @@ export class PladisWorkpermitApproveComponent implements OnInit, OnDestroy {
         return;
       }
 
+      const kind = this.stepData.kind;
       this.stepData = new WpApproveStepData();
+      this.stepData.kind = kind;
       this.moveToStep(WpApproveStep.SelectLocation);
       this.onResetPageState();
     });

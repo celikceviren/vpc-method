@@ -277,4 +277,68 @@ export class WorkPermitApproveService {
       })
     );
   }
+
+  getWorkPermitsToApproveCloseForArea(areaCode: string, kind: string): Observable<ServiceListResult<WpListSelectItem>> {
+    return this.api.getWorkPermitsToApproveCloseForArea(areaCode, kind).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L36';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'getWorkPermitsToApproveCloseForArea'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: undefined,
+        } as ServiceListResult<WpListItem>);
+      }),
+      map((response) => {
+        const mappedResponse = {
+          result: response.result,
+          error: response.error,
+          items: [],
+        } as ServiceListResult<WpListSelectItem>;
+        const mappedItems = (response.items ?? []).map((y) => {
+          const item: WpListSelectItem = {
+            code: y.id.toString(),
+            kind: 'workpermit',
+            name: `#${y.id}`,
+            self: y,
+            staff: (y.staff ?? []).join(', '),
+          };
+          return item;
+        });
+        mappedResponse.items = mappedItems;
+        return mappedResponse;
+      })
+    );
+  }
+
+  sendApproveCloseResult(postData: { isApprove: boolean; rejectReason: string }, kind: string): Observable<any> {
+    return this.api.sendApproveCloseResult(postData, kind).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L81';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'sendApproveCloseResult'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+        } as ServiceItemResult<void>);
+      })
+    );
+  }
 }

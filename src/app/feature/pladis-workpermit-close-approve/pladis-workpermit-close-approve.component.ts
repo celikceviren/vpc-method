@@ -2,19 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, take, takeUntil } from 'rxjs';
-import { ConfirmDialogData, StaticValues } from 'src/app/data/common.model';
+import { ConfirmDialogData } from 'src/app/data/common.model';
 import { WorkPermitApproveService } from 'src/app/data/workpermit-approve.service';
 import { WpMainService } from 'src/app/data/workpermit-main.service';
 import { WorkpermitNewService } from 'src/app/data/workpermit-new.service';
 import {
   CodeValueItem,
-  ControlQuestions,
   PageState,
   Project,
   ServiceError,
-  WpFormStep,
-  WpFormStepData,
-  WpFormType,
+  WpApproveStep,
+  WpApproveStepData,
   WpListSelectItem,
   WpPageState,
 } from 'src/app/data/workpermit.model';
@@ -22,20 +20,19 @@ import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confir
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 
 @Component({
-  selector: 'app-common-workpermit-forms',
-  templateUrl: './common-workpermit-forms.component.html',
-  styleUrls: ['./common-workpermit-forms.component.scss'],
+  selector: 'app-pladis-workpermit-close-approve',
+  templateUrl: './pladis-workpermit-close-approve.component.html',
+  styleUrls: ['./pladis-workpermit-close-approve.component.scss'],
 })
-export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
+export class PladisWorkpermitCloseApproveComponent implements OnInit, OnDestroy {
   private unsubscribeAll = new Subject<void>();
-  companyCode!: string;
-  formType!: WpFormType;
-  title!: string;
-  steps = WpFormStep;
+  companyCode = 'PLADIS';
+  title = 'İş Bitirme Onayı';
+  steps = WpApproveStep;
   states = PageState;
-  currentStep: WpFormStep = WpFormStep.SelectLocation;
+  currentStep: WpApproveStep = WpApproveStep.SelectLocation;
   stepTitle: string | undefined;
-  stepData: WpFormStepData = new WpFormStepData();
+  stepData: WpApproveStepData = new WpApproveStepData();
   pageState: WpPageState = {
     state: PageState.ready,
   };
@@ -44,29 +41,17 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
 
   constructor(
     private splashService: SplashScreenService,
-    private activatedRoute: ActivatedRoute,
     private service: WorkPermitApproveService,
     private wpNewService: WorkpermitNewService,
     private wpMainService: WpMainService,
+    private activatedRoute: ActivatedRoute,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.pipe(take(1)).subscribe((paramMap) => {
-      this.companyCode = paramMap.get('company') ?? '';
-      const formtype = parseInt(paramMap.get('formtype') ?? '0');
-      if (formtype !== WpFormType.WpCloseForm && formtype !== WpFormType.WpControlForm) {
-        return;
-      }
-
-      this.formType = formtype;
-      if (this.formType === WpFormType.WpCloseForm) {
-        this.title = 'İş Bitirme Formu';
-      } else {
-        this.title = 'Ara Kontrol Formu';
-      }
-      this.stepData.formType = this.formType;
-      this.stepTitle = this.service.getFormStepTitle(this.currentStep);
+      this.stepData.kind = paramMap.get('kind') ?? '';
+      this.stepTitle = this.service.getStepTitle(this.currentStep);
       this.splashService.hide();
     });
   }
@@ -85,25 +70,16 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
   }
 
   onPreviousStep(): void {
-    if (this.currentStep === WpFormStep.SelectLocation) {
+    if (this.currentStep === WpApproveStep.SelectLocation) {
       return;
     }
 
     this.backToStep(this.currentStep);
   }
 
-  onBackToStep(step: WpFormStep): void {
-    this.currentStep = step;
-    this.backToStep(this.currentStep);
-  }
-
   onConfirmReset(): void {
-    let msg = 'Ara Kontrol - Vazgeç';
-    if (this.formType === WpFormType.WpCloseForm) {
-      msg = 'İş Bitime - Vazgeç';
-    }
     const dialogData: ConfirmDialogData = {
-      title: msg,
+      title: 'İş Bitirme Onayı - Vazgeç',
       body: 'Girilen veriler silinecek ve en başa döneceksiniz, emin misiniz?',
       hasConfirmBtn: true,
       confirmBtnText: 'Evet',
@@ -121,15 +97,16 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.stepData = new WpFormStepData();
-      this.stepData.formType = this.formType;
-      this.moveToStep(WpFormStep.SelectLocation);
+      const kind = this.stepData.kind;
+      this.stepData = new WpApproveStepData();
+      this.stepData.kind = kind;
+      this.moveToStep(WpApproveStep.SelectLocation);
       this.onResetPageState();
     });
   }
 
   onScanSuccess(qrCode: string): void {
-    if (this.currentStep !== WpFormStep.SelectLocation) {
+    if (this.currentStep !== WpApproveStep.SelectLocation) {
       return;
     }
 
@@ -150,7 +127,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
                   response?.result && !response.item
                     ? 'Okutulan koda ait bir çalışma alanı bulunamadı'
                     : 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L131', 'searchWorkAreaByQrCode'),
+                details: this.service.formatErrorDetails('L91', 'searchWorkAreaByQrCode'),
               } as ServiceError)
           );
           return;
@@ -168,7 +145,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
       this.stepData.clearSelectedLocation();
       return;
     }
-    this.moveToStep(WpFormStep.SelectWorkPermit);
+    this.moveToStep(WpApproveStep.SelectWorkPermit);
     this.loadStep();
   }
 
@@ -178,22 +155,19 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
     }
 
     this.stepData.selectedWp = item.self;
-    this.moveToStep(WpFormStep.QuestionsList);
+    this.moveToStep(WpApproveStep.WorkPermitReview);
     this.loadStep();
   }
 
-  onQuestionsAnswered(control: ControlQuestions): void {
-    this.stepData.controlQuestions.questionGroups = control.questionGroups;
-    this.stepData.controlQuestions.controlNotes = control.controlNotes ?? '';
-    this.moveToStep(WpFormStep.ReviewApprove);
+  onConfirmWpDetails(): void {
+    this.moveToStep(WpApproveStep.Approval);
     this.loadStep();
   }
 
-  onConfirmApprove(): void {
-    const msg =
-      this.stepData.formType === WpFormType.WpCloseForm
-        ? 'İşi sonlandırıyorsunuz, emin misiniz?'
-        : 'Kontrol formu kaydedilecek, emin misiniz?';
+  onFormSubmitted(event: { id: number; isApprove: boolean; rejectReason: string }): void {
+    const msg = event.isApprove
+      ? 'İş bitimini onaylamak istediğinize emin misiniz?'
+      : 'İş bitirme talebini reddediyorsunuz, emin misiniz?';
     const dialogData: ConfirmDialogData = {
       title: '',
       body: msg,
@@ -212,7 +186,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
 
       this.onNewPageState(PageState.inprogress);
       this.service
-        .sendFormResult(this.stepData.controlQuestions, this.stepData.formType, this.stepData.selectedWp?.id ?? 0)
+        .sendApproveCloseResult(event, this.stepData.kind)
         .pipe(takeUntil(this.unsubscribeAll), take(1))
         .subscribe((response) => {
           if (!response?.result) {
@@ -221,7 +195,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
               response?.error ??
                 ({
                   message: 'Bilgiler kaydedilemedi',
-                  details: this.service.formatErrorDetails('L220', 'onConfirmApprove:sendFormResult'),
+                  details: this.service.formatErrorDetails('L196', 'onFormSubmitted:sendApproveCloseResult'),
                 } as ServiceError)
             );
             return;
@@ -230,10 +204,10 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getWorkPermitsForFormType(): void {
+  private getWorkPermitsToApprove(): void {
     const { companyCode, facilityCode, areaCode } = this.stepData.selectedLocation;
     this.service
-      .getWorkPermitsForFormType(areaCode, this.stepData.formType)
+      .getWorkPermitsToApproveCloseForArea(areaCode, this.stepData.kind)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -242,26 +216,21 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
             response?.error ??
               ({
                 message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L175', 'getWorkPermitsForFormType'),
+                details: this.service.formatErrorDetails('L163', 'getWorkPermitsToApproveCloseForArea'),
               } as ServiceError)
           );
           return;
         }
 
-        if (!response.item?.wplist?.length) {
-          let msg = 'Seçilen çalışma alanında ara kontrol girebileceğiniz bir iş izni yok.';
-          if (this.formType === WpFormType.WpCloseForm) {
-            msg = 'Seçilen çalışma alanında sonlandırabileceğiniz bir iş yok.';
-          }
+        if (!response.items?.length) {
           this.onNewPageState(PageState.failed, {
-            message: msg,
-            details: this.service.formatErrorDetails('L116', `${companyCode}:${facilityCode}:${areaCode}`),
+            message: 'Seçilen çalışma alanında iş bitirme onayı verebileceğiniz bir iş izni yok.',
+            details: this.service.formatErrorDetails('L172', `${companyCode}:${facilityCode}:${areaCode}`),
           } as ServiceError);
           return;
         }
 
-        this.stepData.wpList = response.item.wplist;
-        this.stepData.controlQuestions = response.item.controlQuestions;
+        this.stepData.wpList = response.items;
         this.stepData.selectedWp = undefined;
         this.onNewPageState(PageState.done);
       });
@@ -272,7 +241,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
       return;
     }
     this.wpMainService
-      .getWorkPermitItem(this.stepData.selectedWp.id)
+      .getWorkPermitItem(this.stepData.selectedWp.id, true)
       .pipe(takeUntil(this.unsubscribeAll), take(1))
       .subscribe((response) => {
         if (!response?.result) {
@@ -281,7 +250,7 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
             response?.error ??
               ({
                 message: 'Veriler alınamadı',
-                details: this.service.formatErrorDetails('L235', 'getWorkPermitItem'),
+                details: this.service.formatErrorDetails('L206', 'getWorkPermitItem'),
               } as ServiceError)
           );
           return;
@@ -291,51 +260,50 @@ export class CommonWorkpermitFormsComponent implements OnInit, OnDestroy {
       });
   }
 
+  private backToStep(step: WpApproveStep): void {
+    switch (step) {
+      case WpApproveStep.SelectWorkPermit:
+        this.moveToStep(WpApproveStep.SelectLocation);
+        this.stepData.clearSelectedLocation();
+        this.onResetPageState();
+        break;
+      case WpApproveStep.WorkPermitReview:
+        this.moveToStep(WpApproveStep.SelectWorkPermit);
+        this.stepData.selectedWp = undefined;
+        this.loadStep();
+        break;
+      case WpApproveStep.Approval:
+        this.moveToStep(WpApproveStep.WorkPermitReview);
+        this.loadStep();
+        break;
+    }
+  }
+
+  private moveToStep(newStep: WpApproveStep): void {
+    this.currentStep = newStep;
+    this.stepTitle = this.service.getStepTitle(newStep);
+  }
+
   private loadStep(): void {
     switch (this.currentStep) {
-      case WpFormStep.SelectWorkPermit:
+      case WpApproveStep.SelectWorkPermit:
         this.inProgressMsg = 'İş izinleri alnıyor...';
         this.onNewPageState(PageState.inprogress);
-        this.getWorkPermitsForFormType();
+        this.getWorkPermitsToApprove();
         this.retryProcessFn = this.loadStep.bind(this);
         break;
-      case WpFormStep.QuestionsList:
+      case WpApproveStep.WorkPermitReview:
         this.inProgressMsg = 'İş izni bilgileri alnıyor...';
         this.onNewPageState(PageState.inprogress);
         this.getWorkPermitItem();
         this.retryProcessFn = this.loadStep.bind(this);
         break;
-      case WpFormStep.ReviewApprove:
+      case WpApproveStep.Approval:
         this.inProgressMsg = 'Veriler alınıyor...';
         this.onNewPageState(PageState.done);
         this.retryProcessFn = this.loadStep.bind(this);
         break;
     }
-  }
-
-  private backToStep(step: WpFormStep): void {
-    switch (step) {
-      case WpFormStep.SelectWorkPermit:
-        this.moveToStep(WpFormStep.SelectLocation);
-        this.stepData.clearSelectedLocation();
-        this.onResetPageState();
-        break;
-      case WpFormStep.QuestionsList:
-        this.moveToStep(WpFormStep.SelectWorkPermit);
-        this.stepData.selectedWp = undefined;
-        this.stepData.wpItem = undefined;
-        this.loadStep();
-        break;
-      case WpFormStep.ReviewApprove:
-        this.moveToStep(WpFormStep.QuestionsList);
-        this.loadStep();
-        break;
-    }
-  }
-
-  private moveToStep(newStep: WpFormStep): void {
-    this.currentStep = newStep;
-    this.stepTitle = this.service.getFormStepTitle(newStep);
   }
 
   private onNewPageState(newState: PageState, error?: ServiceError): void {

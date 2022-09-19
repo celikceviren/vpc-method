@@ -157,7 +157,7 @@ export class PladisWorkpermitExtendComponent implements OnInit, OnDestroy {
 
   onConfirmReset(): void {
     const dialogData: ConfirmDialogData = {
-      title: 'Yeni İş İzni - Vazgeç',
+      title: 'İş Süresi Uzat - Vazgeç',
       body: 'Girilen veriler silinecek ve en başa döneceksiniz, emin misiniz?',
       hasConfirmBtn: true,
       confirmBtnText: 'Evet',

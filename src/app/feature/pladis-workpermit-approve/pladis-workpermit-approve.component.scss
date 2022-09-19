@@ -61,7 +61,7 @@ div.main-container {
 
       &-md {
         width: 100%;
-        max-width: 420px;
+        max-width: 640px;
         @include media-breakpoint('lt-sm') {
           max-width: unset;
         }

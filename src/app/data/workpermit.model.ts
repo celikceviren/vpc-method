@@ -16,19 +16,16 @@ export enum WPNewStep {
   GasMeasurement,
   ReviewApprove,
 }
-
 export enum WpApproveStep {
   SelectLocation = 1,
   SelectWorkPermit,
   WorkPermitReview,
   Approval,
 }
-
 export enum WpFormType {
   WpCloseForm = 1,
   WpControlForm,
 }
-
 export enum WpFormStep {
   SelectLocation = 1,
   SelectWorkPermit,
@@ -40,26 +37,22 @@ export interface ServiceError {
   details?: string;
   error?: any;
 }
-
 export interface ServiceItemResult<T> {
   result: boolean;
   error?: ServiceError;
   item?: T;
 }
-
 export interface ServiceListResult<T> {
   result: boolean;
   error?: ServiceError;
   items?: Array<T>;
 }
-
 export enum PageState {
   ready = 'ready',
   inprogress = 'inprogress',
   failed = 'failed',
   done = 'done',
 }
-
 export interface WpPageState {
   state: PageState;
   error?: ServiceError;
@@ -217,6 +210,7 @@ export interface WorkDetails {
   dtStart: Date;
   dtEnd?: Date;
   dtCreate?: Date;
+  dtClose?: Date;
   owner?: string;
   ownerCode?: string;
   status?: number;
@@ -228,6 +222,7 @@ export interface WorkDetails {
   rejectReason?: string;
   rejectKind?: string;
   isExtended?: boolean;
+  isPendingClose?: boolean;
 }
 export interface StaffListResponse {
   staffList: CodeValueItem[];
@@ -367,21 +362,26 @@ export class WpFormStepData {
     };
   }
 }
-
 export interface WpFormResponseItem {
   wplist: WpListItem[];
   questionGroups: QuestionGroup[];
 }
-
 export interface WpFormDataItem {
   wplist: WpListSelectItem[];
   controlQuestions: ControlQuestions;
 }
-
 export interface WpFormItem {
-  dtCreate: Date;
   formType: number;
+  dtCreate: Date;
   owner: string;
   workPermitId: number;
+  isgApprove?: boolean;
+  isgApproveText?: string;
+  areaApprove?: boolean;
+  areaApproveText?: string;
+  isRejected?: boolean;
+  rejectedByText?: string;
+  rejectReason?: string;
+  rejectKind?: string;
   controlQuestions: ControlQuestions;
 }

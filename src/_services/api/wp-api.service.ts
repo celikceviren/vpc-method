@@ -194,6 +194,7 @@ export class WpApiService {
             dtCreate: item.dtCreate,
             dtEnd: item.dtEnd,
             dtStart: item.dtStart,
+            dtClose: item.dtClose,
             owner: item.ownerName,
             ownerCode: item.ownerCode,
             contractor: item.contractor,
@@ -207,6 +208,7 @@ export class WpApiService {
             areaApproved: (item.isAreaApproved ?? 0) > 0,
             isgApproved: (item.isgApproved ?? 0) > 0,
             isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
+            isPendingClose: (item.isPendingClose ?? 0) > 0,
           };
           list.push(mapped);
         });
@@ -290,6 +292,7 @@ export class WpApiService {
                 dtCreate: item.dtCreate,
                 dtEnd: item.dtEnd,
                 dtStart: item.dtStart,
+                dtClose: item.dtClose,
                 owner: item.ownerName,
                 ownerCode: item.ownerCode,
                 contractor: item.contractor,
@@ -302,6 +305,7 @@ export class WpApiService {
                 projectOwner: item.projectOwner,
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
+                isPendingClose: (item.isPendingClose ?? 0) > 0,
               };
               list.push(mapped);
             });
@@ -328,6 +332,7 @@ export class WpApiService {
                 dtCreate: item.dtCreate,
                 dtEnd: item.dtEnd,
                 dtStart: item.dtStart,
+                dtClose: item.dtClose,
                 owner: item.ownerName,
                 ownerCode: item.ownerCode,
                 contractor: item.contractor,
@@ -341,6 +346,7 @@ export class WpApiService {
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
                 isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
+                isPendingClose: (item.isPendingClose ?? 0) > 0,
               };
               list.push(mapped);
             });
@@ -410,6 +416,7 @@ export class WpApiService {
                 dtCreate: item.dtCreate,
                 dtEnd: item.dtEnd,
                 dtStart: item.dtStart,
+                dtClose: item.dtClose,
                 owner: item.ownerName,
                 ownerCode: item.ownerCode,
                 contractor: item.contractor,
@@ -422,6 +429,7 @@ export class WpApiService {
                 projectOwner: item.projectOwner,
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
+                isPendingClose: (item.isPendingClose ?? 0) > 0,
               };
               list.push(mapped);
             });
@@ -430,6 +438,63 @@ export class WpApiService {
               questionGroups: response.questionGroups,
             };
             return { result: true, item } as ServiceItemResult<WpFormResponseItem>;
+          })
+        );
+      })
+    );
+  }
+
+  public getWorkPermitsToApproveCloseForArea(
+    areaCode: string,
+    kind: string
+  ): Observable<ServiceListResult<WpListItem>> {
+    let _url = `${environment.apiUrl}/workpermit/close/approve/items`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('areacode', areaCode);
+        params = params.append('kind', kind);
+        params = params.append('token', token);
+        return this.httpClient.get<WpListItem[]>(_url, { params }).pipe(
+          map((items) => {
+            const list: WpListItem[] = [];
+            items.forEach((item: any) => {
+              const mapped: WpListItem = {
+                id: item.Id,
+                dtCreate: item.dtCreate,
+                dtEnd: item.dtEnd,
+                dtStart: item.dtStart,
+                dtClose: item.dtClose,
+                owner: item.ownerName,
+                ownerCode: item.ownerCode,
+                contractor: item.contractor,
+                status: item.status,
+                workArea: item.area,
+                workAreaGroup: item.areaGroupName,
+                staff: (item.staff ?? []).map((p: any) => p.name),
+                permissions: (item.permissions ?? []).map((p: any) => p.name),
+                project: item.project,
+                projectOwner: item.projectOwner,
+                areaApproved: (item.isAreaApproved ?? 0) > 0,
+                isgApproved: (item.isgApproved ?? 0) > 0,
+                isPendingClose: (item.isPendingClose ?? 0) > 0,
+              };
+              list.push(mapped);
+            });
+            return { result: true, items: list } as ServiceListResult<WpListItem>;
+          })
+        );
+      })
+    );
+  }
+
+  public sendApproveCloseResult(postData: any, kind: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/close/approve/items/${postData.id}/${kind}?token=` + token;
+        return this.httpClient.post<any>(_url, postData).pipe(
+          switchMap(() => {
+            return this.onBackToDashboard();
           })
         );
       })

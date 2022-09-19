@@ -25,9 +25,18 @@
       </div>
       <div>
         <small class="label primary-color">Çalışma Saati</small>
-        <span>{{ item.workDescription.dtStart | date: 'dd.MM.yyyy HH:mm' }}</span>
+        <span
+          >{{ item.workDescription.dtStart | date: 'dd.MM.yyyy HH:mm' }}
+          <ng-container
+            *ngIf="
+              (item.workDescription.isPendingClose && item.workDescription.status === wpStatus.ACTIVE) ||
+              item.workDescription.status === wpStatus.CLOSED
+            "
+            >- {{ item.workDescription.dtClose | date: 'dd.MM.yyyy HH:mm' }}</ng-container
+          ></span
+        >
         <small
-          >{{ item.workDescription.dtEnd | date: 'dd.MM.yyyy HH:mm' }}
+          >İş İzni Bitiş : {{ item.workDescription.dtEnd | date: 'dd.MM.yyyy HH:mm' }}
           <ng-container *ngIf="item.workDescription.isExtended"> - (Süresi uzatıldı)</ng-container>
         </small>
       </div>
@@ -112,7 +121,7 @@
 </ng-template>
 
 <ng-template #questions let-ctxItem>
-  <div class="general-info" *ngIf="item">
+  <div class="general-info">
     <ng-container *ngFor="let group of ctxItem.questionGroups">
       <div style="width: 100%">
         <div>
@@ -143,6 +152,61 @@
         <small> {{ measurement.hint }} </small>
       </div>
     </div>
+  </div>
+</ng-template>
+
+<ng-template #closeFormHeader let-ctxItem>
+  <div class="general-info" style="margin-bottom: -24px">
+    <ng-container *ngIf="!ctxItem.closeForm.isRejected">
+      <div style="width: 100%">
+        <div>
+          <small class="label primary-color"> Çalışma Bitiş : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.workPermit.workDescription.dtClose | date: 'dd.MM.yyyy HH:mm' }}
+          </small>
+          <small
+            *ngIf="ctxItem.workPermit.workDescription.isPendingClose"
+            class="py-4 accent-color"
+            style="font-weight: 500"
+          >
+            İş bitirme onayı bekliyor
+          </small>
+        </div>
+      </div>
+      <div style="width: 100%" *ngIf="ctxItem.closeForm.isgApprove">
+        <div>
+          <small class="label primary-color"> İSG Onayı : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.closeForm.isgApproveText ?? '' }}
+          </small>
+        </div>
+      </div>
+      <div style="width: 100%" *ngIf="ctxItem.closeForm.areaApprove">
+        <div>
+          <small class="label primary-color"> Alan Sorumlusu Onayı : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.closeForm.areaApproveText ?? '' }}
+          </small>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="ctxItem.closeForm.isRejected">
+      <div style="width: 100%">
+        <div>
+          <small class="py-4 accent-color" style="font-weight: 500"> Onaylanmadı </small>
+          <small class="label primary-color"> İşlem Yapan : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.closeForm.rejectedByText ?? '' }}
+          </small>
+        </div>
+        <div>
+          <small class="label primary-color"> Red Gerekçesi : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.closeForm.rejectReason ?? '' }}
+          </small>
+        </div>
+      </div>
+    </ng-container>
   </div>
 </ng-template>
 
@@ -177,29 +241,71 @@
   </mat-tab>
   <mat-tab label="ARA KONTROLLER" *ngIf="controlForms.length">
     <div class="tab-container" *ngIf="activeTab === (gasMeasurements?.length ? 4 : 3)">
-      <ng-container *ngFor="let form of controlForms">
+      <ng-container *ngIf="controlForms.length === 1">
         <mat-expansion-panel>
           <mat-expansion-panel-header>
-            <span> {{ form.owner }}, {{ form.dtCreate | date: 'dd.MM.yyyy HH:mm' }}</span>
+            <span> {{ controlForms[0].owner }}, {{ controlForms[0].dtCreate | date: 'dd.MM.yyyy HH:mm' }}</span>
           </mat-expansion-panel-header>
 
           <ng-container
             [ngTemplateOutlet]="questions"
-            [ngTemplateOutletContext]="{ $implicit: form.controlQuestions }"
+            [ngTemplateOutletContext]="{ $implicit: controlForms[0].controlQuestions }"
           ></ng-container>
         </mat-expansion-panel>
       </ng-container>
+      <ng-container *ngIf="controlForms.length > 1">
+        <ng-container *ngFor="let form of controlForms">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <span> {{ form.owner }}, {{ form.dtCreate | date: 'dd.MM.yyyy HH:mm' }}</span>
+            </mat-expansion-panel-header>
+
+            <ng-container
+              [ngTemplateOutlet]="questions"
+              [ngTemplateOutletContext]="{ $implicit: form.controlQuestions }"
+            ></ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+      </ng-container>
     </div>
   </mat-tab>
-  <mat-tab label="İŞ BİTİRME" *ngIf="closeForm">
+  <mat-tab label="İŞ BİTİRME" *ngIf="closeForms?.length">
     <div
       class="tab-container"
       *ngIf="activeTab === (gasMeasurements?.length ? (controlForms.length ? 5 : 4) : controlForms.length ? 4 : 3)"
     >
-      <ng-container
-        [ngTemplateOutlet]="questions"
-        [ngTemplateOutletContext]="{ $implicit: closeForm.controlQuestions }"
-      ></ng-container>
+      <ng-container *ngIf="closeForms.length === 1">
+        <ng-container
+          [ngTemplateOutlet]="closeFormHeader"
+          [ngTemplateOutletContext]="{ $implicit: { closeForm: closeForms[0], workPermit: item } }"
+        ></ng-container>
+        <ng-container
+          [ngTemplateOutlet]="questions"
+          [ngTemplateOutletContext]="{ $implicit: closeForms[0].controlQuestions }"
+        ></ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="closeForms.length > 1">
+        <ng-container *ngFor="let form of closeForms">
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <span *ngIf="!form.isRejected">
+                {{ form.isgApprove && form.areaApprove ? 'Onaylandı' : 'Onay Bekliyor' }}, {{ form.owner }} -
+                {{ form.dtCreate | date: 'dd.MM.yyyy HH:mm' }}</span
+              >
+              <span *ngIf="form.isRejected"> Onaylanmadı, {{ form.rejectedByText }} </span>
+            </mat-expansion-panel-header>
+            <ng-container
+              [ngTemplateOutlet]="closeFormHeader"
+              [ngTemplateOutletContext]="{ $implicit: { closeForm: form, workPermit: item } }"
+            ></ng-container>
+            <ng-container
+              [ngTemplateOutlet]="questions"
+              [ngTemplateOutletContext]="{ $implicit: form.controlQuestions }"
+            ></ng-container>
+          </mat-expansion-panel>
+        </ng-container>
+      </ng-container>
     </div>
   </mat-tab>
 </mat-tab-group>

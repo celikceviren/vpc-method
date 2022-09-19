@@ -9,6 +9,7 @@ import { PladisMethodEditorComponent } from './feature/pladis-method-editor/plad
 import { PladisMethodReviewerComponent } from './feature/pladis-method-reviewer/pladis-method-reviewer.component';
 import { PladisMethodViewerComponent } from './feature/pladis-method-viewer/pladis-method-viewer.component';
 import { PladisWorkpermitApproveComponent } from './feature/pladis-workpermit-approve/pladis-workpermit-approve.component';
+import { PladisWorkpermitCloseApproveComponent } from './feature/pladis-workpermit-close-approve/pladis-workpermit-close-approve.component';
 import { PladisWorkpermitExtendComponent } from './feature/pladis-workpermit-extend/pladis-workpermit-extend.component';
 import { PladisWorkpermitNewComponent } from './feature/pladis-workpermit-new/pladis-workpermit-new.component';
 import { PladisWorkpermitViewComponent } from './feature/pladis-workpermit-view/pladis-workpermit-view.component';
@@ -61,6 +62,10 @@ const routes: Routes = [
   {
     path: 'workpermit/form/:company/:formtype',
     component: CommonWorkpermitFormsComponent,
+  },
+  {
+    path: 'workpermit/approve-close/PLADIS/:kind',
+    component: PladisWorkpermitCloseApproveComponent,
   },
 ];
 

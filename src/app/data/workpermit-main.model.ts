@@ -41,6 +41,7 @@ export interface WpListItem {
   dtCreate: Date;
   dtStart: Date;
   dtEnd: Date;
+  dtClose: Date;
   status: number;
   staff: CodeValueItem[];
   permissions: string[];
@@ -49,4 +50,5 @@ export interface WpListItem {
   isgApproved?: boolean;
   areaApproved?: boolean;
   isExtended?: boolean;
+  isPendingClose?: boolean;
 }

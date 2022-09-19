@@ -94,6 +94,9 @@ export class WpDetailsViewComponent implements OnInit {
 
     switch (this.item.workDescription.status.toString()) {
       case WpStatus.ACTIVE.toString():
+        if (this.item.workDescription.isPendingClose) {
+          return 'İŞ BİTİRME ONAYI BEKLİYOR';
+        }
         return 'AKTİF';
       case WpStatus.PENDING.toString():
         return 'ONAY BEKLİYOR';
@@ -119,6 +122,10 @@ export class WpDetailsViewComponent implements OnInit {
 
   get closeForm(): WpFormItem | undefined {
     return (this.item?.forms ?? []).find((x) => x.formType === WpFormType.WpCloseForm) ?? undefined;
+  }
+
+  get closeForms(): WpFormItem[] {
+    return (this.item?.forms ?? []).filter((x) => x.formType === WpFormType.WpCloseForm) ?? [];
   }
 
   activeTab: number = 0;
