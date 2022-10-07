@@ -76,7 +76,7 @@ export class WpQuestionsComponent implements OnInit {
     }
   }
 
-  onPreviousQuestion(): void {
+  onPreviousQuestion(skipToGroupStart?: boolean): void {
     if (!this.groupIx && !this.questionIx) {
       return;
     }
@@ -93,18 +93,36 @@ export class WpQuestionsComponent implements OnInit {
       this.numTotalQuestions = this.group.questions.length;
       this.questionIx = this.group.questions.length - 1;
       this.question = this.group.questions[this.questionIx];
+
+      if (this.group.code === 'PLADIS_QGR1') {
+        const firstQuestionAnswer = this.group.questions[0].answer;
+        if (firstQuestionAnswer !== StaticValues.QUESTION_ANSWER_YES_CODE) {
+          this.onPreviousQuestion(true);
+        }
+      }
+
       return;
     }
 
     this.questionIx--;
     this.question = this.group.questions[this.questionIx];
     this.completed = false;
+
+    if (skipToGroupStart) {
+      this.onPreviousQuestion(true);
+    }
   }
 
-  onNextQuestion() {
+  onNextQuestion(skipToGroupEnd?: boolean) {
     if (!this.question.answer) {
       return;
     }
+
+    const shouldSkipPladisGroup =
+      skipToGroupEnd ||
+      (this.group.code === 'PLADIS_QGR1' &&
+        this.questionIx === 0 &&
+        this.question.answer !== StaticValues.QUESTION_ANSWER_YES_CODE);
 
     let newQuestionIx = this.questionIx + 1;
     if (newQuestionIx === this.group.questions.length) {
@@ -123,6 +141,12 @@ export class WpQuestionsComponent implements OnInit {
 
     this.questionIx = newQuestionIx;
     this.question = this.group.questions[this.questionIx];
+
+    if (shouldSkipPladisGroup && this.group.code === 'PLADIS_QGR1') {
+      this.question.answer = StaticValues.QUESTION_ANSWER_NAN_CODE;
+      this.question.answerText = StaticValues.QUESTION_ANSWER_NAN_VALUE;
+      this.onNextQuestion(true);
+    }
   }
 
   onSaveForm(): void {
