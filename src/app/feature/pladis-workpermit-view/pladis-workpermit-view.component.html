@@ -12,5 +12,9 @@
     </button>
   </div>
 
-  <app-wp-details-view *ngIf="ready" [item]="item"></app-wp-details-view>
+  <app-wp-details-view
+    *ngIf="ready"
+    [item]="item"
+    (transferComplete)="onConfirmTransferComplete($event)"
+  ></app-wp-details-view>
 </div>

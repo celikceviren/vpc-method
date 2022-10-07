@@ -42,6 +42,13 @@
     </mat-card>
   </div>
 
+  <div class="pending-transfers" *ngIf="pendingTransfers?.length">
+    <div class="transfer-notification" *ngFor="let transfer of pendingTransfers">
+      <span>#{{ transfer.id }} numaralı iş izni "{{ transfer.owner }}" tarafından size devredilmek isteniyor.</span>
+      <button mat-raised-button color="primary" (click)="onGetWorkPermitItem(transfer.id)">Görüntüle</button>
+    </div>
+  </div>
+
   <mat-tab-group *ngIf="!singleTab; else table" (selectedTabChange)="onTabChange($event)">
     <mat-tab label="ONAY BEKLYEN" *ngIf="pendingTab">
       <ng-container *ngIf="visibleStatus === statuses.PENDING" [ngTemplateOutlet]="table"></ng-container>
@@ -151,6 +158,13 @@
           >
             hourglass_empty
           </mat-icon>
+          <mat-icon
+            class="desktop-approve-check reject"
+            *ngIf="item.status === statuses.ACTIVE && item.isPendingTransfer"
+            matTooltip="Devir Onayı Bekliyor"
+          >
+            hourglass_empty
+          </mat-icon>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="mobiledata">
@@ -190,6 +204,13 @@
               class="desktop-approve-check reject"
               *ngIf="item.status === statuses.ACTIVE && item.isPendingClose"
               matTooltip="İş Bitirme Onayı Bekliyor"
+            >
+              hourglass_empty
+            </mat-icon>
+            <mat-icon
+              class="desktop-approve-check reject"
+              *ngIf="item.status === statuses.ACTIVE && item.isPendingTransfer"
+              matTooltip="Devir Onayı Bekliyor"
             >
               hourglass_empty
             </mat-icon>
@@ -276,6 +297,24 @@
       >
         <mat-icon class="accent-color">delete_forever</mat-icon>
         <span>Geri Al</span>
+      </div>
+      <div
+        class="menu-item"
+        (click)="onStartTransfer(item?.id)"
+        *ngIf="
+          role === roles.OWNER && visibleStatus === statuses.ACTIVE && !item.isPendingClose && !item.isPendingTransfer
+        "
+      >
+        <mat-icon class="accent-color">move_down</mat-icon>
+        <span>Devret</span>
+      </div>
+      <div
+        class="menu-item"
+        (click)="onCancelTransfer(item?.id)"
+        *ngIf="role === roles.OWNER && visibleStatus === statuses.ACTIVE && item.isPendingTransfer"
+      >
+        <mat-icon class="accent-color">move_down</mat-icon>
+        <span>Devir İptal</span>
       </div>
     </ng-template>
   </mat-menu>

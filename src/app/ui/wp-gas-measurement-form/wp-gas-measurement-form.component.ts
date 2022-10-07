@@ -62,7 +62,6 @@ export class WpGasMeasurementFormComponent implements OnInit {
       if (this.gasVOC) {
         this.gasVOC.value = this.form.controls.gasVOC.value ?? '';
       }
-      console.log('value changed =>', this.form.controls);
     });
   }
 

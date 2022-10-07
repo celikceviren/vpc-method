@@ -51,4 +51,6 @@ export interface WpListItem {
   areaApproved?: boolean;
   isExtended?: boolean;
   isPendingClose?: boolean;
+  isPendingTransfer?: boolean;
+  transferTo?: string;
 }

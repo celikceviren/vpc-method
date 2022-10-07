@@ -22,6 +22,7 @@ export class WpDetailsViewComponent implements OnInit {
   @Input() hasNext: boolean = false;
   @Output() next: EventEmitter<void> = new EventEmitter<void>();
   @Output() cancel: EventEmitter<void> = new EventEmitter<void>();
+  @Output() transferComplete: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   wpStatus = WpStatus;
 
@@ -126,6 +127,16 @@ export class WpDetailsViewComponent implements OnInit {
 
   get closeForms(): WpFormItem[] {
     return (this.item?.forms ?? []).filter((x) => x.formType === WpFormType.WpCloseForm) ?? [];
+  }
+
+  get isPendingTransfer(): boolean {
+    return (
+      (this.item?.workDescription.status === WpStatus.ACTIVE && this.item?.workDescription?.isPendingTransfer) ?? false
+    );
+  }
+
+  get isTransferTo(): boolean {
+    return (this.item?.workDescription.status === WpStatus.ACTIVE && this.item?.workDescription?.transferTo) ?? false;
   }
 
   activeTab: number = 0;

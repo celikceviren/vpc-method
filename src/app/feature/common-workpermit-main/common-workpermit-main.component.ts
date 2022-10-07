@@ -6,14 +6,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, debounceTime, forkJoin, map, of, Subject, take, takeUntil, tap, distinctUntilChanged } from 'rxjs';
 import { ConfirmDialogData, InfoDialogData } from 'src/app/data/common.model';
 import { WpMainTableDataSource } from 'src/app/data/workpermit-main-table-source';
-import { WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
+import { PaginatedListResult, WpListItem, WpRole, WpScope, WpStatus } from 'src/app/data/workpermit-main.model';
 import { WpMainService } from 'src/app/data/workpermit-main.service';
-import { ServiceError, ServiceItemResult, SummaryStatsItem } from 'src/app/data/workpermit.model';
+import { CodeValueItem, ServiceError, ServiceItemResult, SummaryStatsItem } from 'src/app/data/workpermit.model';
 import { UiConfirmDialogComponent } from 'src/app/ui/ui-confirm-dialog/ui-confirm-dialog.component';
 import { WpApiService } from 'src/_services/api/wp-api.service';
 import { SplashScreenService } from 'src/_services/common/splash-screen-service';
 import { InfoDialogService } from 'src/app/data/info-dialog.service';
 import { WindowMsgService } from 'src/app/data/window-msg.service';
+import { WpCreateTransferComponent } from 'src/app/ui/wp-create-transfer/wp-create-transfer.component';
 
 @Component({
   selector: 'app-common-workpermit-main',
@@ -40,6 +41,7 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
   columns: string[] = ['id', 'owner', 'project', 'dtWp', 'permissions', 'staff', 'action'];
   mobileColumns: string[] = ['mobiledata'];
   stats!: SummaryStatsItem;
+  pendingTransfers!: WpListItem[];
   scopes = WpScope;
   roles = WpRole;
   statuses = WpStatus;
@@ -207,6 +209,45 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
     });
   }
 
+  onStartTransfer(id: number): void {
+    const dialogData: InfoDialogData = {
+      body: 'Veriler alınıyor...',
+      isLoading: true,
+    };
+    this.dialogService.show(dialogData);
+    this.service
+      .getUsersForTransfer()
+      .pipe(
+        takeUntil(this.unsubscribeAll),
+        take(1),
+        tap(() => this.dialogService.hide())
+      )
+      .subscribe((resp) => {
+        if (!resp?.result) {
+          const msg =
+            resp?.error ??
+            ({
+              message: 'Veriler alınamadı',
+              details: this.service.formatErrorDetails('L230', 'onStartTransfer'),
+            } as ServiceError);
+
+          const dialogData: InfoDialogData = {
+            title: 'İşlem başarısız',
+            body: `${msg.message}<br /><small>${msg.details}</small>`,
+            dismissable: true,
+          };
+          setTimeout(() => {
+            this.dialogService.show(dialogData);
+          }, 500);
+          return;
+        }
+
+        setTimeout(() => {
+          this.showTransferWpDialog(id, resp.items ?? []);
+        }, 500);
+      });
+  }
+
   onGetWorkPermitItem(id?: number): void {
     if (!id) {
       throw new Error('onGetWorkPermitItem => id undefined');
@@ -230,6 +271,73 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe(() => {});
     return;
   }
+
+  onCancelTransfer(id: number): void {
+    const dialogData: ConfirmDialogData = {
+      title: '',
+      body: 'Onay bekleyen devir işlemini iptal etmek istediğinize emin misiniz?',
+      hasConfirmBtn: true,
+      confirmBtnText: 'Evet',
+      closeBtnText: 'Vazgeç',
+    };
+    const dialogRef = this.dialog.open(UiConfirmDialogComponent, {
+      width: '320px',
+      autoFocus: false,
+      restoreFocus: false,
+      data: dialogData,
+    });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (!resp || !resp?.confirmed) {
+        return;
+      }
+
+      const dialogData: InfoDialogData = {
+        body: 'Kaydediliyor...',
+        isLoading: true,
+      };
+      this.dialogService.show(dialogData);
+      this.service
+        .cancelTransfer(id)
+        .pipe(
+          takeUntil(this.unsubscribeAll),
+          take(1),
+          tap(() => this.dialogService.hide())
+        )
+        .subscribe((resp) => {
+          if (resp?.error) {
+            const msg =
+              resp.error ??
+              ({
+                message: 'İşlem başarısız.',
+                details: this.service.formatErrorDetails('L312', 'onCancelTransfer'),
+              } as ServiceError);
+
+            const dialogData: InfoDialogData = {
+              title: 'İşlem başarısız',
+              body: `${msg.message}<br /><small>${msg.details}</small>`,
+              dismissable: true,
+            };
+            setTimeout(() => {
+              this.dialogService.show(dialogData);
+            }, 500);
+            return;
+          }
+
+          const dialogData: InfoDialogData = {
+            title: 'İşlem başarılı',
+            body: `İş izni devir işlemi iptal edildi`,
+            dismissable: true,
+          };
+          setTimeout(() => {
+            this.dialogService.show(dialogData);
+          }, 500);
+
+          this.tableDs.reloadPage();
+        });
+    });
+  }
+
+  onNavigateToWp(id: number): void {}
 
   private init(): void {
     this.splashService.hide();
@@ -256,10 +364,91 @@ export class WorkpermitMainComponent implements OnInit, OnDestroy, AfterViewInit
           }, 0);
         });
     }
+
+    this.api
+      .getPendingTransfers()
+      .pipe(
+        takeUntil(this.unsubscribeAll),
+        take(1),
+        catchError(() => {
+          return of({
+            result: true,
+            items: [],
+            page: 1,
+            size: 0,
+            total: 0,
+          } as PaginatedListResult<WpListItem>);
+        })
+      )
+      .subscribe((transfers) => {
+        this.pendingTransfers = transfers.items ?? [];
+      });
   }
 
   private initTable(status: WpStatus): void {
     this.tableDs = new WpMainTableDataSource(this.service, status, this.scope, this.areaGroup, this.project);
+  }
+
+  private showTransferWpDialog(id: number, usersList: CodeValueItem[]): void {
+    const dialogRef = this.dialog.open(WpCreateTransferComponent, {
+      data: usersList,
+      width: '320px',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.unsubscribeAll), take(1))
+      .subscribe((user: CodeValueItem) => {
+        if (!user) {
+          return;
+        }
+
+        setTimeout(() => {
+          const dialogData: InfoDialogData = {
+            body: 'Devir yapılıyor...',
+            isLoading: true,
+          };
+          this.dialogService.show(dialogData);
+
+          this.service
+            .createTransfer(id, user.code)
+            .pipe(takeUntil(this.unsubscribeAll), take(1))
+            .subscribe((response) => {
+              this.dialogService.hide();
+
+              if (response?.error) {
+                const msg =
+                  response.error ??
+                  ({
+                    message: 'Devir yapılamadı.',
+                    details: this.service.formatErrorDetails('L424', 'showTransferWpDialog'),
+                  } as ServiceError);
+
+                const dialogData: InfoDialogData = {
+                  title: 'İşlem başarısız',
+                  body: `${msg.message}<br /><small>${msg.details}</small>`,
+                  dismissable: true,
+                };
+                setTimeout(() => {
+                  this.dialogService.show(dialogData);
+                }, 500);
+                return;
+              }
+
+              const dialogData: InfoDialogData = {
+                title: 'İşlem başarılı',
+                body: `İş izni devir işlemi kaydedildi.`,
+                dismissable: true,
+              };
+              setTimeout(() => {
+                this.dialogService.show(dialogData);
+              }, 500);
+              this.tableDs.reloadPage();
+            });
+        }, 500);
+      });
   }
 
   private awaitHeightChange(): void {

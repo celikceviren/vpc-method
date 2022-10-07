@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>İş İzni - Devret</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>Devredeceğiniz Kişi</mat-label>
+      <mat-select formControlName="selectedUser" required>
+        <mat-option *ngFor="let user of usersList" [value]="user.code">
+          {{ user.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1" (click)="dialogRef.close()">Vazgeç</button>
+  <button mat-raised-button color="primary" tabindex="-1" [disabled]="form.invalid" (click)="onSelectTransferUser()">
+    Onayla
+  </button>
+</div>

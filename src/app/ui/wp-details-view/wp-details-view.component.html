@@ -3,6 +3,7 @@
     <div style="width: 100%">
       <div>
         <span class="accent-color" style="font-weight: 500"> {{ status }} </span>
+        <span class="accent-color" *ngIf="isPendingTransfer" style="font-size: 0.85em">(Devir Onayı Bekliyor)</span>
       </div>
     </div>
     <div>
@@ -213,6 +214,16 @@
 <div class="title" *ngIf="item && hasTitle">
   <h3>İş İzni #{{ item.id }} Detayları</h3>
   <h4>Doldurulan iş izni formunu kontrol edin.</h4>
+</div>
+
+<div class="transfer-approve" *ngIf="isPendingTransfer && isTransferTo">
+  <p>
+    <b>{{ owner }}</b> bu iş iznini size devretmek istiyor.
+  </p>
+  <div class="actions">
+    <button mat-raised-button (click)="transferComplete.emit(false)">Reddet</button>
+    <button mat-raised-button color="primary" (click)="transferComplete.emit(true)">Onayla</button>
+  </div>
 </div>
 
 <mat-tab-group *ngIf="item" (selectedTabChange)="onTabChange($event)" [ngClass]="{ bordered: hasNext }">

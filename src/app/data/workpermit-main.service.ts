@@ -5,7 +5,7 @@ import { WpApiService } from 'src/_services/api/wp-api.service';
 import { InfoDialogData } from './common.model';
 import { InfoDialogService } from './info-dialog.service';
 import { PaginatedListResult, WpListItem, WpStatus } from './workpermit-main.model';
-import { ServiceError, ServiceItemResult, WorkPermitItem } from './workpermit.model';
+import { CodeValueItem, ServiceError, ServiceItemResult, ServiceListResult, WorkPermitItem } from './workpermit.model';
 
 @Injectable({
   providedIn: 'root',
@@ -41,7 +41,7 @@ export class WpMainService {
                 ? 'Yetkisiz erişim'
                 : err.error?.Message ?? err.status.toString()
               : err.message ?? 'Bilinmeyen hata.',
-          details: this.formatErrorDetails(errorCode, 'searchWorkAreaByQrCode'),
+          details: this.formatErrorDetails(errorCode, 'loadTablePage'),
           error: err,
         };
         return of({
@@ -184,5 +184,94 @@ export class WpMainService {
         return 'ONAYLANMADI';
     }
     return status;
+  }
+
+  public getUsersForTransfer(): Observable<ServiceListResult<CodeValueItem>> {
+    return this.api.getUsersForTransfer().pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L193';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'getUsersForTransfer'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: [],
+        } as ServiceListResult<CodeValueItem>);
+      })
+    );
+  }
+
+  public createTransfer(id: number, transferTo: string): Observable<ServiceItemResult<void>> {
+    return this.api.createTransfer(id, transferTo).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L215';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'createTransfer'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+        } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  public cancelTransfer(id: number, backToDashboard?: boolean): Observable<ServiceItemResult<void>> {
+    return this.api.cancelTransfer(id, backToDashboard).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L237';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'cancelTransfer'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+        } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  public approveTransfer(id: number): Observable<ServiceItemResult<void>> {
+    return this.api.approveTransfer(id, true).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L237';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.ErrorMessage ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'cancelTransfer'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+        } as ServiceItemResult<void>);
+      })
+    );
   }
 }

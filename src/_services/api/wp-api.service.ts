@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { filter, fromEvent, map, Observable, switchMap, take, takeUntil, timer } from 'rxjs';
+import { filter, fromEvent, map, Observable, switchMap, take, takeUntil, timer, of } from 'rxjs';
 import { WindowMsgService } from 'src/app/data/window-msg.service';
 import { PaginatedListResult, WpListItem, WpStatus } from 'src/app/data/workpermit-main.model';
 import {
@@ -209,6 +209,8 @@ export class WpApiService {
             isgApproved: (item.isgApproved ?? 0) > 0,
             isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
             isPendingClose: (item.isPendingClose ?? 0) > 0,
+            isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+            transferTo: item.transferTo ?? '',
           };
           list.push(mapped);
         });
@@ -306,6 +308,8 @@ export class WpApiService {
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
                 isPendingClose: (item.isPendingClose ?? 0) > 0,
+                isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+                transferTo: item.transferTo ?? '',
               };
               list.push(mapped);
             });
@@ -347,6 +351,8 @@ export class WpApiService {
                 isgApproved: (item.isgApproved ?? 0) > 0,
                 isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
                 isPendingClose: (item.isPendingClose ?? 0) > 0,
+                isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+                transferTo: item.transferTo ?? '',
               };
               list.push(mapped);
             });
@@ -430,6 +436,8 @@ export class WpApiService {
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
                 isPendingClose: (item.isPendingClose ?? 0) > 0,
+                isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+                transferTo: item.transferTo ?? '',
               };
               list.push(mapped);
             });
@@ -478,6 +486,8 @@ export class WpApiService {
                 areaApproved: (item.isAreaApproved ?? 0) > 0,
                 isgApproved: (item.isgApproved ?? 0) > 0,
                 isPendingClose: (item.isPendingClose ?? 0) > 0,
+                isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+                transferTo: item.transferTo ?? '',
               };
               list.push(mapped);
             });
@@ -495,6 +505,121 @@ export class WpApiService {
         return this.httpClient.post<any>(_url, postData).pipe(
           switchMap(() => {
             return this.onBackToDashboard();
+          })
+        );
+      })
+    );
+  }
+
+  public getPendingTransfers(): Observable<PaginatedListResult<WpListItem>> {
+    let _url = `${environment.apiUrl}/workpermit/transfer/pending`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        return this.httpClient.get<any>(_url, { params }).pipe(
+          map((response) => {
+            const items = (response as WpListItem[]) ?? [];
+            return {
+              page: 1,
+              size: items.length ?? 0,
+              total: items.length ?? 0,
+              items,
+            } as PaginatedListResult<WpListItem>;
+          })
+        );
+      }),
+      map((page: any) => {
+        const items = page.items ?? [];
+        const list: WpListItem[] = [];
+        items.forEach((item: any) => {
+          const mapped: WpListItem = {
+            id: item.Id,
+            dtCreate: item.dtCreate,
+            dtEnd: item.dtEnd,
+            dtStart: item.dtStart,
+            dtClose: item.dtClose,
+            owner: item.ownerName,
+            ownerCode: item.ownerCode,
+            contractor: item.contractor,
+            status: item.status,
+            workArea: item.area,
+            workAreaGroup: item.areaGroupName,
+            staff: (item.staff ?? []).map((p: any) => p.name),
+            permissions: (item.permissions ?? []).map((p: any) => p.name),
+            project: item.project,
+            projectOwner: item.projectOwner,
+            areaApproved: (item.isAreaApproved ?? 0) > 0,
+            isgApproved: (item.isgApproved ?? 0) > 0,
+            isExtended: (item.isExtended ?? 0) > 0 || (item.isSecondExtended ?? 0) > 0,
+            isPendingClose: (item.isPendingClose ?? 0) > 0,
+            isPendingTransfer: (item.isPendingTransfer ?? 0) > 0,
+            transferTo: item.transferTo ?? '',
+          };
+          list.push(mapped);
+        });
+        const result: PaginatedListResult<WpListItem> = {
+          result: true,
+          total: page.total,
+          page: page.page,
+          size: page.size,
+          items: list,
+        };
+        return result;
+      })
+    );
+  }
+
+  public getUsersForTransfer(): Observable<ServiceListResult<CodeValueItem>> {
+    let _url = `${environment.apiUrl}/workpermit/transfer/users`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        return this.httpClient.get<CodeValueItem[]>(_url, { params }).pipe(
+          map((response) => {
+            return {
+              result: true,
+              items: response.map((x) => {
+                x.kind = 'user';
+                return x;
+              }),
+            } as ServiceListResult<CodeValueItem>;
+          })
+        );
+      })
+    );
+  }
+
+  public createTransfer(id: number, transferTo: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/transfer/${id}?token=` + token;
+        return this.httpClient.post<any>(_url, { transferTo });
+      })
+    );
+  }
+
+  public cancelTransfer(id: number, backToDashboard?: boolean): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/transfer/${id}/complete?token=` + token;
+        return this.httpClient.post<any>(_url, { isApprove: false }).pipe(
+          switchMap(() => {
+            return backToDashboard ? this.onBackToDashboard() : of({ result: true } as ServiceItemResult<void>);
+          })
+        );
+      })
+    );
+  }
+
+  public approveTransfer(id: number, backToDashboard?: boolean): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/workpermit/transfer/${id}/complete?token=` + token;
+        return this.httpClient.post<any>(_url, { isApprove: true }).pipe(
+          switchMap(() => {
+            return backToDashboard ? this.onBackToDashboard() : of({ result: true } as ServiceItemResult<void>);
           })
         );
       })

@@ -69,6 +69,7 @@ import { WpExtendApproveComponent } from './ui/wp-extend-approve/wp-extend-appro
 import { CommonWorkpermitFormsComponent } from './feature/common-workpermit-forms/common-workpermit-forms.component';
 import { WpFormReviewApproveComponent } from './ui/wp-form-review-approve/wp-form-review-approve.component';
 import { PladisWorkpermitCloseApproveComponent } from './feature/pladis-workpermit-close-approve/pladis-workpermit-close-approve.component';
+import { WpCreateTransferComponent } from './ui/wp-create-transfer/wp-create-transfer.component';
 
 @NgModule({
   declarations: [
@@ -110,6 +111,7 @@ import { PladisWorkpermitCloseApproveComponent } from './feature/pladis-workperm
     CommonWorkpermitFormsComponent,
     WpFormReviewApproveComponent,
     PladisWorkpermitCloseApproveComponent,
+    WpCreateTransferComponent,
   ],
   imports: [
     BrowserModule,
