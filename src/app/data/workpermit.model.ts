@@ -218,6 +218,9 @@ export interface WorkDetails {
   isgApproveText?: string;
   areaApprove?: boolean;
   areaApproveText?: string;
+  qualityApproveRequired?: boolean;
+  qualityApprove?: boolean;
+  qualityApproveText?: string;
   rejectedBy?: string;
   rejectReason?: string;
   rejectKind?: string;
@@ -381,6 +384,9 @@ export interface WpFormItem {
   isgApproveText?: string;
   areaApprove?: boolean;
   areaApproveText?: string;
+  qualityApproveRequired?: boolean;
+  qualityApprove?: boolean;
+  qualityApproveText?: string;
   isRejected?: boolean;
   rejectedByText?: string;
   rejectReason?: string;

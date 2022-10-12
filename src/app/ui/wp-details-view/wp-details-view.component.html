@@ -80,6 +80,13 @@
         <span *ngIf="item.workDescription?.areaApprove"> {{ item.workDescription.areaApproveText ?? '-' }} </span>
       </div>
     </div>
+    <div *ngIf="item.workDescription.status !== wpStatus.REJECTED && item.workDescription.qualityApproveRequired">
+      <div>
+        <small class="label primary-color">Kalite Sorumlusu Onayı</small>
+        <span *ngIf="!item.workDescription?.qualityApprove"> - </span>
+        <span *ngIf="item.workDescription?.qualityApprove"> {{ item.workDescription.qualityApproveText ?? '-' }} </span>
+      </div>
+    </div>
     <div style="width: 100%" *ngIf="item.workDescription.status === wpStatus.REJECTED">
       <div>
         <small class="label primary-color">Onaylanmama Gerekçesi</small>
@@ -187,6 +194,14 @@
           <small class="label primary-color"> Alan Sorumlusu Onayı : </small>
           <small class="py-4" style="font-weight: 500">
             {{ ctxItem.closeForm.areaApproveText ?? '' }}
+          </small>
+        </div>
+      </div>
+      <div style="width: 100%" *ngIf="ctxItem.closeForm.qualityApprove">
+        <div>
+          <small class="label primary-color"> Kalite Sorumlusu Onayı : </small>
+          <small class="py-4" style="font-weight: 500">
+            {{ ctxItem.closeForm.qualityApproveText ?? '' }}
           </small>
         </div>
       </div>

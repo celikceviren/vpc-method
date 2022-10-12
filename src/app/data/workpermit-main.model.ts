@@ -19,6 +19,7 @@ export enum WpRole {
   OWNER = 'owner',
   APPROVAL_ISG = 'approvalisg',
   APPROVAL_AREA = 'approvalarea',
+  APPROVAL_QUALITY = 'approvalquality',
   VIEWER = 'viewer',
 }
 
@@ -49,6 +50,8 @@ export interface WpListItem {
   workAreaGroup: string;
   isgApproved?: boolean;
   areaApproved?: boolean;
+  qualityApproveRequired?: boolean;
+  qualityApproved?: boolean;
   isExtended?: boolean;
   isPendingClose?: boolean;
   isPendingTransfer?: boolean;

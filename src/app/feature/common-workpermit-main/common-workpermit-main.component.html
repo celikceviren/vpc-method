@@ -138,6 +138,13 @@
             task_alt
           </mat-icon>
           <mat-icon
+            class="desktop-approve-check quality"
+            *ngIf="item.status === statuses.PENDING && item.qualityApproved"
+            matTooltip="Onaylandı (Kalite Sorumlusu)"
+          >
+            task_alt
+          </mat-icon>
+          <mat-icon
             class="desktop-approve-check reject"
             *ngIf="item.status === statuses.REJECTED"
             matTooltip="Onaylanmadı"
@@ -183,6 +190,13 @@
               class="desktop-approve-check"
               *ngIf="item.status === statuses.PENDING && item.areaApproved"
               matTooltip="Onaylandı (Alan Sorumlusu)"
+            >
+              task_alt
+            </mat-icon>
+            <mat-icon
+              class="desktop-approve-check quality"
+              *ngIf="item.status === statuses.PENDING && item.qualityApproved"
+              matTooltip="Onaylandı (Kalite Sorumlusu)"
             >
               task_alt
             </mat-icon>
