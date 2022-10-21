@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+div.qr-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}

@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, take, tap, timer } from 'rxjs';
 import { WpApiService } from 'src/_services/api/wp-api.service';
+import { AreaGroupListItem } from './aregroups.model';
 import { InfoDialogData } from './common.model';
 import { InfoDialogService } from './info-dialog.service';
 import { PaginatedListResult, WpListItem, WpStatus } from './workpermit-main.model';
@@ -271,6 +272,34 @@ export class WpMainService {
           result: false,
           error,
         } as ServiceItemResult<void>);
+      })
+    );
+  }
+
+  public loadAreaGroupsTablePage(page?: number, size?: number): Observable<PaginatedListResult<AreaGroupListItem>> {
+    const currentPage = page ?? 1;
+    const currentSize = currentPage && (size ?? 10);
+    return this.api.getAreaGroupsList(currentPage, currentSize).pipe(
+      catchError((err) => {
+        const errorCode = err instanceof HttpErrorResponse ? err.statusText : 'L284';
+        const error: ServiceError = {
+          message:
+            err instanceof HttpErrorResponse
+              ? err.status === HttpStatusCode.Unauthorized
+                ? 'Yetkisiz erişim'
+                : err.error?.Message ?? err.status.toString()
+              : err.message ?? 'Bilinmeyen hata.',
+          details: this.formatErrorDetails(errorCode, 'loadAreaGroupsTablePage'),
+          error: err,
+        };
+        return of({
+          result: false,
+          error,
+          items: [],
+          page: 0,
+          size: 0,
+          total: 0,
+        } as PaginatedListResult<AreaGroupListItem>);
       })
     );
   }

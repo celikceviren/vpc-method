@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { filter, fromEvent, map, Observable, switchMap, take, takeUntil, timer, of } from 'rxjs';
+import { AreaGroupListItem, AreaListItem } from 'src/app/data/aregroups.model';
 import { WindowMsgService } from 'src/app/data/window-msg.service';
 import { PaginatedListResult, WpListItem, WpStatus } from 'src/app/data/workpermit-main.model';
 import {
@@ -637,6 +638,152 @@ export class WpApiService {
             return backToDashboard ? this.onBackToDashboard() : of({ result: true } as ServiceItemResult<void>);
           })
         );
+      })
+    );
+  }
+
+  public getAreaGroupsList(page: number = 1, size: number = 50): Observable<PaginatedListResult<AreaGroupListItem>> {
+    let _url = `${environment.apiUrl}/settings/company/areaGroups`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('page', page.toString());
+        params = params.append('size', size.toString());
+        params = params.append('sort', '');
+        params = params.append('order', '');
+        params = params.append('token', token);
+        return this.httpClient.get<any>(_url, { params }).pipe(
+          map((response) => {
+            const { page, size, total, items } = response;
+            return { page, size, total, items } as PaginatedListResult<AreaGroupListItem>;
+          })
+        );
+      }),
+      map((page: any) => {
+        const items: AreaGroupListItem[] = page.items ?? [];
+        const result: PaginatedListResult<AreaGroupListItem> = {
+          result: true,
+          total: page.total,
+          page: page.page,
+          size: page.size,
+          items,
+        };
+        return result;
+      })
+    );
+  }
+
+  public getFacilities(): Observable<ServiceListResult<{ id: string; name: string }>> {
+    let _url = `${environment.apiUrl}/settings/company/facilities`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('token', token);
+        return this.httpClient.get<any>(_url, { params }).pipe(
+          map((response) => {
+            const items = response
+              .map((x: any) => {
+                const item = { id: x.FacilityCode, name: x.Name };
+                return item;
+              })
+              .sort((a: { id: string; name: string }, b: { id: string; name: string }) => a.name.localeCompare(b.name));
+            return { result: true, items } as ServiceListResult<{ id: string; name: string }>;
+          })
+        );
+      })
+    );
+  }
+
+  public createAreaGroup(name: string, facilityCode: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areaGroups/new?token=` + token;
+        return this.httpClient.post<any>(_url, { name, facilityCode });
+      })
+    );
+  }
+
+  public updateAreaGroup(id: number, name: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areaGroups/${id}/update?token=` + token;
+        return this.httpClient.put<any>(_url, { name });
+      })
+    );
+  }
+
+  public deleteAreaGroup(id: number): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areaGroups/${id}/delete?token=` + token;
+        return this.httpClient.delete<any>(_url);
+      })
+    );
+  }
+
+  public getAreasListPage(
+    facilityCode: string = '',
+    areaCode: string = '',
+    page: number = 1,
+    size: number = 50,
+    sort: string = '',
+    direction: string = ''
+  ): Observable<PaginatedListResult<AreaListItem>> {
+    let _url = `${environment.apiUrl}/settings/company/areas`;
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let params: HttpParams = new HttpParams();
+        params = params.append('page', page.toString());
+        params = params.append('size', size.toString());
+        params = params.append('sort', sort);
+        params = params.append('order', direction);
+        params = params.append('facilityCode', facilityCode);
+        params = params.append('areaCode', areaCode);
+        params = params.append('token', token);
+        return this.httpClient.get<any>(_url, { params }).pipe(
+          map((response) => {
+            const { page, size, total, items } = response;
+            return { page, size, total, items } as PaginatedListResult<AreaListItem>;
+          })
+        );
+      }),
+      map((page: any) => {
+        const items: AreaListItem[] = page.items ?? [];
+        const result: PaginatedListResult<AreaListItem> = {
+          result: true,
+          total: page.total,
+          page: page.page,
+          size: page.size,
+          items,
+        };
+        return result;
+      })
+    );
+  }
+
+  public createArea(name: string, facilityCode: string, areaGroupCode: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areas/new?token=` + token;
+        return this.httpClient.post<any>(_url, { name, facilityCode, areaGroupCode });
+      })
+    );
+  }
+
+  public updateArea(id: number, name: string): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areas/${id}/update?token=` + token;
+        return this.httpClient.put<any>(_url, { name });
+      })
+    );
+  }
+
+  public deleteArea(id: number): Observable<ServiceItemResult<void>> {
+    return this.refreshAccessToken().pipe(
+      switchMap((token) => {
+        let _url = `${environment.apiUrl}/settings/company/areas/${id}/delete?token=` + token;
+        return this.httpClient.delete<any>(_url);
       })
     );
   }

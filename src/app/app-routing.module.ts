@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AreagroupsListComponent } from './feature/areagroups-list/areagroups-list.component';
+import { AreasListComponent } from './feature/areas-list/areas-list.component';
 import { CommonWorkpermitFormsComponent } from './feature/common-workpermit-forms/common-workpermit-forms.component';
 import { WorkpermitMainComponent } from './feature/common-workpermit-main/common-workpermit-main.component';
 import { NestleMethodEditorComponent } from './feature/nestle-method-editor/nestle-method-editor.component';
@@ -66,6 +68,14 @@ const routes: Routes = [
   {
     path: 'workpermit/approve-close/PLADIS/:kind',
     component: PladisWorkpermitCloseApproveComponent,
+  },
+  {
+    path: 'aregroups',
+    component: AreagroupsListComponent,
+  },
+  {
+    path: 'areas',
+    component: AreasListComponent,
   },
 ];
 

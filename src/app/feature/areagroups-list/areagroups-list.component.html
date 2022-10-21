@@ -1,0 +1,83 @@
+<div class="main-container" #focus>
+  <div class="header">
+    <div class="title">
+      <h2 class="mat-h2 primary-color">Alanlar Listesi</h2>
+      <h4>Yeni alan ekleyebilirsiniz veya mevcut alanları düzenleyebilirsiniz</h4>
+    </div>
+    <button mat-raised-button color="primary" (click)="onNewAreaClick()">Yeni Alan Oluştur</button>
+  </div>
+  <div class="table-container single-tab" *ngIf="tableDs">
+    <mat-table class="table-striped desktop" [dataSource]="tableDs">
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef class="w-56">ID</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <span> {{ item.id }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="facility">
+        <mat-header-cell *matHeaderCellDef>Tesis</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.facility }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>Alan Adı</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.name }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="areaCount">
+        <mat-header-cell *matHeaderCellDef>Çalışma Yeri Adedi</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.areaCount }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef class="w-56">&nbsp;</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <button mat-icon-button [matMenuTriggerFor]="actions" [matMenuTriggerData]="{item}" color="accent">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row class="p-4" style="min-height: 42px" *matHeaderRowDef="columns"></mat-header-row>
+      <mat-row *matRowDef="let item; columns: columns" class="p-4"> </mat-row>
+      <div class="no-data" *matNoDataRow>
+        <ng-container *ngIf="!tableDs.loading; else loading"> Kayıt yok </ng-container>
+      </div>
+    </mat-table>
+    <ng-container [ngTemplateOutlet]="paginator"></ng-container>
+    <mat-menu #actions="matMenu" xPosition="before">
+      <ng-template matMenuContent let-item="item">
+        <div class="menu-item" (click)="onEditClick(item)">
+          <span>Düzenle</span>
+        </div>
+        <div *ngIf="!item.areaCount" class="menu-item" (click)="onDeleteClick(item)">
+          <span>Sil</span>
+        </div>
+      </ng-template>
+    </mat-menu>
+  </div>
+</div>
+
+<ng-template #paginator>
+  <div class="paginator-row">
+    <div class="loading">
+      <mat-spinner [diameter]="16" *ngIf="tableDs.loading && tableDs.total > 0"></mat-spinner>
+    </div>
+    <mat-paginator
+      showFirstLastButtons
+      [disabled]="tableDs.loading"
+      [length]="tableDs.total"
+      [pageSize]="tableDs.size"
+      [pageIndex]="tableDs.page - 1"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPaginatorChanged($event)"
+    >
+    </mat-paginator>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <mat-spinner [diameter]="16"></mat-spinner>
+</ng-template>

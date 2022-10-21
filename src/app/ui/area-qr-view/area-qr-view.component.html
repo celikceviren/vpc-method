@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Çalışma Yeri - QR Kod</h1>
+<div mat-dialog-content>
+  <div class="qr-content" #qrContent>
+    <qrcode [qrdata]="item.qrCode" [width]="420"></qrcode> <span>{{ item.facility }}</span>
+    <span>{{ item.name }}</span>
+    <img #canvas style="display: none" />
+    <a #downloadLink style="display: none"></a>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1">Kapat</button>
+  <button mat-flat-button color="primary" (click)="onDownloadClick()" tabindex="-1">İndir</button>
+</div>

@@ -1,0 +1,25 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline" class="w-100-p">
+      <mat-label>Alan Adı</mat-label>
+      <input matInput required formControlName="Name" autocomplete="off" />
+      <mat-hint>(Max: 200 karakter)</mat-hint>
+      <mat-error *ngIf="form.controls.Name.hasError('required') || form.controls.Name.hasError('maxlength')"
+        >(Max: 200 karakter)</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="w-100-p mt-16">
+      <mat-label>Tesis</mat-label>
+      <mat-select formControlName="Facility" required>
+        <mat-option *ngFor="let option of facilities" [value]="option.id">
+          {{ option.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close tabindex="-1">Vazgeç</button>
+  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="!form.valid" tabindex="-1">Kaydet</button>
+</div>

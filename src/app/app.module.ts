@@ -70,6 +70,13 @@ import { CommonWorkpermitFormsComponent } from './feature/common-workpermit-form
 import { WpFormReviewApproveComponent } from './ui/wp-form-review-approve/wp-form-review-approve.component';
 import { PladisWorkpermitCloseApproveComponent } from './feature/pladis-workpermit-close-approve/pladis-workpermit-close-approve.component';
 import { WpCreateTransferComponent } from './ui/wp-create-transfer/wp-create-transfer.component';
+import { AreagroupsListComponent } from './feature/areagroups-list/areagroups-list.component';
+import { AreagroupsFormComponent } from './ui/areagroups-form/areagroups-form.component';
+import { AreasListComponent } from './feature/areas-list/areas-list.component';
+import { MatSortModule } from '@angular/material/sort';
+import { AreaFormComponent } from './ui/area-form/area-form.component';
+import { QRCodeModule } from 'angularx-qrcode';
+import { AreaQrViewComponent } from './ui/area-qr-view/area-qr-view.component';
 
 @NgModule({
   declarations: [
@@ -112,6 +119,11 @@ import { WpCreateTransferComponent } from './ui/wp-create-transfer/wp-create-tra
     WpFormReviewApproveComponent,
     PladisWorkpermitCloseApproveComponent,
     WpCreateTransferComponent,
+    AreagroupsListComponent,
+    AreagroupsFormComponent,
+    AreasListComponent,
+    AreaFormComponent,
+    AreaQrViewComponent,
   ],
   imports: [
     BrowserModule,
@@ -141,6 +153,8 @@ import { WpCreateTransferComponent } from './ui/wp-create-transfer/wp-create-tra
     MatTableModule,
     MatMenuModule,
     ZXingScannerModule,
+    MatSortModule,
+    QRCodeModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ApiNoauthInterceptor, multi: true },
