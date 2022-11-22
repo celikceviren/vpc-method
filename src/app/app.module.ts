@@ -22,6 +22,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSliderModule } from '@angular/material/slider';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { PladisMethodEditorComponent } from './feature/pladis-method-editor/pladis-method-editor.component';
 import { PladisMethodEditorService } from './data/pladis-method-editor.service';
@@ -77,6 +78,9 @@ import { MatSortModule } from '@angular/material/sort';
 import { AreaFormComponent } from './ui/area-form/area-form.component';
 import { QRCodeModule } from 'angularx-qrcode';
 import { AreaQrViewComponent } from './ui/area-qr-view/area-qr-view.component';
+import { CommonCtreviewMainComponent } from './feature/common-ctreview-main/common-ctreview-main.component';
+import { CommonCtreviewFormComponent } from './feature/common-ctreview-form/common-ctreview-form.component';
+import { CommonCtreviewDetailsComponent } from './feature/common-ctreview-details/common-ctreview-details.component';
 
 @NgModule({
   declarations: [
@@ -124,6 +128,9 @@ import { AreaQrViewComponent } from './ui/area-qr-view/area-qr-view.component';
     AreasListComponent,
     AreaFormComponent,
     AreaQrViewComponent,
+    CommonCtreviewMainComponent,
+    CommonCtreviewFormComponent,
+    CommonCtreviewDetailsComponent,
   ],
   imports: [
     BrowserModule,
@@ -152,6 +159,7 @@ import { AreaQrViewComponent } from './ui/area-qr-view/area-qr-view.component';
     MatPaginatorModule,
     MatTableModule,
     MatMenuModule,
+    MatSliderModule,
     ZXingScannerModule,
     MatSortModule,
     QRCodeModule,

@@ -1,0 +1,147 @@
+<ng-template #errorRetry>
+  <p *ngIf="error?.message">{{ error?.message }}</p>
+  <small *ngIf="error?.details" [innerHTML]="error?.details"></small>
+  <button mat-flat-button color="primary" (click)="onReloadActiveForm()">Tekrar dene</button>
+</ng-template>
+
+<ng-template #inprogress>
+  <mat-spinner color="primary" diameter="20"></mat-spinner>
+  <span> Yükleniyor... </span>
+</ng-template>
+
+<div class="main-container">
+  <div class="step-title">
+    <h2 class="mat-h2 primary-color">
+      <mat-icon (click)="onBackClick()">arrow_back</mat-icon>
+      Yüklenici Değerlendirme Formu
+    </h2>
+    <h4 class="mat-h4">Formdaki tüm maddeler için değerlendirmenizi girip kaydedebilirsiniz.</h4>
+  </div>
+  <div class="step-container">
+    <div class="step-content">
+      <div class="step-state" *ngIf="loading">
+        <ng-container [ngTemplateOutlet]="inprogress"> </ng-container>
+      </div>
+
+      <div class="step-state" *ngIf="failed">
+        <ng-container [ngTemplateOutlet]="errorRetry"> </ng-container>
+      </div>
+
+      <ng-container *ngIf="!loading && !failed">
+        <div class="step-section">
+          <div class="item">
+            <h3 class="mat-h3 primary-color">Yüklenici</h3>
+            <p class="mat-p">{{ activeForm.review?.contractor?.name ?? '' }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="item">
+            <h3 class="mat-h3 primary-color">İş Çağrısı</h3>
+            <p class="mat-p">{{ activeForm.review?.project?.name ?? '' }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="item">
+            <h3 class="mat-h3 primary-color">Tesis</h3>
+            <p class="mat-p">{{ activeForm.review?.project?.facility ?? '' }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="item">
+            <h3 class="mat-h3 primary-color">Başlangıç Tarihi</h3>
+            <p class="mat-p">{{ activeForm.review?.project?.dtStart ?? '' | date: 'dd.MM.yyyy' }}</p>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="item">
+            <h3 class="mat-h3 primary-color">İşi Açan</h3>
+            <p class="mat-p">{{ activeForm.review?.project?.owner ?? '' }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loading && !failed">
+    <h3 class="mat-h3 primary-color" style="margin: 8px 16px">Puanlama</h3>
+    <div class="step-container">
+      <div class="step-section">
+        <ng-container *ngFor="let item of legendValues; let last = last">
+          <div class="item">
+            <h3 class="mat-h3 primary-color">{{ item.name }} ({{ item.min }} - {{ item.max }})</h3>
+            <p class="mat-caption">{{ item.desc }}</p>
+          </div>
+          <mat-divider *ngIf="!last"></mat-divider>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && !failed">
+    <h3 class="mat-h3 primary-color" style="margin: 8px 16px">Değerlendirme</h3>
+    <div class="step-container">
+      <div class="step-section">
+        <ng-container *ngFor="let item of reviewFormResponse; let last = last">
+          <div class="review-form-item">
+            <span class="mat-body-2"> {{ item.question.order }}. {{ item.question.text }} </span>
+            <div class="value-container">
+              <mat-slider
+                [max]="max"
+                [min]="min"
+                [step]="step"
+                discrete
+                [thumbLabel]="false"
+                [ngModel]="item.answer.value"
+                (input)="onSliderChange(item, $event)"
+              >
+              </mat-slider>
+
+              <div class="value">
+                <span class="mat-body-2">{{ item.answer.value }}</span>
+                <span class="mat-body">{{ item.answer.text }}</span>
+              </div>
+            </div>
+          </div>
+          <mat-divider *ngIf="!last"></mat-divider>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!loading && !failed">
+    <h3 class="mat-h3 primary-color" style="margin: 8px 16px">Değerlendirme Sonucu</h3>
+    <div class="step-container">
+      <div class="step-section">
+        <div class="review-form-item">
+          <ng-container *ngIf="avarageValue !== undefined">
+            <span class="mat-body-2" style="font-size: 1.8em">{{ avarageValue }}</span>
+          </ng-container>
+          <ng-container *ngIf="avarageValue === undefined">
+            <span class="mat-body-2" style="font-size: 1.8em">-</span>
+          </ng-container>
+
+          <div class="value-container">
+            <div class="value">
+              <ng-container *ngIf="avarageValue !== undefined">
+                <span class="mat-body">{{ avarageValueText }}</span>
+              </ng-container>
+              <ng-container *ngIf="avarageValue === undefined">
+                <span class="mat-body-2"> &nbsp; </span>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="submit-container">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="avarageValue === undefined || saving"
+            (click)="onSaveReview()"
+          >
+            Kaydet
+          </button>
+          <mat-spinner *ngIf="saving" [diameter]="24"></mat-spinner>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,218 @@
+<div class="main-container" #focus>
+  <div class="stats-container" [ngClass]="{ reverse: scope === scopes.USER }" *ngIf="!this.hideDashboard">
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">verified</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading"> {{ stats.completed.toString() }} </span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>GEÇMİŞ<br />DEĞERLENDİRMELER</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="stats-box">
+      <mat-card-content class="stats">
+        <mat-icon color="accent">pending_actions</mat-icon>
+        <div class="value">
+          <span *ngIf="!dashboardLoading"> {{ stats.pending.toString() }} </span>
+          <mat-spinner *ngIf="dashboardLoading" [diameter]="16" class="mt-4"></mat-spinner>
+          <span>BEKLEYEN<br />DEĞERLENDİRMELER</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-tab-group
+    *ngIf="!singleTab; else table"
+    (selectedTabChange)="onTabChange($event)"
+    [ngClass]="{ hidden: detailsView }"
+  >
+    <mat-tab label="GEÇMİŞ" *ngIf="completedTab && scope !== scopes.USER">
+      <ng-container *ngIf="visibleStatus === statuses.COMPLETED" [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+    <mat-tab label="BEKLEYEN" *ngIf="pendingTab">
+      <ng-container *ngIf="visibleStatus === statuses.PENDING" [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+    <mat-tab label="GEÇMİŞ" *ngIf="completedTab && scope === scopes.USER">
+      <ng-container *ngIf="visibleStatus === statuses.COMPLETED" [ngTemplateOutlet]="table"></ng-container>
+    </mat-tab>
+  </mat-tab-group>
+
+  <ng-container *ngIf="detailsView && detailsItem !== undefined">
+    <app-common-ctreview-details
+      [item]="detailsItem"
+      [companyCode]="companyCode"
+      (close)="onCloseDetails()"
+    ></app-common-ctreview-details>
+  </ng-container>
+</div>
+
+<ng-template #table>
+  <div class="table-container" [ngClass]="{ 'single-tab': singleTab }" *ngIf="tableDs">
+    <mat-table class="table-striped desktop" [dataSource]="tableDs">
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef class="w-56">ID</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <span> {{ item.id }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="project">
+        <mat-header-cell *matHeaderCellDef>İş Çağrısı</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.project.name }} </span>
+          <small> ( {{ item.project.owner }} / {{ item.project.dtStart | date: 'dd.MM.yyyy' }}) </small>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="contractor">
+        <mat-header-cell *matHeaderCellDef>Yüklenici</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <span> {{ item.contractor.name }} </span>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="dtCreate">
+        <mat-header-cell *matHeaderCellDef>{{ dateHeader }}</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <ng-container *ngIf="visibleStatus === statuses.COMPLETED">
+            <span> {{ item.dtComplete | date: 'dd.MM.yyyy HH:mm' }} </span>
+          </ng-container>
+          <ng-container *ngIf="visibleStatus === statuses.PENDING">
+            <span> {{ item.dtCreate | date: 'dd.MM.yyyy HH:mm' }} </span>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="reviewer">
+        <mat-header-cell *matHeaderCellDef>Değerlendirici</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <small>{{ item.user.name }}</small>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="rating">
+        <mat-header-cell *matHeaderCellDef>Sonuç</mat-header-cell>
+        <mat-cell *matCellDef="let item">
+          <ng-container *ngIf="item.completed">
+            <span>{{ item.rating }}</span>
+            <span class="primary-color mat-body-2">{{ getRatingValueText(item.rating) }}</span>
+          </ng-container>
+          <ng-container *ngIf="item.pending">
+            <small>--</small>
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef class="w-56">&nbsp;</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="w-56">
+          <button
+            *ngIf="item.completed || (item.pending && item.allowed)"
+            mat-icon-button
+            [matMenuTriggerFor]="actions"
+            [matMenuTriggerData]="{item}"
+            color="accent"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="mobiledata">
+        <mat-header-cell *matHeaderCellDef>&nbsp;</mat-header-cell>
+        <mat-cell *matCellDef="let item" class="mobile-cell">
+          <div class="id-row">
+            <h3>#{{ item.id }}</h3>
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="actions"
+              [matMenuTriggerData]="{item}"
+              color="accent"
+              *ngIf="item.completed || (item.pending && item.allowed)"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+          <div>
+            <div>
+              <small class="label primary-color">{{ dateHeader }}</small>
+              <ng-container *ngIf="visibleStatus === statuses.COMPLETED">
+                <span> {{ item.dtComplete | date: 'dd.MM.yyyy HH:mm' }} </span>
+              </ng-container>
+              <ng-container *ngIf="visibleStatus === statuses.PENDING">
+                <span> {{ item.dtCreate | date: 'dd.MM.yyyy HH:mm' }} </span>
+              </ng-container>
+            </div>
+            <div>
+              <small class="label primary-color">Değerlendirici</small>
+              <span>{{ item.user.name }}</span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <small class="label primary-color">Yüklenici</small>
+              <span> {{ item.contractor.name }} </span>
+            </div>
+            <div>
+              <small class="label primary-color">İş Çağrısı</small>
+              <span> {{ item.project.name }} </span>
+              <small> ( {{ item.project.owner }} / {{ item.project.dtStart | date: 'dd.MM.yyyy' }}) </small>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <div>
+              <small class="label primary-color">Sonuç</small>
+              <ng-container *ngIf="item.completed">
+                <span>{{ item.rating }}</span>
+                <span class="primary-color mat-body-2">{{ getRatingValueText(item.rating) }}</span>
+              </ng-container>
+              <ng-container *ngIf="item.pending">
+                <small>--</small>
+              </ng-container>
+            </div>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row
+        class="p-4"
+        style="min-height: 42px"
+        [ngStyle]="{ 'min-height: 60px': isMobileView }"
+        *matHeaderRowDef="!isMobileView ? columns : mobileColumns"
+      ></mat-header-row>
+      <mat-row *matRowDef="let item; columns: !isMobileView ? columns : mobileColumns" class="p-4"> </mat-row>
+      <div class="no-data" *matNoDataRow>
+        <ng-container *ngIf="!tableDs.loading; else loading"> Kayıt yok </ng-container>
+      </div>
+    </mat-table>
+    <ng-container [ngTemplateOutlet]="paginator"></ng-container>
+  </div>
+  <mat-menu #actions="matMenu" xPosition="before">
+    <ng-template matMenuContent let-item="item">
+      <div class="menu-item" (click)="onViewCompletedReview(item?.id)" *ngIf="item.completed">
+        <mat-icon class="accent-color">info_outline</mat-icon>
+        <span>Görüntüle</span>
+      </div>
+
+      <div class="menu-item" (click)="onAddReview(item?.id)" *ngIf="item.allowed && item.pending">
+        <mat-icon class="accent-color">add</mat-icon>
+        <span>Değerlendirme Gir</span>
+      </div>
+    </ng-template>
+  </mat-menu>
+</ng-template>
+
+<ng-template #paginator>
+  <div class="paginator-row">
+    <div class="loading">
+      <mat-spinner [diameter]="16" *ngIf="tableDs.loading && tableDs.total > 0"></mat-spinner>
+    </div>
+    <mat-paginator
+      showFirstLastButtons
+      [disabled]="tableDs.loading"
+      [length]="tableDs.total"
+      [pageSize]="tableDs.size"
+      [pageIndex]="tableDs.page - 1"
+      [pageSizeOptions]="[10, 25, 50]"
+      (page)="onPaginatorChanged($event)"
+    >
+    </mat-paginator>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <mat-spinner [diameter]="16"></mat-spinner>
+</ng-template>

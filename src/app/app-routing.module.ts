@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AreagroupsListComponent } from './feature/areagroups-list/areagroups-list.component';
 import { AreasListComponent } from './feature/areas-list/areas-list.component';
+import { CommonCtreviewFormComponent } from './feature/common-ctreview-form/common-ctreview-form.component';
+import { CommonCtreviewMainComponent } from './feature/common-ctreview-main/common-ctreview-main.component';
 import { CommonWorkpermitFormsComponent } from './feature/common-workpermit-forms/common-workpermit-forms.component';
 import { WorkpermitMainComponent } from './feature/common-workpermit-main/common-workpermit-main.component';
 import { NestleMethodEditorComponent } from './feature/nestle-method-editor/nestle-method-editor.component';
@@ -68,6 +70,14 @@ const routes: Routes = [
   {
     path: 'workpermit/approve-close/PLADIS/:kind',
     component: PladisWorkpermitCloseApproveComponent,
+  },
+  {
+    path: 'ctreview/form/:company/:type/:param',
+    component: CommonCtreviewFormComponent,
+  },
+  {
+    path: 'ctreview/main/:company',
+    component: CommonCtreviewMainComponent,
   },
   {
     path: 'aregroups',

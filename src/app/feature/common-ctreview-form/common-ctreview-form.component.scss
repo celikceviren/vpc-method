@@ -1,0 +1,134 @@
+@import '../../../assets/scss/common/breakpoints';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+div.main-container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 48px);
+  padding: 0 24px;
+  min-height: 320px;
+
+  div.step-title {
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    > h2,
+    > h4 {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    > h2 {
+      padding-left: 24px;
+      position: relative;
+
+      &.no-padding {
+        padding-left: 0;
+      }
+
+      .mat-icon {
+        position: absolute;
+        bottom: 4px;
+        left: -6px;
+        cursor: pointer;
+      }
+    }
+    > h4 {
+      font-size: 0.85rem;
+    }
+  }
+
+  div.step-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+
+    > div.step-content {
+      width: 100%;
+    }
+
+    div.step-state {
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    div.step-section {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 90px;
+
+      div.item {
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+        align-items: center;
+        padding: 8px 12px;
+
+        h3,
+        p {
+          margin: 0;
+        }
+
+        h3 {
+          min-width: 160px;
+        }
+      }
+
+      div.review-form-item {
+        display: flex;
+        flex-direction: column;
+        padding: 8px 12px;
+        gap: 8px;
+
+        div.value-container {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 16px;
+
+          .mat-slider {
+            width: 320px;
+          }
+
+          div.value {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 8px;
+          }
+        }
+      }
+
+      div.submit-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 12px;
+        gap: 16px;
+
+        button {
+          width: 180px;
+        }
+      }
+    }
+  }
+}

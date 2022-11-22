@@ -1,0 +1,76 @@
+<div class="main-container">
+  <div class="step-title">
+    <h2 class="mat-h2 primary-color">
+      <mat-icon (click)="close.emit()">arrow_back</mat-icon>
+      Yüklenici Değerlendirme
+    </h2>
+  </div>
+  <div class="step-container">
+    <div class="step-content">
+      <div class="step-section">
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Yüklenici</h3>
+          <p class="mat-p">{{ item.contractor.name }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">İş Çağrısı</h3>
+          <p class="mat-p">{{ item.project.name }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Tesis</h3>
+          <p class="mat-p">{{ item.project.facility }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Başlangıç Tarihi</h3>
+          <p class="mat-p">{{ item.project.dtStart | date: 'dd.MM.yyyy' }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">İşi Açan</h3>
+          <p class="mat-p">{{ item.project.owner }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Değerlendirmeyi Yapan</h3>
+          <p class="mat-p">{{ item.user.name }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Değerlendirme Tarihi</h3>
+          <p class="mat-p">{{ item.dtComplete | date: 'dd.MM.yyyy HH:mm' }}</p>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="item">
+          <h3 class="mat-h3 primary-color">Değerlendirme Sonucu</h3>
+          <p class="mat-p">
+            {{ item.rating }} - <span class="mat-body-2">{{ ratingValueText }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mat-h3 primary-color" style="margin: 8px 16px">Puanlama</h3>
+
+  <div class="step-container">
+    <div class="step-content">
+      <div class="step-section">
+        <ng-container *ngFor="let x of item.submittedForm; let last = last; let index = index">
+          <div class="review-form-item">
+            <span class="mat-body-2"> {{ index + 1 }}. {{ x.text }} </span>
+            <div class="value-container">
+              <div class="value">
+                <span class="mat-body-2">{{ x.rating }}</span>
+                <span class="mat-body">{{ x.answerText }}</span>
+              </div>
+            </div>
+          </div>
+          <mat-divider *ngIf="!last"></mat-divider>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
